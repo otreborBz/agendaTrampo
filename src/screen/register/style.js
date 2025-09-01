@@ -20,10 +20,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     logo: {
-        width: width * 0.5,
-        height: width * 0.5,
-        maxWidth: 300,
-        maxHeight: 300,
+        width: width * 0.4,
+        height: width * 0.4,
+        maxWidth: 250,
+        maxHeight: 250,
         resizeMode: 'contain',
         marginBottom: 10,
     },
@@ -76,16 +76,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         letterSpacing: 0.5,
     },
-    buttonRecoveryPassword: {
-        marginTop: 15,
-        marginBottom: 30,
-        padding: 5,
-    },
-    textRecoveryPassword: {
-        color: colors.secondary,
-        fontSize: 14,
-        fontWeight: '500',
-    },
     buttonContainer: {
         width: '100%',
         maxWidth: 400,
@@ -94,11 +84,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginTop: 20,
     },
-    textButtonCreate: {
+    textButtonLogin: {
         fontSize: 15,
         color: colors.darkGray,
     },
-    textButtonRegister: {
+    textButtonLoginLink: {
         fontSize: 15,
         color: colors.secondary,
         marginLeft: 5,
@@ -112,10 +102,7 @@ const styles = StyleSheet.create({
         color: colors.secondary,
         fontSize: 13,
         fontWeight: '500',
-    },
-
-
-
+    }
 });
 
 export default styles;

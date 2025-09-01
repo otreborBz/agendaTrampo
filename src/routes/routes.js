@@ -5,6 +5,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 //screns
 import Intro from '../screen/intro/intro'
 import Login from '../screen/login/login'
+import Register from '../screen/register/register'
+import ChangeRecord from '../screen/changeRecord/changeRecord'
 
 const Stack = createStackNavigator();
 
@@ -24,6 +26,14 @@ export default function Routes() {
                 <Stack.Screen
                     name="Login"
                     component={Login}
+                />
+                <Stack.Screen
+                    name="Register"
+                    component={Register}
+                />
+                <Stack.Screen
+                    name="ChangeRecord"
+                    component={ChangeRecord}
                 />
             </Stack.Navigator>
         </NavigationContainer>

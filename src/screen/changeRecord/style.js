@@ -25,7 +25,15 @@ const styles = StyleSheet.create({
         maxWidth: 300,
         maxHeight: 300,
         resizeMode: 'contain',
-        marginBottom: 10,
+        marginBottom: 30,
+    },
+    title: {
+        fontSize: 16,
+        color: colors.darkGray,
+        textAlign: 'center',
+        marginBottom: 25,
+        maxWidth: 300,
+        lineHeight: 22,
     },
     inputContainer: {
         width: '100%',
@@ -76,16 +84,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         letterSpacing: 0.5,
     },
-    buttonRecoveryPassword: {
-        marginTop: 15,
-        marginBottom: 30,
-        padding: 5,
-    },
-    textRecoveryPassword: {
-        color: colors.secondary,
-        fontSize: 14,
-        fontWeight: '500',
-    },
     buttonContainer: {
         width: '100%',
         maxWidth: 400,
@@ -94,28 +92,25 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginTop: 20,
     },
-    textButtonCreate: {
+    textButtonLogin: {
         fontSize: 15,
         color: colors.darkGray,
     },
-    textButtonRegister: {
+    textButtonLoginLink: {
         fontSize: 15,
         color: colors.secondary,
         marginLeft: 5,
         fontWeight: '600',
     },
     buttonTerms: {
-        marginTop: 10,
+        marginTop: 30,
         padding: 5,
     },
     textButtonTerms: {
         color: colors.secondary,
         fontSize: 13,
         fontWeight: '500',
-    },
-
-
-
+    }
 });
 
 export default styles;

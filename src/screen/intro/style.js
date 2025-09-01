@@ -6,7 +6,7 @@ const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'space-around',
+        justifyContent: 'space-evenly',
         alignItems: 'center',
         backgroundColor: colors.background,
         paddingHorizontal: 20,
@@ -14,8 +14,8 @@ const styles = StyleSheet.create({
     logo: {
         width: width * 0.7,
         height: width * 0.7,
-        maxWidth: 300,
-        maxHeight: 300,
+        maxWidth: 350,
+        maxHeight: 350,
         resizeMode: 'contain',
     },
     buttonContainer: {
