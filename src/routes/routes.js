@@ -7,6 +7,7 @@ import Intro from '../screen/intro/intro'
 import Login from '../screen/login/login'
 import Register from '../screen/register/register'
 import ChangeRecord from '../screen/changeRecord/changeRecord'
+import Home from '../screen/home/home'
 
 const Stack = createStackNavigator();
 
@@ -34,6 +35,11 @@ export default function Routes() {
                 <Stack.Screen
                     name="ChangeRecord"
                     component={ChangeRecord}
+                />
+
+                <Stack.Screen
+                    name="Home"
+                    component={Home}
                 />
             </Stack.Navigator>
         </NavigationContainer>

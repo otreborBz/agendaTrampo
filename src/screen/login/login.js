@@ -31,6 +31,9 @@ export default function Login(){
     function goToChangeRecord(){
         navigation.navigate('ChangeRecord');
     }
+    function goToHome(){
+        navigation.replace('Home');
+    }
 
     return(
         <KeyboardAvoidingView 
@@ -61,7 +64,7 @@ export default function Login(){
                     secureTextEntry
                     autoCapitalize="none"
                 />
-                <TouchableOpacity style={styles.button} activeOpacity={0.8}>
+                <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={ goToHome }>
                     <Text style={styles.textButton}>Entrar</Text>
                 </TouchableOpacity>
             </View>
