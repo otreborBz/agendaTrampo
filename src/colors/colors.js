@@ -18,6 +18,11 @@ export const colors = {
   error: '#e74c3c',
   warning: '#f1c40f',
   info: '#3498db',
+  confirm: "#d1fae5",
+  pending: "#fef3c7",
+  canceled:  "#fee2e2",
+  
+
   
   // Tons de cinza
   white: '#ffffff',
