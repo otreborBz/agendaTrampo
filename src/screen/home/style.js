@@ -30,69 +30,7 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 
-  // Card da FlatList
-  card: {
-    backgroundColor: colors.white,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: "#f0f0f0",
-  },
 
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-
-  cardNome: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.primary,
-  },
-
-  cardTelefone: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 4,
-  },
-
-  cardDataHora: {
-    fontSize: 14,
-    color: "#777",
-  },
-
-  cardStatus: {
-    fontSize: 13,
-    fontWeight: "600",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-
-  // Status com cores diferentes
-  statusConfirmado: {
-    backgroundColor: colors.confirm, // verde claro
-    color: colors.black, // verde escuro
-  },
-
-  statusPendente: {
-    backgroundColor: colors.pending, // amarelo claro
-    color: colors.black, // amarelo escuro
-  },
-
-  statusCancelado: {
-    backgroundColor: colors.canceled, // vermelho claro
-    color: colors.black, // vermelho escuro
-  },
 });
 
 export default styles;
