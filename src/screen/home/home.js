@@ -1,13 +1,21 @@
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import styles from './style';
 
 import Header from '../../components/header/header';
 import ListAgenda from '../../components/listAgenda/listAgenda';
-
-import  data  from '../../../data.json';
-
+import { AuthContext } from '../../contexts/auth';
 
 export default function Home() {
+  const { user } = useContext(AuthContext);
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    if (user) {
+      setData([user]); // transforma em array para o FlatList
+    }
+  }, [user]);
+
   function CreateAgenda() {
     Alert.alert("Agendamento", "Novo agendamento criado!");
   }
@@ -24,8 +32,8 @@ export default function Home() {
       {/* Lista de agendamentos */}
       <FlatList
         data={data}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <ListAgenda item={item} />}
+        keyExtractor={(item, index) => String(index)} // usa index pq não tem id no objeto
+        renderItem={({ item }) => <ListAgenda userData={item} />}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
       />

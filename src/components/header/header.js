@@ -1,9 +1,14 @@
+import React, {useContext} from 'react';
 import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import styles from './style';
 import { colors } from '../../colors/colors';
 import Feather from '@expo/vector-icons/Feather';
+import { AuthContext } from '../../contexts/auth';
 
 export default  function Header(){
+
+    const { user } = useContext(AuthContext);
+ 
     function logoutButton(){
         Alert.alert(
             'Confirmação',
@@ -20,7 +25,7 @@ export default  function Header(){
                  <Image source={require('../../image/logo/icon.png')} style={styles.logo} />
                 <View styles={ styles.contentWelcome}>
                     <Text style={styles.welcomeText}>Bem-Vindo</Text>
-                    <Text style={styles.textUser}>Fulano de Tal</Text>
+                    <Text style={styles.textUser}>{user.name}</Text>
                 </View>
                 <TouchableOpacity>
                     <Feather name="log-out" size={24} color={colors.secondary} style={styles.logoutButton}
