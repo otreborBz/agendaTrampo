@@ -1,20 +1,23 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { 
   View, Text, FlatList, TouchableOpacity, Modal, TextInput, 
-  ScrollView, Platform, Alert, KeyboardAvoidingView 
+  ScrollView, Platform, Alert, KeyboardAvoidingView, ActivityIndicator
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import styles from './style';
+import { colors } from '../../colors/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 import Header from '../../components/header/header';
 import ListAgenda from '../../components/listAgenda/listAgenda';
 import { AuthContext } from '../../contexts/auth';
-import { colors } from '../../colors/colors';
+
+import apiViaCep from '../../service/apiViaCep';
 
 export default function Home() {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const [agendamentos, setAgendamentos] = useState([]);
 
   // Modais
@@ -33,12 +36,13 @@ export default function Home() {
   const [servico, setServico] = useState('');
   const [valor, setValor] = useState('');
   const [endereco, setEndereco] = useState({
-    rua: '', numero: '', cidade: '', estado: '', cep: ''
+    rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: ''
   });
 
   // Serviços e novo serviço
   const [servicosExistentes, setServicosExistentes] = useState([]);
   const [novoServico, setNovoServico] = useState('');
+  const [ loadingCep, setLoadingCep] = useState(false);
 
   // Carrega serviços e agendamentos do storage
   useEffect(() => {
@@ -60,7 +64,6 @@ export default function Home() {
       const saved = await AsyncStorage.getItem('@agendamentos');
       if (saved) {
         const agendamentosData = JSON.parse(saved);
-        // Garantir que todos os agendamentos tenham status
         const agendamentosComStatus = agendamentosData.map(agenda => ({
           ...agenda,
           status: agenda.status || 'Pendente'
@@ -95,8 +98,8 @@ export default function Home() {
 
   // Salvar endereço
   const saveEndereco = () => {
-    const { rua, numero, cidade, estado, cep } = endereco;
-    if (!rua || !numero || !cidade || !estado || !cep) {
+    const { rua, numero, bairro, cidade, estado, cep } = endereco;
+    if (!rua || !numero || !bairro || !cidade || !estado || !cep) {
       Alert.alert("Erro", "Preencha todos os campos do endereço!");
       return;
     }
@@ -119,7 +122,7 @@ export default function Home() {
       servico: servico || null,
       valor: valor || null,
       endereco: Object.values(endereco).some(e => e) ? endereco : null,
-      status: 'Pendente' // Status padrão
+      status: 'Pendente'
     };
     
     const novosAgendamentos = [...agendamentos, novoAgendamento];
@@ -133,7 +136,7 @@ export default function Home() {
     setDataHora(new Date());
     setServico('');
     setValor('');
-    setEndereco({ rua: '', numero: '', cidade: '', estado: '', cep: '' });
+    setEndereco({ rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '' });
 
     Alert.alert("Sucesso", "Agendamento cadastrado!");
   };
@@ -191,10 +194,7 @@ export default function Home() {
       "Confirmar Exclusão",
       "Tem certeza que deseja excluir este serviço?",
       [
-        {
-          text: "Cancelar",
-          style: "cancel"
-        },
+        { text: "Cancelar", style: "cancel" },
         { 
           text: "Excluir", 
           onPress: async () => {
@@ -202,11 +202,7 @@ export default function Home() {
             newList.splice(index, 1);
             setServicosExistentes(newList);
             await saveServicosStorage(newList);
-            
-            // Se o serviço removido era o selecionado, limpar seleção
-            if (servico === servicosExistentes[index]) {
-              setServico('');
-            }
+            if (servico === servicosExistentes[index]) setServico('');
           }
         }
       ]
@@ -217,6 +213,42 @@ export default function Home() {
   const selecionarServico = (servicoSelecionado) => {
     setServico(servicoSelecionado);
     setModalServicoVisible(false);
+  };
+
+  // Buscar CEP e preencher endereço
+  const handleSearchCep = async () => {
+    
+    try {
+      setLoadingCep(true);
+      const cepSanitized = endereco.cep.replace(/\D/g, '');
+      if (cepSanitized.length !== 8) {
+        Alert.alert("Erro", "CEP inválido! Deve conter 8 dígitos.");
+        return;
+      }
+
+      const response = await apiViaCep.get(`${cepSanitized}/json/`);
+      const data = response.data;
+      setLoadingCep(false);
+
+      if (data.erro) {
+        Alert.alert("Erro", "CEP não encontrado.");
+        return;
+      }
+
+      setEndereco(prev => ({
+        ...prev,
+        rua: data.logradouro || '',
+        bairro: data.bairro || '',
+        cidade: data.localidade || '',
+        estado: data.uf || '',
+        cep: cepSanitized
+      }));
+
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error.message);
+      Alert.alert("Erro", "Não foi possível buscar o CEP. Tente novamente.");
+      setLoadingCep(false);
+    }
   };
 
   return (
@@ -274,10 +306,7 @@ export default function Home() {
               />
 
               <Text style={styles.label}>Data e Hora*</Text>
-              <TouchableOpacity 
-                style={styles.input} 
-                onPress={() => setShowDatePicker(true)}
-              >
+              <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
                 <Text>{dataHora.toLocaleString('pt-BR')}</Text>
               </TouchableOpacity>
 
@@ -290,7 +319,6 @@ export default function Home() {
                   minimumDate={new Date()}
                 />
               )}
-
               {showTimePicker && (
                 <DateTimePicker
                   value={dataHora}
@@ -301,10 +329,7 @@ export default function Home() {
               )}
 
               <Text style={styles.label}>Serviço</Text>
-              <TouchableOpacity 
-                style={styles.input} 
-                onPress={openModalServico}
-              >
+              <TouchableOpacity style={styles.input} onPress={openModalServico}>
                 <Text>{servico || "Selecione um serviço"}</Text>
               </TouchableOpacity>
 
@@ -316,26 +341,18 @@ export default function Home() {
                 placeholder="0,00"
                 keyboardType="numeric"
               />
-              <TouchableOpacity 
-                style={styles.buttonEndereco} 
-                onPress={openModalEndereco}
-              >
+
+              <TouchableOpacity style={styles.buttonEndereco} onPress={openModalEndereco}>
                 <Text style={styles.textButtonEndereco}>Cadastrar Endereço</Text>
               </TouchableOpacity>
 
             </ScrollView>
 
             <View style={styles.modalFooter}>
-              <TouchableOpacity 
-                onPress={() => setModalVisible(false)} 
-                style={styles.buttonFooterCancel}
-              >
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.buttonFooterCancel}>
                 <Text style={styles.buttonTextCancel}>Cancelar</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
-                onPress={saveAgenda} 
-                style={styles.buttonFooter}
-              >
+              <TouchableOpacity onPress={saveAgenda} style={styles.buttonFooter}>
                 <Text style={styles.buttonTextFooter}>Salvar</Text>
               </TouchableOpacity>
             </View>
@@ -356,10 +373,7 @@ export default function Home() {
                 onChangeText={setNovoServico}
                 placeholder="Digite um novo serviço"
               />
-              <TouchableOpacity 
-                style={styles.addButton}
-                onPress={adicionarServico}
-              >
+              <TouchableOpacity style={styles.addButton} onPress={adicionarServico}>
                 <Ionicons name="save" size={24} color={colors.darkGray} />
               </TouchableOpacity>
             </View>
@@ -367,17 +381,11 @@ export default function Home() {
             <ScrollView style={styles.servicosList}>
               {servicosExistentes.map((s, i) => (
                 <View key={i} style={styles.servicoItemContainer}>
-                  <TouchableOpacity
-                    style={styles.servicoOption}
-                    onPress={() => selecionarServico(s)}
-                  >
+                  <TouchableOpacity style={styles.servicoOption} onPress={() => selecionarServico(s)}>
                     <Ionicons name="briefcase-outline" size={20} color={colors.primary} />
                     <Text style={styles.servicoOptionText}>{s}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={styles.deleteServicoButton}
-                    onPress={() => removerServico(i)}
-                  >
+                  <TouchableOpacity style={styles.deleteServicoButton} onPress={() => removerServico(i)}>
                     <Ionicons name="close-circle" size={22} color="#ff3b30" />
                   </TouchableOpacity>
                 </View>
@@ -385,10 +393,7 @@ export default function Home() {
             </ScrollView>
 
             <View style={styles.modalFooter}>
-              <TouchableOpacity 
-                onPress={() => setModalServicoVisible(false)}
-                style={styles.buttonFooterCancel}
-              >
+              <TouchableOpacity onPress={() => setModalServicoVisible(false)} style={styles.buttonFooterCancel}>
                 <Text style={styles.buttonTextCancel}>Fechar</Text>
               </TouchableOpacity>
             </View>
@@ -406,12 +411,39 @@ export default function Home() {
             <ScrollView style={styles.modalContent}>
               <Text style={styles.modalTitle}>Cadastrar Endereço</Text>
 
+              <Text style={styles.label}>CEP*</Text>
+              <TextInput
+                style={styles.input}
+                value={endereco.cep}
+                onChangeText={text => setEndereco(prev => ({ ...prev, cep: text }))}
+                placeholder="00000-000"
+                keyboardType="numeric"
+              />
+              <TouchableOpacity style={styles.buttonSearchCep} onPress={handleSearchCep}>
+                {
+                  loadingCep ? (
+                    <ActivityIndicator size="small" color="#FFF" />
+                  ) : (
+                    <Text style={styles.textButtonSearchCep}>Buscar CEP</Text>
+                  )
+                }
+                
+              </TouchableOpacity>
+
               <Text style={styles.label}>Rua*</Text>
               <TextInput
                 style={styles.input}
                 value={endereco.rua}
                 onChangeText={text => setEndereco(prev => ({ ...prev, rua: text }))}
                 placeholder="Nome da rua"
+              />
+
+              <Text style={styles.label}>Bairro*</Text>
+              <TextInput
+                style={styles.input}
+                value={endereco.bairro}
+                onChangeText={text => setEndereco(prev => ({ ...prev, bairro: text }))}
+                placeholder="Bairro"
               />
 
               <Text style={styles.label}>Número*</Text>
@@ -437,28 +469,13 @@ export default function Home() {
                 onChangeText={text => setEndereco(prev => ({ ...prev, estado: text }))}
                 placeholder="Estado"
               />
-
-              <Text style={styles.label}>CEP*</Text>
-              <TextInput
-                style={styles.input}
-                value={endereco.cep}
-                onChangeText={text => setEndereco(prev => ({ ...prev, cep: text }))}
-                placeholder="00000-000"
-                keyboardType="numeric"
-              />
             </ScrollView>
 
             <View style={styles.modalFooter}>
-              <TouchableOpacity 
-                onPress={() => setModalEnderecoVisible(false)}
-                style={styles.buttonFooterCancel}
-              >
+              <TouchableOpacity onPress={() => setModalEnderecoVisible(false)} style={styles.buttonFooterCancel}>
                 <Text style={styles.buttonTextCancel}>Cancelar</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
-                onPress={saveEndereco}
-                style={styles.buttonFooter}
-              >
+              <TouchableOpacity onPress={saveEndereco} style={styles.buttonFooter}>
                 <Text style={styles.buttonTextFooter}>Salvar</Text>
               </TouchableOpacity>
             </View>

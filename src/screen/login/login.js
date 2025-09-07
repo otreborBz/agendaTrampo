@@ -55,8 +55,6 @@ export default function Login() {
         Alert.alert('Erro', 'Não foi possível fazer login. Verifique seus dados.');
       }
 
-      // ❌ NÃO precisamos navegar manualmente para Home
-      // A renderização de Routes.js cuidará disso
     } catch (error) {
       console.log("Erro ao logar:", error);
       Alert.alert('Erro', 'Ocorreu um erro ao fazer login.');

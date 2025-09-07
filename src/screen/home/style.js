@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 16,
     width: "95%",
-    maxHeight: "85%",
+    maxHeight: "95%",
     overflow: "hidden",
   },
 
@@ -82,6 +82,28 @@ const styles = StyleSheet.create({
     color: colors.secondary,
     textAlign: "center",
   },
+    cepContainer:{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+    marginBottom: 12,
+    },
+
+    buttonSearchCep: {
+    backgroundColor: colors.secondary,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+    },
+
+    textButtonSearchCep: {
+    color: colors.white,
+    fontWeight: "600",
+    fontSize: 14,
+    },
 
   input: {
     borderWidth: 1,
