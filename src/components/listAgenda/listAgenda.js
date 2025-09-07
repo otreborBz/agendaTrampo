@@ -10,25 +10,20 @@ import {
   ActionSheetIOS,
   Platform,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./style";
 import { colors } from "../../colors/colors";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 // ActionSheet custom para Android
 const ActionSheet = ({ visible, onClose, options }) => {
   if (!visible) return null;
 
   return (
-    <Modal
-      transparent={true}
-      animationType="fade"
-      visible={visible}
-      onRequestClose={onClose}
-    >
+    <Modal transparent={true} animationType="fade" visible={visible} onRequestClose={onClose}>
       <Pressable style={styles.actionSheetOverlay} onPress={onClose}>
         <View style={styles.actionSheetContainer}>
           {options.map((option, index) => (
@@ -36,7 +31,7 @@ const ActionSheet = ({ visible, onClose, options }) => {
               key={index}
               style={[
                 styles.actionSheetButton,
-                option.style === "destructive" && styles.actionSheetDestructive
+                option.style === "destructive" && styles.actionSheetDestructive,
               ]}
               onPress={() => {
                 onClose();
@@ -46,17 +41,14 @@ const ActionSheet = ({ visible, onClose, options }) => {
               <Text
                 style={[
                   styles.actionSheetText,
-                  option.style === "destructive" && styles.actionSheetDestructiveText
+                  option.style === "destructive" && styles.actionSheetDestructiveText,
                 ]}
               >
                 {option.text}
               </Text>
             </TouchableOpacity>
           ))}
-          <TouchableOpacity
-            style={styles.actionSheetCancel}
-            onPress={onClose}
-          >
+          <TouchableOpacity style={styles.actionSheetCancel} onPress={onClose}>
             <Text style={styles.actionSheetCancelText}>Cancelar</Text>
           </TouchableOpacity>
         </View>
@@ -69,9 +61,8 @@ const ActionSheet = ({ visible, onClose, options }) => {
 function formatDateTime(field) {
   if (!field) return "";
 
-  // Se for timestamp Firestore
-  if (field?.seconds) {
-    const date = new Date(field.seconds * 1000);
+  if (typeof field === "string") {
+    const date = new Date(field);
     return date.toLocaleString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
@@ -81,25 +72,20 @@ function formatDateTime(field) {
     });
   }
 
-  // Se já for string
-  if (typeof field === "string") {
-    return field;
-  }
-
   return "";
 }
 
-export default function ListAgenda({ userData }) {
-  const item = userData;
-  console.log("userData===", item);
-
+export default function ListAgenda({ data }) {
+  const item = data; 
   const [visible, setVisible] = useState(false);
   const [actionSheetVisible, setActionSheetVisible] = useState(false);
   const [scaleValue] = useState(new Animated.Value(1));
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // Sempre tenta pegar primeiro "date", depois "time"
-  const formattedDateTime = formatDateTime(item.date || item.time);
+  // Estado do status
+  const [status, setStatus] = useState(item.status || "pendente");
+
+  const formattedDateTime = formatDateTime(item.dataHora);
 
   function openDetail() {
     setVisible(true);
@@ -119,36 +105,20 @@ export default function ListAgenda({ userData }) {
   }
 
   function handlePressIn() {
-    Animated.spring(scaleValue, {
-      toValue: 0.98,
-      useNativeDriver: true,
-    }).start();
+    Animated.spring(scaleValue, { toValue: 0.98, useNativeDriver: true }).start();
   }
 
   function handlePressOut() {
-    Animated.spring(scaleValue, {
-      toValue: 1,
-      friction: 3,
-      tension: 40,
-      useNativeDriver: true,
-    }).start();
+    Animated.spring(scaleValue, { toValue: 1, friction: 3, tension: 40, useNativeDriver: true }).start();
   }
 
   function showActionSheet() {
     if (Platform.OS === "ios") {
       ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: ["Cancelar", "Editar", "Excluir"],
-          destructiveButtonIndex: 2,
-          cancelButtonIndex: 0,
-          userInterfaceStyle: "light",
-        },
+        { options: ["Cancelar", "Editar", "Excluir"], destructiveButtonIndex: 2, cancelButtonIndex: 0 },
         (buttonIndex) => {
-          if (buttonIndex === 1) {
-            handleEdit();
-          } else if (buttonIndex === 2) {
-            handleDelete();
-          }
+          if (buttonIndex === 1) handleEdit();
+          else if (buttonIndex === 2) handleDelete();
         }
       );
     } else {
@@ -158,31 +128,20 @@ export default function ListAgenda({ userData }) {
 
   function handleEdit() {
     closeDetail();
-    Alert.alert(
-      "Editar Agendamento",
-      `Deseja editar o agendamento de ${item.name}?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Editar", onPress: () => console.log("Editar:", item) },
-      ]
-    );
+    Alert.alert("Editar Agendamento", `Deseja editar o agendamento de ${item.nomeCliente}?`, [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Editar", onPress: () => console.log("Editar:", item) },
+    ]);
   }
 
   function handleDelete() {
     closeDetail();
     Alert.alert(
       "Excluir Agendamento",
-      `Tem certeza que deseja excluir o agendamento de ${item.name}? Esta ação não pode ser desfeita.`,
+      `Tem certeza que deseja excluir o agendamento de ${item.nomeCliente}?`,
       [
         { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: () => {
-            console.log("Excluir:", item);
-            Alert.alert("Sucesso", "Agendamento excluído com sucesso!");
-          },
-        },
+        { text: "Excluir", style: "destructive", onPress: () => console.log("Excluir:", item) },
       ]
     );
   }
@@ -200,42 +159,28 @@ export default function ListAgenda({ userData }) {
           onPress={openDetail}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
-          accessibilityLabel={`Agendamento de ${item.name}. Clique para ver detalhes`}
         >
           <View style={styles.cardHeader}>
             <View style={styles.nameContainer}>
-              <Ionicons
-                name="person-circle-outline"
-                size={20}
-                color={colors.primary}
-              />
-              <Text style={styles.cardNome} numberOfLines={1}>
-                {item.name}
-              </Text>
+              <Ionicons name="person-circle-outline" size={20} color={colors.primary} />
+              <Text style={styles.cardNome} numberOfLines={1}>{item.nomeCliente}</Text>
             </View>
 
             <View style={styles.cardHeaderRight}>
               <View
                 style={[
                   styles.statusBadge,
-                  item.status?.toLowerCase() === "confirmado"
+                  status.toLowerCase() === "concluido"
                     ? styles.statusConfirmado
-                    : item.status?.toLowerCase() === "pendente"
+                    : status.toLowerCase() === "Pendente"
                     ? styles.statusPendente
                     : styles.statusCancelado,
                 ]}
               >
-                <Text style={styles.statusText}>{item.status}</Text>
+                <Text style={styles.statusText}>{status}</Text>
               </View>
 
-              <Pressable
-                onPress={(e) => {
-                  e.stopPropagation();
-                  showActionSheet();
-                }}
-                style={styles.optionsButton}
-                accessibilityLabel="Mais opções"
-              >
+              <Pressable onPress={(e) => { e.stopPropagation(); showActionSheet(); }} style={styles.optionsButton}>
                 <Ionicons name="ellipsis-vertical" size={20} color="#777" />
               </Pressable>
             </View>
@@ -253,116 +198,85 @@ export default function ListAgenda({ userData }) {
 
           <View style={styles.cardInfoRow}>
             <Ionicons name="briefcase-outline" size={16} color="#555" />
-            <Text style={styles.cardServico} numberOfLines={1}>
-              {item.service}
-            </Text>
+            <Text style={styles.cardServico} numberOfLines={1}>{item.servico}</Text>
           </View>
         </Pressable>
       </Animated.View>
 
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={visible}
-        onRequestClose={closeDetail}
-      >
+      <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={closeDetail}>
         <Animated.View style={[styles.modalOverlay, { opacity: fadeAnim }]}>
-          <Pressable
-            style={styles.modalOverlayPressable}
-            onPress={closeDetail}
-          >
+          <Pressable style={styles.modalOverlayPressable} onPress={closeDetail}>
             <Animated.View style={styles.modalContentCentered}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalHeaderText}>
-                  Detalhes do Agendamento
-                </Text>
-                <Pressable
-                  onPress={closeDetail}
-                  style={styles.closeButton}
-                  accessibilityLabel="Fechar detalhes"
-                  hitSlop={10}
-                >
+                <Text style={styles.modalHeaderText}>Detalhes do Agendamento</Text>
+                <Pressable onPress={closeDetail} style={styles.closeButton} hitSlop={10}>
                   <Ionicons name="close" size={24} color="#fff" />
                 </Pressable>
               </View>
 
-              <ScrollView
-                style={styles.modalScrollView}
-                showsVerticalScrollIndicator={false}
-              >
+              <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+                {/* Informações Pessoais */}
                 <View style={styles.infoSection}>
                   <Text style={styles.sectionTitle}>Informações Pessoais</Text>
                   <View style={styles.infoRow}>
-                    <Ionicons
-                      name="person-outline"
-                      size={20}
-                      color={colors.border}
-                    />
-                    <Text style={styles.infoText}> {item.name}</Text>
+                    <Ionicons name="person-outline" size={20} color={colors.border} />
+                    <Text style={styles.infoText}> {item.nomeCliente}</Text>
                   </View>
                   <View style={styles.infoRow}>
-                    <Ionicons
-                      name="call-outline"
-                      size={20}
-                      color={colors.border}
-                    />
+                    <Ionicons name="call-outline" size={20} color={colors.border} />
                     <Text style={styles.infoText}> {item.telefone}</Text>
                   </View>
                 </View>
 
+                {/* Detalhes do Agendamento */}
                 <View style={styles.infoSection}>
-                  <Text style={styles.sectionTitle}>
-                    Detalhes do Agendamento
-                  </Text>
+                  <Text style={styles.sectionTitle}>Detalhes do Agendamento</Text>
                   <View style={styles.infoRow}>
-                    <Ionicons
-                      name="calendar-outline"
-                      size={20}
-                      color={colors.border}
-                    />
+                    <Ionicons name="calendar-outline" size={20} color={colors.border} />
                     <Text style={styles.infoText}> {formattedDateTime}</Text>
                   </View>
                   <View style={styles.infoRow}>
-                    <Ionicons
-                      name="briefcase-outline"
-                      size={20}
-                      color={colors.border}
-                    />
-                    <Text style={styles.infoText}> {item.service}</Text>
+                    <Ionicons name="briefcase-outline" size={20} color={colors.border} />
+                    <Text style={styles.infoText}> {item.servico}</Text>
                   </View>
                   <View style={styles.infoRow}>
-                    <Ionicons
-                      name="cash-outline"
-                      size={20}
-                      color={colors.border}
-                    />
-                    <Text style={styles.infoText}> R$ {item.value}</Text>
+                    <Ionicons name="cash-outline" size={20} color={colors.border} />
+                    <Text style={styles.infoText}> R$ {item.valor}</Text>
                   </View>
-                  <View style={styles.infoRow}>
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        item.status?.toLowerCase() === "confirmado"
-                          ? styles.statusConfirmado
-                          : item.status?.toLowerCase() === "pendente"
-                          ? styles.statusPendente
-                          : styles.statusCancelado,
-                      ]}
-                    >
-                      <Text style={styles.statusText}>{item.status}</Text>
+
+                  {/* Status clicável */}
+                  <View style={{ marginTop: 10 }}>
+                    <Text style={{ fontSize: 14, fontWeight: "600", marginBottom: 6 }}>Status:</Text>
+                    <View style={{ flexDirection: "row", gap: 10 }}>
+                      {["Concluido", "Pendente", "Cancelado"].map((s) => (
+                        <Pressable
+                          key={s}
+                          onPress={() => setStatus(s)}
+                          style={[
+                            styles.statusBadge,
+                            s === "Concluido" && styles.statusConfirmado,
+                            s === "Pendente" && styles.statusPendente,
+                            s === "Cancelado" && styles.statusCancelado,
+                            s === status && { borderWidth: 2, borderColor: colors.primary },
+                          ]}
+                        >
+                          <Text style={styles.statusText}>{s.charAt(0).toUpperCase() + s.slice(1)}</Text>
+                        </Pressable>
+                      ))}
                     </View>
                   </View>
                 </View>
 
+                {/* Localização */}
                 <View style={styles.infoSection}>
                   <Text style={styles.sectionTitle}>Localização</Text>
                   <View style={styles.infoRow}>
-                    <Ionicons
-                      name="location-outline"
-                      size={20}
-                      color={colors.border}
-                    />
-                    <Text style={styles.infoText}>{item.address}</Text>
+                    <Ionicons name="location-outline" size={20} color={colors.border} />
+                    <Text style={styles.infoText}>
+                      {item.endereco
+                        ? `${item.endereco.rua}, ${item.endereco.numero} - ${item.endereco.cidade}/${item.endereco.estado}`
+                        : ""}
+                    </Text>
                   </View>
                 </View>
               </ScrollView>
@@ -371,11 +285,7 @@ export default function ListAgenda({ userData }) {
         </Animated.View>
       </Modal>
 
-      <ActionSheet
-        visible={actionSheetVisible}
-        onClose={() => setActionSheetVisible(false)}
-        options={actionSheetOptions}
-      />
+      <ActionSheet visible={actionSheetVisible} onClose={() => setActionSheetVisible(false)} options={actionSheetOptions} />
     </>
   );
 }

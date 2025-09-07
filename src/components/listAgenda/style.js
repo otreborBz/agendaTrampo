@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 6,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -245,6 +245,21 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "600",
   },
+  // Adicione ao final do seu StyleSheet
+statusButton: {
+  flex: 1,
+  paddingVertical: 10,
+  borderRadius: 12,
+  alignItems: "center",
+  justifyContent: "center",
+},
+statusButtonText: {
+  color: "#fff",
+  fontWeight: "600",
+  fontSize: 14,
+  textTransform: "uppercase",
+},
+
 });
 
 export default styles;
