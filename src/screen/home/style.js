@@ -1,7 +1,64 @@
-import { StyleSheet, Platform } from "react-native";
-import { colors } from "../../colors/colors";
+
+  import { StyleSheet, Platform } from "react-native";
+  import { colors } from "../../colors/colors";
 
 const styles = StyleSheet.create({
+  statusFilterWrapper: {
+    width: '100%',
+    marginBottom: 8,
+  },
+  statusFilterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 14,
+    paddingVertical: 2,
+  },
+  statusFilterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 22,
+    backgroundColor: colors.white,
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: colors.lightGray,
+  },
+  statusFilterButtonActive: {
+    backgroundColor: colors.secondary,
+    borderColor: colors.secondary,
+  },
+  statusFilterText: {
+    color: colors.text,
+    fontWeight: '600',
+    fontSize: 15,
+    letterSpacing: 0.2,
+  },
+  statusFilterTextActive: {
+    color: colors.white,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.08)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  fab: {
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 100,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

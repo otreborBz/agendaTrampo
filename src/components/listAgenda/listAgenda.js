@@ -1,4 +1,7 @@
 import { useState, useRef } from "react";
+import { useNavigation } from '@react-navigation/native';
+import { doc, deleteDoc } from 'firebase/firestore';
+import { db } from '../../service/firebaseConnection';
 import {
   View,
   Text,
@@ -76,7 +79,8 @@ function formatDateTime(field) {
 }
 
 export default function ListAgenda({ data }) {
-  const item = data; 
+  const item = data;
+  const navigation = useNavigation();
   const [visible, setVisible] = useState(false);
   const [actionSheetVisible, setActionSheetVisible] = useState(false);
   const [scaleValue] = useState(new Animated.Value(1));
@@ -128,10 +132,22 @@ export default function ListAgenda({ data }) {
 
   function handleEdit() {
     closeDetail();
-    Alert.alert("Editar Agendamento", `Deseja editar o agendamento de ${item.nomeCliente}?`, [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Editar", onPress: () => console.log("Editar:", item) },
-    ]);
+    // Navega para a tela de agendamento, passando o agendamento para edição
+    navigation.navigate('Agendamentos', { agendamento: item });
+  }
+
+  async function deleteFromFirestore() {
+    try {
+      await deleteDoc(doc(db, 'agendamentos', item.id));
+      Alert.alert('Sucesso', 'Agendamento excluído com sucesso!');
+      // Atualiza a lista de agendamentos na tela principal, se função passada via props
+      if (typeof data.onDelete === 'function') {
+        data.onDelete(item.id);
+      }
+    } catch (e) {
+      Alert.alert('Erro', 'Não foi possível excluir o agendamento.');
+      console.log('Erro ao excluir agendamento:', e);
+    }
   }
 
   function handleDelete() {
@@ -141,7 +157,7 @@ export default function ListAgenda({ data }) {
       `Tem certeza que deseja excluir o agendamento de ${item.nomeCliente}?`,
       [
         { text: "Cancelar", style: "cancel" },
-        { text: "Excluir", style: "destructive", onPress: () => console.log("Excluir:", item) },
+        { text: "Excluir", style: "destructive", onPress: deleteFromFirestore },
       ]
     );
   }
@@ -154,54 +170,43 @@ export default function ListAgenda({ data }) {
   return (
     <>
       <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-        <Pressable
-          style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-          onPress={openDetail}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-        >
-          <View style={styles.cardHeader}>
-            <View style={styles.nameContainer}>
-              <Ionicons name="person-circle-outline" size={20} color={colors.primary} />
-              <Text style={styles.cardNome} numberOfLines={1}>{item.nomeCliente}</Text>
-            </View>
+  <Pressable
+    style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+    onPress={openDetail}
+    onPressIn={handlePressIn}
+    onPressOut={handlePressOut}
+  >
+    {/* Header: Nome + Status */}
+    <View style={styles.cardHeader}>
+      <Text style={styles.cardNome} numberOfLines={1}>
+        {item.nomeCliente}
+      </Text>
+      <View
+        style={[
+          styles.statusBadge,
+          status.toLowerCase() === "concluido"
+            ? styles.statusConfirmado
+            : status.toLowerCase() === "pendente"
+            ? styles.statusPendente
+            : styles.statusCancelado,
+        ]}
+      >
+        <Text style={styles.statusText}>{status}</Text>
+      </View>
+    </View>
 
-            <View style={styles.cardHeaderRight}>
-              <View
-                style={[
-                  styles.statusBadge,
-                  status.toLowerCase() === "concluido"
-                    ? styles.statusConfirmado
-                    : status.toLowerCase() === "Pendente"
-                    ? styles.statusPendente
-                    : styles.statusCancelado,
-                ]}
-              >
-                <Text style={styles.statusText}>{status}</Text>
-              </View>
+    {/* Data e Hora */}
+    <View style={styles.cardInfoRow}>
+      <Ionicons name="calendar-outline" size={14} color="#999" />
+      <Text style={styles.cardDataHora}>{formattedDateTime}</Text>
+    </View>
 
-              <Pressable onPress={(e) => { e.stopPropagation(); showActionSheet(); }} style={styles.optionsButton}>
-                <Ionicons name="ellipsis-vertical" size={20} color="#777" />
-              </Pressable>
-            </View>
-          </View>
-
-          <View style={styles.cardInfoRow}>
-            <Ionicons name="call-outline" size={16} color="#555" />
-            <Text style={styles.cardTelefone}>{item.telefone}</Text>
-          </View>
-
-          <View style={styles.cardInfoRow}>
-            <Ionicons name="calendar-outline" size={16} color="#555" />
-            <Text style={styles.cardDataHora}>{formattedDateTime}</Text>
-          </View>
-
-          <View style={styles.cardInfoRow}>
-            <Ionicons name="briefcase-outline" size={16} color="#555" />
-            <Text style={styles.cardServico} numberOfLines={1}>{item.servico}</Text>
-          </View>
-        </Pressable>
-      </Animated.View>
+    {/* Serviço */}
+    <Text style={styles.cardServico} numberOfLines={1}>
+      {item.servico}
+    </Text>
+  </Pressable>
+</Animated.View>
 
       <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={closeDetail}>
         <Animated.View style={[styles.modalOverlay, { opacity: fadeAnim }]}>

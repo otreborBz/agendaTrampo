@@ -1,12 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { collection, query, where, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
 import { db, auth } from "../../src/service/firebaseConnection";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  onAuthStateChanged
-} from "firebase/auth";
+import {createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged} from "firebase/auth";
 
 export const AuthContext = createContext({});
 
@@ -43,7 +38,7 @@ function AuthProvider({ children }) {
         setLoading(true);
 
         // Busca dados do usuário no Firestore
-        const docRef = doc(db, "appointments", currentUser.uid);
+        const docRef = doc(db, "users", currentUser.uid);
         const snapshot = await getDoc(docRef);
         if (snapshot.exists()) {
           setUser(snapshot.data());
@@ -60,7 +55,7 @@ function AuthProvider({ children }) {
       setInitializing(false);
     });
 
-    return () => unsubscribe(); // limpa listener ao desmontar
+    return () => unsubscribe(); 
   }, []);
 
   // Login
@@ -70,12 +65,12 @@ function AuthProvider({ children }) {
       const value = await signInWithEmailAndPassword(auth, email, password);
       const uid = value.user.uid;
 
-      const docRef = doc(db, "appointments", uid);
+      const docRef = doc(db, "users", uid);
       const snapshot = await getDoc(docRef);
 
       if (snapshot.exists()) {
         setUser(snapshot.data());
-        await fetchAppointmentsByUser(uid); // carrega agendamentos
+        await fetchAppointmentsByUser(uid);
         return { success: true, user: snapshot.data() };
       } else {
         alert("Usuário não encontrado no banco de dados.");
@@ -101,7 +96,7 @@ function AuthProvider({ children }) {
     try {
       const value = await createUserWithEmailAndPassword(auth, email, password);
       const uid = value.user.uid;
-      const docRef = doc(db, "appointments", uid);
+      const docRef = doc(db, "users", uid);
       await setDoc(docRef, { uid, name, email, createdAt: new Date() });
       alert("Usuário criado com sucesso!");
       return { success: true };
@@ -138,7 +133,7 @@ function AuthProvider({ children }) {
         user,
         appointments,
         loading,
-        initializing, // adiciona initializing para controlar tela de loading
+        initializing,
         signUp,
         signIn,
         logout

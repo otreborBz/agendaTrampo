@@ -1,25 +1,20 @@
 import { StyleSheet, Dimensions } from "react-native";
 import { colors } from "../../colors/colors";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
-  // Estilos do card
+  // ===== Card =====
   card: {
     backgroundColor: colors.white,
-    padding: 16,
+    padding: 14,
     borderRadius: 12,
     marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
     borderWidth: 1,
-    borderColor: "#f0f0f0",
+    borderColor: "#eee",
   },
   cardPressed: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fafafa",
   },
   cardHeader: {
     flexDirection: "row",
@@ -27,72 +22,55 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
   },
-  cardHeaderRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  nameContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    marginRight: 10,
-  },
   cardNome: {
     fontSize: 16,
     fontWeight: "600",
     color: colors.secondary,
-    marginLeft: 6,
-  },
-  optionsButton: {
-    padding: 5,
-    marginLeft: 10,
+    flex: 1,
+    marginRight: 8,
   },
   cardInfoRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 6,
-  },
-  cardTelefone: {
-    fontSize: 14,
-    color: "#555",
-    marginLeft: 6,
+    marginBottom: 4,
   },
   cardDataHora: {
-    fontSize: 14,
-    color: "#777",
-    marginLeft: 6,
+    fontSize: 13,
+    color: "#666",
+    marginLeft: 4,
   },
   cardServico: {
     fontSize: 14,
-    color: "#777",
-    marginLeft: 6,
-    flex: 1,
+    color: "#444",
+    marginTop: 4,
   },
 
-  // Status badge
+  // ===== Status Badge =====
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+    minWidth: 70,
   },
   statusText: {
     fontSize: 12,
     fontWeight: "600",
-    color: colors.black,
+    color: "#fff",
+    textAlign: "center",
   },
   statusConfirmado: {
-    backgroundColor: colors.confirm,
+    backgroundColor: "#4CAF50",
   },
   statusPendente: {
-    backgroundColor: colors.pending,
+    backgroundColor: "#FFC107",
   },
   statusCancelado: {
-    backgroundColor: colors.canceled,
+    backgroundColor: "#F44336",
   },
 
-  // Modal Centralizado
+  // ===== Modal Overlay =====
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -112,6 +90,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: "hidden",
   },
+
+  // ===== Modal Header =====
   modalHeader: {
     backgroundColor: colors.secondary,
     paddingVertical: 16,
@@ -129,7 +109,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
 
-  // Conteúdo do modal
+  // ===== Conteúdo do Modal =====
   modalScrollView: {
     paddingHorizontal: 20,
     maxHeight: height * 0.9,
@@ -142,15 +122,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: colors.secondary,
-    marginBottom: 16,
-    paddingBottom: 8,
+    marginBottom: 12,
+    paddingBottom: 6,
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },
   infoRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginBottom: 16,
+    marginBottom: 14,
   },
   infoIcon: {
     width: 24,
@@ -167,44 +147,11 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   infoText: {
-    fontSize: 16,
+    fontSize: 15,
     color: "#444",
   },
 
-  // Botões do modal (escondidos)
-  modalActionsHidden: {
-    display: "none",
-  },
-  modalButton: {
-    flex: 1,
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 5,
-    flexDirection: "row",
-    minHeight: 50,
-  },
-  buttonPressed: {
-    opacity: 0.8,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  modalButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    marginLeft: 8,
-  },
-  editButton: {
-    backgroundColor: "#4CAF50",
-  },
-  deleteButton: {
-    backgroundColor: "#F44336",
-  },
-
-  // Estilos para o ActionSheet (Android)
+  // ===== ActionSheet Android =====
   actionSheetOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -219,47 +166,32 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   actionSheetButton: {
-    padding: 16,
+    padding: 14,
     borderRadius: 8,
-    marginBottom: 8,
+    marginBottom: 6,
     backgroundColor: "#f8f8f8",
   },
   actionSheetDestructive: {
     backgroundColor: "#fff0f0",
   },
   actionSheetText: {
-    fontSize: 16,
+    fontSize: 15,
     textAlign: "center",
   },
   actionSheetDestructiveText: {
     color: "red",
   },
   actionSheetCancel: {
-    padding: 16,
+    padding: 14,
     borderRadius: 8,
     backgroundColor: "#f8f8f8",
     marginTop: 5,
   },
   actionSheetCancelText: {
-    fontSize: 16,
+    fontSize: 15,
     textAlign: "center",
     fontWeight: "600",
   },
-  // Adicione ao final do seu StyleSheet
-statusButton: {
-  flex: 1,
-  paddingVertical: 10,
-  borderRadius: 12,
-  alignItems: "center",
-  justifyContent: "center",
-},
-statusButtonText: {
-  color: "#fff",
-  fontWeight: "600",
-  fontSize: 14,
-  textTransform: "uppercase",
-},
-
 });
 
 export default styles;

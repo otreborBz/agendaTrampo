@@ -22,10 +22,10 @@ function AppRoutes() {
   const { user, initializing } = useContext(AuthContext);
 
   if (initializing) {
-    return <Loading />; // mostra tela de loading enquanto Firebase carrega
+    return <Loading />; 
   }
 
-  return <Routes user={user} />; // passa o usuário para as rotas
+  return <Routes user={user} />;
 }
 
 const styles = StyleSheet.create({

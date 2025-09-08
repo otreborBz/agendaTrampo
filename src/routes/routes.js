@@ -10,7 +10,8 @@ import ChangeRecord from '../screen/changeRecord/changeRecord';
 import Home from '../screen/home/home';
 
 import { AuthContext } from '../contexts/auth';
-import Loading from '../components/loading/loading'; // seu componente de loading
+import Loading from '../components/loading/loading';
+import Agendamentos from "../screen/agendamentos/agendamentos";
 
 const Stack = createStackNavigator();
 
@@ -25,8 +26,11 @@ export default function Routes() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          // Usuário logado → Home
-          <Stack.Screen name="Home" component={Home} />
+          // Usuário logado → Home e Agendamentos
+          <>
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Agendamentos" component={Agendamentos} />
+          </>
         ) : (
           // Usuário não logado → Intro/Login/Register
           <>

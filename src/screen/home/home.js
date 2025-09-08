@@ -1,10 +1,20 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { 
-  View, Text, FlatList, TouchableOpacity, Modal, TextInput, 
-  ScrollView, Platform, Alert, KeyboardAvoidingView, ActivityIndicator
-} from 'react-native';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { View, Text, FlatList, TouchableOpacity, Modal, TextInput,  ScrollView, Platform, Alert, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
+// Configuração do calendário para o padrão brasileiro
+LocaleConfig.locales['pt-br'] = {
+  monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+  monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+  dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+  dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+  today: 'Hoje'
+};
+LocaleConfig.defaultLocale = 'pt-br';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { db } from '../../service/firebaseConnection';
+import { collection, addDoc, getDocs, updateDoc, doc, setDoc, query, where, onSnapshot } from 'firebase/firestore';
 
 import styles from './style';
 import { colors } from '../../colors/colors';
@@ -19,6 +29,57 @@ import apiViaCep from '../../service/apiViaCep';
 export default function Home() {
   const { user, loading } = useContext(AuthContext);
   const [agendamentos, setAgendamentos] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  // Filtro de status
+  const [statusFiltro, setStatusFiltro] = useState('Todos');
+  // Marcações do calendário: sempre atualizadas conforme agendamentos e selectedDate
+  const markedDates = useMemo(() => {
+    const marks = {};
+    agendamentos.map(agenda => {
+      let dataStr = '';
+      if (agenda.dataHora) {
+        if (typeof agenda.dataHora === 'string') {
+          dataStr = agenda.dataHora.split('T')[0];
+        } else if (agenda.dataHora.toDate) {
+          dataStr = agenda.dataHora.toDate().toISOString().split('T')[0];
+        }
+      }
+      if (!dataStr) return;
+      if (!marks[dataStr]) marks[dataStr] = { count: 0, status: {} };
+      marks[dataStr].count++;
+      marks[dataStr].status[agenda.status] = (marks[dataStr].status[agenda.status] || 0) + 1;
+    });
+    const calendarMarks = {};
+    Object.keys(marks).forEach(date => {
+      let bg = colors.success;
+      if (marks[date].status['Cancelado']) bg = colors.error;
+      else if (marks[date].status['Pendente']) bg = colors.warning;
+      else if (marks[date].status['Concluído']) bg = colors.success;
+      calendarMarks[date] = {
+        selected: date === selectedDate,
+        selectedColor: date === selectedDate ? colors.secondary : bg,
+        count: marks[date].count,
+      };
+    });
+    if (!calendarMarks[selectedDate]) {
+      calendarMarks[selectedDate] = {
+        selected: true,
+        selectedColor: colors.secondary,
+      };
+    }
+    return calendarMarks;
+  }, [agendamentos, selectedDate]);
+
+  // Estado para expandir/colapsar calendário (dropdown)
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  // Função para formatar data
+  function formatDateHeader(dateStr) {
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const [ano, mes, dia] = dateStr.split('-');
+    return `${dia} ${meses[parseInt(mes,10)-1]} ${ano}`;
+  }
+
 
   // Modais
   const [modalVisible, setModalVisible] = useState(false);
@@ -44,11 +105,88 @@ export default function Home() {
   const [novoServico, setNovoServico] = useState('');
   const [ loadingCep, setLoadingCep] = useState(false);
 
-  // Carrega serviços e agendamentos do storage
+
+  // Carrega serviços e agendamentos do storage/Firebase
+
   useEffect(() => {
     loadServicos();
-    loadAgendamentos();
-  }, []);
+  }, [user]);
+
+
+  // Listener em tempo real para agendamentos do usuário
+  useEffect(() => {
+    if (!user?.uid) return;
+    const agendamentosRef = collection(db, 'agendamentos');
+    const q = query(agendamentosRef, where('uid', '==', user.uid));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const agendamentosData = [];
+      querySnapshot.forEach((doc) => {
+        agendamentosData.push({ ...doc.data(), id: doc.id });
+      });
+      const agendamentosComStatus = agendamentosData.map(agenda => ({
+        ...agenda,
+        status: agenda.status || 'Pendente'
+      }));
+      setAgendamentos(agendamentosComStatus);
+    });
+    return () => unsubscribe();
+  // Marcações do calendário: sempre atualizadas conforme agendamentos e selectedDate
+  const markedDates = useMemo(() => {
+    const marks = {};
+    agendamentos.map(agenda => {
+      let dataStr = '';
+      if (agenda.dataHora) {
+        if (typeof agenda.dataHora === 'string') {
+          dataStr = agenda.dataHora.split('T')[0];
+        } else if (agenda.dataHora.toDate) {
+          dataStr = agenda.dataHora.toDate().toISOString().split('T')[0];
+        }
+      }
+      if (!dataStr) return;
+      if (!marks[dataStr]) marks[dataStr] = { count: 0, status: {} };
+      marks[dataStr].count++;
+      marks[dataStr].status[agenda.status] = (marks[dataStr].status[agenda.status] || 0) + 1;
+    });
+    const calendarMarks = {};
+    Object.keys(marks).forEach(date => {
+      let bg = colors.success;
+      if (marks[date].status['Cancelado']) bg = colors.error;
+      else if (marks[date].status['Pendente']) bg = colors.warning;
+      else if (marks[date].status['Concluído']) bg = colors.success;
+      calendarMarks[date] = {
+        selected: date === selectedDate,
+        selectedColor: date === selectedDate ? colors.secondary : bg,
+        customStyles: {
+          container: {
+            backgroundColor: date === selectedDate ? colors.secondary : bg,
+            borderRadius: 16,
+          },
+          text: {
+            color: date === selectedDate ? colors.white : colors.text,
+            fontWeight: date === selectedDate ? 'bold' : 'normal',
+          },
+        },
+        dots: [
+          { key: 'count', color: colors.primary, selectedDotColor: colors.white }
+        ],
+        count: marks[date].count
+      };
+    });
+    // Garante que o dia selecionado sempre aparece como selecionado
+    if (!calendarMarks[selectedDate]) {
+      calendarMarks[selectedDate] = {
+        selected: true,
+        selectedColor: colors.secondary,
+        customStyles: {
+          container: { backgroundColor: colors.secondary, borderRadius: 16 },
+          text: { color: colors.white, fontWeight: 'bold' },
+        },
+        count: 0
+      };
+    }
+    return calendarMarks;
+  }, [agendamentos, selectedDate]);
+  }, [user]);
 
   const loadServicos = async () => {
     try {
@@ -59,19 +197,25 @@ export default function Home() {
     }
   };
 
-  const loadAgendamentos = async () => {
+  // Carregar agendamentos do Firestore apenas do usuário logado
+  const loadAgendamentosFirestore = async () => {
+    if (!user?.uid) return;
     try {
-      const saved = await AsyncStorage.getItem('@agendamentos');
-      if (saved) {
-        const agendamentosData = JSON.parse(saved);
-        const agendamentosComStatus = agendamentosData.map(agenda => ({
-          ...agenda,
-          status: agenda.status || 'Pendente'
-        }));
-        setAgendamentos(agendamentosComStatus);
-      }
+      const agendamentosRef = collection(db, 'agendamentos');
+      const q = query(agendamentosRef, where('uid', '==', user.uid));
+      const querySnapshot = await getDocs(q);
+      const agendamentosData = [];
+      querySnapshot.forEach((doc) => {
+        agendamentosData.push({ ...doc.data(), id: doc.id });
+      });
+      // Garante que todos tenham status
+      const agendamentosComStatus = agendamentosData.map(agenda => ({
+        ...agenda,
+        status: agenda.status || 'Pendente'
+      }));
+      setAgendamentos(agendamentosComStatus);
     } catch (e) {
-      console.log('Erro ao carregar agendamentos', e);
+      console.log('Erro ao carregar agendamentos do Firestore', e);
     }
   };
 
@@ -83,11 +227,23 @@ export default function Home() {
     }
   };
 
-  const saveAgendamentosStorage = async (list) => {
+
+  // Salvar novo agendamento no Firestore
+  const saveAgendamentoFirestore = async (agendamento) => {
     try {
-      await AsyncStorage.setItem('@agendamentos', JSON.stringify(list));
+      await addDoc(collection(db, 'agendamentos'), agendamento);
     } catch (e) {
-      console.log('Erro ao salvar agendamentos', e);
+      console.log('Erro ao salvar agendamento no Firestore', e);
+    }
+  };
+
+  // Atualizar agendamento no Firestore
+  const updateAgendamentoFirestore = async (id, data) => {
+    try {
+      const agendamentoRef = doc(db, 'agendamentos', id);
+      await updateDoc(agendamentoRef, data);
+    } catch (e) {
+      console.log('Erro ao atualizar agendamento no Firestore', e);
     }
   };
 
@@ -113,23 +269,18 @@ export default function Home() {
       Alert.alert("Erro", "Preencha todos os campos obrigatórios!");
       return;
     }
-    
     const novoAgendamento = {
-      id: Date.now().toString(),
       nomeCliente,
       telefone,
       dataHora: dataHora.toISOString(),
       servico: servico || null,
       valor: valor || null,
       endereco: Object.values(endereco).some(e => e) ? endereco : null,
-      status: 'Pendente'
+      status: 'Pendente',
+      uid: user?.uid || null
     };
-    
-    const novosAgendamentos = [...agendamentos, novoAgendamento];
-    setAgendamentos(novosAgendamentos);
-    await saveAgendamentosStorage(novosAgendamentos);
+    await saveAgendamentoFirestore(novoAgendamento);
     setModalVisible(false);
-
     // Reset dos campos
     setNomeCliente('');
     setTelefone('');
@@ -137,18 +288,20 @@ export default function Home() {
     setServico('');
     setValor('');
     setEndereco({ rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '' });
-
+    // Recarrega agendamentos
+    loadAgendamentosFirestore();
     Alert.alert("Sucesso", "Agendamento cadastrado!");
   };
 
   // Atualizar status do agendamento
   const updateStatus = async (id, novoStatus) => {
+    // Atualiza localmente
     const novosAgendamentos = agendamentos.map(agenda => 
       agenda.id === id ? { ...agenda, status: novoStatus } : agenda
     );
-    
     setAgendamentos(novosAgendamentos);
-    await saveAgendamentosStorage(novosAgendamentos);
+    // Atualiza no Firestore
+    await updateAgendamentoFirestore(id, { status: novoStatus });
   };
 
   // Picker
@@ -252,19 +405,125 @@ export default function Home() {
   };
 
   return (
-    <View style={styles.container}>
-      <Header />
 
-      <TouchableOpacity style={styles.buttonAgenda} onPress={openModal}>
-        <Text style={styles.textButtonAgenda}>+ Agendamentos</Text>
+    <View style={styles.container}>
+  <Header />
+  <View style={{marginBottom: 10}} />
+
+      {/* Cabeçalho colapsável tipo dropdown */}
+      <TouchableOpacity
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: colors.white,
+          borderRadius: 12,
+          padding: 14,
+          marginBottom: 4,
+          elevation: 2,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.08,
+          shadowRadius: 4,
+        }}
+        onPress={() => setCalendarOpen(open => !open)}
+        activeOpacity={0.8}
+      >
+        <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.secondary }}>
+          {formatDateHeader(selectedDate)}
+        </Text>
+        <Ionicons name={calendarOpen ? 'chevron-up' : 'chevron-down'} size={24} color={colors.secondary} />
       </TouchableOpacity>
 
+      {calendarOpen && (
+        <View style={{ backgroundColor: colors.white, borderRadius: 14, padding: 8, marginTop: 8, marginBottom: 8, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 }}>
+          <Calendar
+            onDayPress={day => {
+              setSelectedDate(day.dateString);
+              setCalendarOpen(false);
+            }}
+            markingType={'multi-dot'}
+            markedDates={markedDates}
+            style={{ borderRadius: 10, minWidth: 300 }}
+            theme={{
+              todayTextColor: colors.primary,
+              selectedDayBackgroundColor: colors.secondary,
+              arrowColor: colors.secondary,
+              textDayFontSize: 15,
+              textMonthFontSize: 18,
+              textDayHeaderFontSize: 13,
+            }}
+            firstDay={0}
+            dayComponent={({ date, state }) => {
+              const dateStr = date.dateString;
+              const marking = markedDates[dateStr] || {};
+              const isSelected = marking.selected;
+              const bgColor = isSelected ? colors.secondary : marking.selectedColor || 'transparent';
+              const textColor = isSelected ? colors.white : colors.text;
+              const fontWeight = isSelected ? 'bold' : 'normal';
+              return (
+                <TouchableOpacity
+                  style={{ alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 17, backgroundColor: bgColor }}
+                  onPress={() => {
+                    setSelectedDate(dateStr);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={{ color: textColor, fontWeight, fontSize: 14 }}>{date.day}</Text>
+                  {marking && marking.count > 0 && (
+                    <View style={{ position: 'absolute', bottom: 1, right: 1, backgroundColor: colors.primary, borderRadius: 7, paddingHorizontal: 3, minWidth: 13 }}>
+                      <Text style={{ color: colors.white, fontSize: 9, textAlign: 'center' }}>{marking.count}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </View>
+      )}
+
+
+      {/* Filtro por status */}
+      <View style={styles.statusFilterWrapper}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statusFilterContainer}>
+          {[
+            { label: 'Todos', icon: 'apps', color: colors.text },
+            { label: 'Confirmado', icon: 'checkmark-circle', color: colors.success },
+            { label: 'Pendente', icon: 'time', color: colors.warning },
+            { label: 'Cancelado', icon: 'close-circle', color: colors.error },
+          ].map(({ label, icon, color }) => (
+            <TouchableOpacity
+              key={label}
+              style={[
+                styles.statusFilterButton,
+                statusFiltro === label && styles.statusFilterButtonActive,
+                statusFiltro === label && { borderColor: color, borderWidth: 2 }
+              ]}
+              onPress={() => setStatusFiltro(label)}
+              activeOpacity={0.8}
+            >
+              <Ionicons name={icon} size={18} color={statusFiltro === label ? colors.white : color} style={{ marginRight: 4 }} />
+              <Text style={[styles.statusFilterText, statusFiltro === label && styles.statusFilterTextActive, { fontSize: 15 }]}> 
+                {label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
       <FlatList
-        data={agendamentos}
+        data={agendamentos.filter(item => {
+          // Considera apenas a data (YYYY-MM-DD) do campo dataHora
+          if (!item.dataHora) return false;
+          const data = typeof item.dataHora === 'string' ? item.dataHora : (item.dataHora.toDate ? item.dataHora.toDate().toISOString() : '');
+          const matchDate = data.startsWith(selectedDate);
+          const matchStatus = statusFiltro === 'Todos' ? true : (item.status === statusFiltro);
+          return matchDate && matchStatus;
+        })}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <ListAgenda 
-            data={item} 
+            data={{...item, onDelete: (id) => setAgendamentos(agendamentos.filter(a => a.id !== id))}}
             onUpdateStatus={updateStatus} 
           />
         )}
@@ -482,6 +741,15 @@ export default function Home() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Botão de ação flutuante para adicionar agendamento */}
+      <TouchableOpacity
+        style={styles.fab}
+        activeOpacity={0.8}
+        onPress={() => setModalVisible(true)}
+      >
+  <Ionicons name="add" size={32} color={colors.white} />
+      </TouchableOpacity>
     </View>
   );
 }

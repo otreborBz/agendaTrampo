@@ -1,7 +1,20 @@
-import { StyleSheet, Platform } from "react-native";
-import { colors } from "../../colors/colors";
+
+  import { StyleSheet, Platform } from "react-native";
+  import { colors } from "../../colors/colors";
 
 const styles = StyleSheet.create({
+  greetingText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    letterSpacing: 0.2,
+  },
+
+  greetingName: {
+    color: colors.secondary,
+    fontWeight: 'bold',
+    fontSize: 17,
+  },
   container: {
     position: "absolute",
     top: 0,

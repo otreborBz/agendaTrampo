@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { 
-  View, Text, TextInput, Image, TouchableOpacity, 
-  KeyboardAvoidingView, Platform, Animated, ActivityIndicator, Alert 
-} from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity, KeyboardAvoidingView, Platform, Animated, ActivityIndicator, Alert } from 'react-native';
 import styles from './style';
 import { AuthContext } from '../../contexts/auth';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Login() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateYAnim = useRef(new Animated.Value(50)).current;
+
+  const navigation = useNavigation();
 
   const { signIn, loading } = useContext(AuthContext);
 
@@ -32,12 +32,12 @@ export default function Login() {
   }, []);
 
   // Abrir tela de registro
-  function openRegister(navigation) {
+  function openRegister() {
     navigation.navigate('Register');
   }
 
   // Abrir tela de recuperação de senha
-  function goToChangeRecord(navigation) {
+  function goToChangeRecord() {
     navigation.navigate('ChangeRecord');
   }
 
