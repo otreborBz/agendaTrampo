@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import AppDrawer from './AppDrawer';
 
 // Screens
 import Intro from '../screen/intro/intro';
@@ -26,11 +27,8 @@ export default function Routes() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          // Usuário logado → Home e Agendamentos
-          <>
-            <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen name="Agendamentos" component={Agendamentos} />
-          </>
+          // Usuário logado → Drawer
+          <Stack.Screen name="AppDrawer" component={AppDrawer} options={{ headerShown: false }} />
         ) : (
           // Usuário não logado → Intro/Login/Register
           <>

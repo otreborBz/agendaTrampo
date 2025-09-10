@@ -27,9 +27,39 @@ import { AuthContext } from '../../contexts/auth';
 import apiViaCep from '../../service/apiViaCep';
 
 export default function Home() {
+  // Função utilitária para obter os dias da semana da data selecionada
+  function getWeekDays(dateStr) {
+    const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const date = new Date(dateStr);
+    const week = [];
+    // Encontra o domingo da semana
+    const sunday = new Date(date);
+    sunday.setDate(date.getDate() - date.getDay());
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(sunday);
+      d.setDate(sunday.getDate() + i);
+      week.push({
+        label: diasSemana[i],
+        date: d.toISOString().split('T')[0],
+        day: d.getDate(),
+      });
+    }
+    return week;
+  }
+  // Estado para mostrar/esconder o calendário
+  const [showCalendar, setShowCalendar] = useState(true);
+  const [showFullCalendar, setShowFullCalendar] = useState(false); // Começa reduzido
+  const scrollOffset = React.useRef(0);
   const { user, loading } = useContext(AuthContext);
   const [agendamentos, setAgendamentos] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  // Corrige fuso horário para garantir a data local
+  function getLocalDateString() {
+    const now = new Date();
+    const tzOffset = now.getTimezoneOffset() * 60000;
+    const localISO = new Date(now.getTime() - tzOffset).toISOString();
+    return localISO.split('T')[0];
+  }
+  const [selectedDate, setSelectedDate] = useState(getLocalDateString());
   // Filtro de status
   const [statusFiltro, setStatusFiltro] = useState('Todos');
   // Marcações do calendário: sempre atualizadas conforme agendamentos e selectedDate
@@ -70,8 +100,7 @@ export default function Home() {
     return calendarMarks;
   }, [agendamentos, selectedDate]);
 
-  // Estado para expandir/colapsar calendário (dropdown)
-  const [calendarOpen, setCalendarOpen] = useState(false);
+  // O calendário ficará sempre aberto, não precisa de estado para expandir/colapsar
 
   // Função para formatar data
   function formatDateHeader(dateStr) {
@@ -405,111 +434,91 @@ export default function Home() {
   };
 
   return (
+  <View style={styles.container}>
 
-    <View style={styles.container}>
-  <Header />
-  <View style={{marginBottom: 10}} />
-
-      {/* Cabeçalho colapsável tipo dropdown */}
-      <TouchableOpacity
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: colors.white,
-          borderRadius: 12,
-          padding: 14,
-          marginBottom: 4,
-          elevation: 2,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.08,
-          shadowRadius: 4,
-        }}
-        onPress={() => setCalendarOpen(open => !open)}
-        activeOpacity={0.8}
-      >
-        <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.secondary }}>
-          {formatDateHeader(selectedDate)}
-        </Text>
-        <Ionicons name={calendarOpen ? 'chevron-up' : 'chevron-down'} size={24} color={colors.secondary} />
-      </TouchableOpacity>
-
-      {calendarOpen && (
+      {/* Calendário sempre visível */}
+      {showCalendar && (
         <View style={{ backgroundColor: colors.white, borderRadius: 14, padding: 8, marginTop: 8, marginBottom: 8, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 }}>
-          <Calendar
-            onDayPress={day => {
-              setSelectedDate(day.dateString);
-              setCalendarOpen(false);
-            }}
-            markingType={'multi-dot'}
-            markedDates={markedDates}
-            style={{ borderRadius: 10, minWidth: 300 }}
-            theme={{
-              todayTextColor: colors.primary,
-              selectedDayBackgroundColor: colors.secondary,
-              arrowColor: colors.secondary,
-              textDayFontSize: 15,
-              textMonthFontSize: 18,
-              textDayHeaderFontSize: 13,
-            }}
-            firstDay={0}
-            dayComponent={({ date, state }) => {
-              const dateStr = date.dateString;
-              const marking = markedDates[dateStr] || {};
-              const isSelected = marking.selected;
-              const bgColor = isSelected ? colors.secondary : marking.selectedColor || 'transparent';
-              const textColor = isSelected ? colors.white : colors.text;
-              const fontWeight = isSelected ? 'bold' : 'normal';
-              return (
-                <TouchableOpacity
-                  style={{ alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 17, backgroundColor: bgColor }}
-                  onPress={() => {
-                    setSelectedDate(dateStr);
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={{ color: textColor, fontWeight, fontSize: 14 }}>{date.day}</Text>
-                  {marking && marking.count > 0 && (
-                    <View style={{ position: 'absolute', bottom: 1, right: 1, backgroundColor: colors.primary, borderRadius: 7, paddingHorizontal: 3, minWidth: 13 }}>
-                      <Text style={{ color: colors.white, fontSize: 9, textAlign: 'center' }}>{marking.count}</Text>
-                    </View>
-                  )}
+          {showFullCalendar ? (
+            <>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 4 }}>
+                <TouchableOpacity onPress={() => setShowFullCalendar(false)} style={{ flexDirection: 'row', alignItems: 'center', padding: 4 }}>
+                  <Ionicons name="chevron-up-outline" size={18} color={colors.secondary} />
+                  <Text style={{ color: colors.secondary, fontSize: 13, marginLeft: 2 }}>Recolher calendário</Text>
                 </TouchableOpacity>
-              );
-            }}
-          />
+              </View>
+              <Calendar
+                onDayPress={day => {
+                  setSelectedDate(day.dateString);
+                }}
+                markingType={'multi-dot'}
+                markedDates={markedDates}
+                style={{ borderRadius: 10, minWidth: 300 }}
+                theme={{
+                  todayTextColor: colors.primary,
+                  selectedDayBackgroundColor: colors.secondary,
+                  arrowColor: colors.secondary,
+                  textDayFontSize: 15,
+                  textMonthFontSize: 18,
+                  textDayHeaderFontSize: 13,
+                }}
+                firstDay={0}
+                dayComponent={({ date, state }) => {
+                  const dateStr = date.dateString;
+                  const marking = markedDates[dateStr] || {};
+                  const isSelected = marking.selected;
+                  const bgColor = isSelected ? colors.secondary : marking.selectedColor || 'transparent';
+                  const textColor = isSelected ? colors.white : colors.text;
+                  const fontWeight = isSelected ? 'bold' : 'normal';
+                  return (
+                    <TouchableOpacity
+                      style={{ alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 17, backgroundColor: bgColor }}
+                      onPress={() => {
+                        setSelectedDate(dateStr);
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={{ color: textColor, fontWeight, fontSize: 14 }}>{date.day}</Text>
+                      {marking && marking.count > 0 && (
+                        <View style={{ position: 'absolute', bottom: 1, right: 1, backgroundColor: colors.primary, borderRadius: 7, paddingHorizontal: 3, minWidth: 13 }}>
+                          <Text style={{ color: colors.white, fontSize: 9, textAlign: 'center' }}>{marking.count}</Text>
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </>
+          ) : (
+            <TouchableOpacity onPress={() => setShowFullCalendar(true)} activeOpacity={0.8} style={{paddingVertical: 4}}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 8 }}>
+                {getWeekDays(selectedDate).map((d, idx) => {
+                  const isSelected = d.date === selectedDate;
+                  return (
+                    <TouchableOpacity
+                      key={d.date}
+                      onPress={() => setSelectedDate(d.date)}
+                      style={{ alignItems: 'center', flex: 1 }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={{ color: colors.text, fontSize: 12, marginBottom: 2 }}>{d.label}</Text>
+                      <View style={{
+                        width: 32, height: 32, borderRadius: 16,
+                        backgroundColor: isSelected ? colors.secondary : 'transparent',
+                        alignItems: 'center', justifyContent: 'center',
+                        borderWidth: isSelected ? 0 : 1, borderColor: '#eee',
+                      }}>
+                        <Text style={{ color: isSelected ? colors.white : colors.text, fontWeight: isSelected ? 'bold' : 'normal', fontSize: 15 }}>{d.day}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              <Text style={{ textAlign: 'center', color: colors.secondary, marginTop: 4, fontSize: 13 }}>Toque para expandir o calendário</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
-
-
-      {/* Filtro por status */}
-      <View style={styles.statusFilterWrapper}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statusFilterContainer}>
-          {[
-            { label: 'Todos', icon: 'apps', color: colors.text },
-            { label: 'Confirmado', icon: 'checkmark-circle', color: colors.success },
-            { label: 'Pendente', icon: 'time', color: colors.warning },
-            { label: 'Cancelado', icon: 'close-circle', color: colors.error },
-          ].map(({ label, icon, color }) => (
-            <TouchableOpacity
-              key={label}
-              style={[
-                styles.statusFilterButton,
-                statusFiltro === label && styles.statusFilterButtonActive,
-                statusFiltro === label && { borderColor: color, borderWidth: 2 }
-              ]}
-              onPress={() => setStatusFiltro(label)}
-              activeOpacity={0.8}
-            >
-              <Ionicons name={icon} size={18} color={statusFiltro === label ? colors.white : color} style={{ marginRight: 4 }} />
-              <Text style={[styles.statusFilterText, statusFiltro === label && styles.statusFilterTextActive, { fontSize: 15 }]}> 
-                {label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
 
       <FlatList
         data={agendamentos.filter(item => {
@@ -529,6 +538,7 @@ export default function Home() {
         )}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
+  // Não faz mais nada ao rolar, só o clique expande
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="calendar-outline" size={60} color="#ccc" />
