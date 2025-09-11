@@ -1,18 +1,17 @@
 import React, { useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import AppDrawer from './AppDrawer';
+import AppDrawer from '../components/appDrawer/AppDrawer';
 
 // Screens
 import Intro from '../screen/intro/intro';
 import Login from '../screen/login/login';
 import Register from '../screen/register/register';
 import ChangeRecord from '../screen/changeRecord/changeRecord';
-import Home from '../screen/home/home';
+import Agendamentos from "../screen/agendamentos/agendamentos";
 
 import { AuthContext } from '../contexts/auth';
 import Loading from '../components/loading/loading';
-import Agendamentos from "../screen/agendamentos/agendamentos";
 
 const Stack = createStackNavigator();
 
@@ -29,6 +28,7 @@ export default function Routes() {
         {user ? (
           // Usuário logado → Drawer
           <Stack.Screen name="AppDrawer" component={AppDrawer} options={{ headerShown: false }} />
+          // <Stack.Screen name="Agendamentos" component={Agendamentos} />
         ) : (
           // Usuário não logado → Intro/Login/Register
           <>

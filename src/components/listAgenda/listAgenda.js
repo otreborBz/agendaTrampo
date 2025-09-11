@@ -1,23 +1,23 @@
 import { useState, useRef } from "react";
 import { useNavigation } from '@react-navigation/native';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../service/firebaseConnection';
 import {
   View,
   Text,
-  Modal,
   Pressable,
   ScrollView,
-  Alert,
+  Modal,
   Animated,
-  ActionSheetIOS,
-  Platform,
   TouchableOpacity,
-  Dimensions,
+  Alert,
+  Platform,
+  ActionSheetIOS,
+  Dimensions
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import styles from "./style";
 import { colors } from "../../colors/colors";
+import styles from "./style";
 
 const { width, height } = Dimensions.get("window");
 
@@ -132,7 +132,6 @@ export default function ListAgenda({ data }) {
 
   function handleEdit() {
     closeDetail();
-    // Navega para a tela de agendamento, passando o agendamento para edição
     navigation.navigate('Agendamentos', { agendamento: item });
   }
 
@@ -140,7 +139,6 @@ export default function ListAgenda({ data }) {
     try {
       await deleteDoc(doc(db, 'agendamentos', item.id));
       Alert.alert('Sucesso', 'Agendamento excluído com sucesso!');
-      // Atualiza a lista de agendamentos na tela principal, se função passada via props
       if (typeof data.onDelete === 'function') {
         data.onDelete(item.id);
       }
@@ -167,50 +165,62 @@ export default function ListAgenda({ data }) {
     { text: "Excluir", onPress: handleDelete, style: "destructive" },
   ];
 
+  // Definir cor de fundo do card conforme status
+  let cardBg = styles.card;
+  if (status.toLowerCase() === 'pendente') {
+    cardBg = [styles.card, { backgroundColor: '#FFF8E1', borderColor: '#FFD600' }];
+  } else if (status.toLowerCase() === 'concluido' || status.toLowerCase() === 'concluído') {
+    cardBg = [styles.card, { backgroundColor: '#E8F5E9', borderColor: '#43A047' }];
+  } else if (status.toLowerCase() === 'cancelado') {
+    cardBg = [styles.card, { backgroundColor: '#FFEBEE', borderColor: '#D32F2F' }];
+  }
+
   return (
     <>
+      {/* --- Card --- */}
       <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-  <Pressable
-    style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-    onPress={openDetail}
-    onPressIn={handlePressIn}
-    onPressOut={handlePressOut}
-  >
-    {/* Header: Nome + Status */}
-    <View style={styles.cardHeader}>
-      <Text style={styles.cardNome} numberOfLines={1}>
-        {item.nomeCliente}
-      </Text>
-      <View
-        style={[
-          styles.statusBadge,
-          status.toLowerCase() === "concluido"
-            ? styles.statusConfirmado
-            : status.toLowerCase() === "pendente"
-            ? styles.statusPendente
-            : styles.statusCancelado,
-        ]}
-      >
-        <Text style={styles.statusText}>{status}</Text>
-      </View>
-    </View>
+        <Pressable
+          style={({ pressed }) => [cardBg, pressed && styles.cardPressed]}
+          onPress={openDetail}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+        >
+          {/* Header: Nome + Status */}
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardNome} numberOfLines={1}>
+              {item.nomeCliente}
+            </Text>
+            <View
+              style={[
+                styles.statusBadge,
+                status.toLowerCase() === "concluido" || status.toLowerCase() === "concluído"
+                  ? styles.statusConfirmado
+                  : status.toLowerCase() === "pendente"
+                  ? styles.statusPendente
+                  : styles.statusCancelado,
+              ]}
+            >
+              <Text style={styles.statusText}>{status}</Text>
+            </View>
+          </View>
 
-    {/* Data e Hora */}
-    <View style={styles.cardInfoRow}>
-      <Ionicons name="calendar-outline" size={14} color="#999" />
-      <Text style={styles.cardDataHora}>{formattedDateTime}</Text>
-    </View>
+          {/* Data e Hora */}
+          <View style={styles.cardInfoRow}>
+            <Ionicons name="calendar-outline" size={14} color="#999" />
+            <Text style={styles.cardDataHora}>{formattedDateTime}</Text>
+          </View>
 
-    {/* Serviço */}
-    <Text style={styles.cardServico} numberOfLines={1}>
-      {item.servico}
-    </Text>
-  </Pressable>
-</Animated.View>
+          {/* Serviço */}
+          <Text style={styles.cardServico} numberOfLines={1}>
+            {item.servico}
+          </Text>
+        </Pressable>
+      </Animated.View>
 
+      {/* --- Modal de Detalhes --- */}
       <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={closeDetail}>
         <Animated.View style={[styles.modalOverlay, { opacity: fadeAnim }]}>
-          <Pressable style={styles.modalOverlayPressable} onPress={closeDetail}>
+          <Pressable style={styles.modalOverlayPressable}>
             <Animated.View style={styles.modalContentCentered}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalHeaderText}>Detalhes do Agendamento</Text>
@@ -256,7 +266,17 @@ export default function ListAgenda({ data }) {
                       {["Concluido", "Pendente", "Cancelado"].map((s) => (
                         <Pressable
                           key={s}
-                          onPress={() => setStatus(s)}
+                          onPress={async () => {
+                            setStatus(s);
+                            try {
+                              await updateDoc(doc(db, "agendamentos", item.id), { status: s });
+                              if (typeof data.onUpdateStatus === "function") {
+                                data.onUpdateStatus(item.id, s);
+                              }
+                            } catch (e) {
+                              Alert.alert("Erro", "Não foi possível atualizar o status no banco.");
+                            }
+                          }}
                           style={[
                             styles.statusBadge,
                             s === "Concluido" && styles.statusConfirmado,
@@ -265,7 +285,9 @@ export default function ListAgenda({ data }) {
                             s === status && { borderWidth: 2, borderColor: colors.primary },
                           ]}
                         >
-                          <Text style={styles.statusText}>{s.charAt(0).toUpperCase() + s.slice(1)}</Text>
+                          <Text style={styles.statusText}>
+                            {s.charAt(0).toUpperCase() + s.slice(1)}
+                          </Text>
                         </Pressable>
                       ))}
                     </View>
@@ -290,6 +312,7 @@ export default function ListAgenda({ data }) {
         </Animated.View>
       </Modal>
 
+      {/* --- ActionSheet --- */}
       <ActionSheet visible={actionSheetVisible} onClose={() => setActionSheetVisible(false)} options={actionSheetOptions} />
     </>
   );

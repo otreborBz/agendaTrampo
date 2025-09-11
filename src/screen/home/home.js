@@ -20,13 +20,15 @@ import styles from './style';
 import { colors } from '../../colors/colors';
 import { Ionicons } from '@expo/vector-icons';
 
-import Header from '../../components/header/header';
 import ListAgenda from '../../components/listAgenda/listAgenda';
 import { AuthContext } from '../../contexts/auth';
 
 import apiViaCep from '../../service/apiViaCep';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Home() {
+
+  const Navigation = useNavigation();
   // Função utilitária para obter os dias da semana da data selecionada
   function getWeekDays(dateStr) {
     const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -38,11 +40,12 @@ export default function Home() {
     for (let i = 0; i < 7; i++) {
       const d = new Date(sunday);
       d.setDate(sunday.getDate() + i);
-      week.push({
-        label: diasSemana[i],
-        date: d.toISOString().split('T')[0],
-        day: d.getDate(),
-      });
+     week.push({
+    label: diasSemana[i],
+    date: formatDateLocal(d),
+    day: d.getDate(),
+});
+
     }
     return week;
   }
@@ -54,10 +57,12 @@ export default function Home() {
   const [agendamentos, setAgendamentos] = useState([]);
   // Corrige fuso horário para garantir a data local
   function getLocalDateString() {
+    // Retorna a data local no formato YYYY-MM-DD, sem ajuste manual de fuso
     const now = new Date();
-    const tzOffset = now.getTimezoneOffset() * 60000;
-    const localISO = new Date(now.getTime() - tzOffset).toISOString();
-    return localISO.split('T')[0];
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
   const [selectedDate, setSelectedDate] = useState(getLocalDateString());
   // Filtro de status
@@ -68,11 +73,12 @@ export default function Home() {
     agendamentos.map(agenda => {
       let dataStr = '';
       if (agenda.dataHora) {
-        if (typeof agenda.dataHora === 'string') {
+       if (typeof agenda.dataHora === 'string') {
           dataStr = agenda.dataHora.split('T')[0];
         } else if (agenda.dataHora.toDate) {
-          dataStr = agenda.dataHora.toDate().toISOString().split('T')[0];
-        }
+          dataStr = formatDateLocal(agenda.dataHora.toDate()); // 🔥 aqui troca
+}
+
       }
       if (!dataStr) return;
       if (!marks[dataStr]) marks[dataStr] = { count: 0, status: {} };
@@ -100,7 +106,7 @@ export default function Home() {
     return calendarMarks;
   }, [agendamentos, selectedDate]);
 
-  // O calendário ficará sempre aberto, não precisa de estado para expandir/colapsar
+
 
   // Função para formatar data
   function formatDateHeader(dateStr) {
@@ -135,15 +141,10 @@ export default function Home() {
   const [ loadingCep, setLoadingCep] = useState(false);
 
 
-  // Carrega serviços e agendamentos do storage/Firebase
-
-  useEffect(() => {
-    loadServicos();
-  }, [user]);
-
 
   // Listener em tempo real para agendamentos do usuário
   useEffect(() => {
+    loadServicos();
     if (!user?.uid) return;
     const agendamentosRef = collection(db, 'agendamentos');
     const q = query(agendamentosRef, where('uid', '==', user.uid));
@@ -159,6 +160,7 @@ export default function Home() {
       setAgendamentos(agendamentosComStatus);
     });
     return () => unsubscribe();
+    
   // Marcações do calendário: sempre atualizadas conforme agendamentos e selectedDate
   const markedDates = useMemo(() => {
     const marks = {};
@@ -256,7 +258,6 @@ export default function Home() {
     }
   };
 
-
   // Salvar novo agendamento no Firestore
   const saveAgendamentoFirestore = async (agendamento) => {
     try {
@@ -277,7 +278,19 @@ export default function Home() {
   };
 
   // Abrir modais
-  const openModal = () => setModalVisible(true);
+  const openModal = () => {
+    // Sincroniza dataHora com o dia selecionado ao abrir o modal
+    const [year, month, day] = selectedDate.split('-');
+    const now = new Date();
+    // Se selectedDate for hoje, mantém hora atual, senão zera hora
+    if (selectedDate === getLocalDateString()) {
+      setDataHora(new Date(year, month - 1, day, now.getHours(), now.getMinutes()));
+    } else {
+      setDataHora(new Date(year, month - 1, day, 0, 0));
+    }
+    setModalVisible(true);
+  };
+
   const openModalEndereco = () => setModalEnderecoVisible(true);
   const openModalServico = () => setModalServicoVisible(true);
 
@@ -338,7 +351,12 @@ export default function Home() {
     setShowDatePicker(false);
     if (event.type === 'dismissed') return;
     const currentDate = selectedDate || dataHora;
-    if (currentDate < new Date()) {
+    // Permite qualquer horário do dia de hoje, bloqueia apenas datas anteriores a hoje
+    const hoje = new Date();
+    hoje.setHours(0,0,0,0);
+    const dataSelecionada = new Date(currentDate);
+    dataSelecionada.setHours(0,0,0,0);
+    if (dataSelecionada < hoje) {
       Alert.alert("Erro", "Não é permitido escolher datas anteriores!");
       return;
     }
@@ -433,26 +451,38 @@ export default function Home() {
     }
   };
 
+  function formatDateLocal(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+  };
+
+
   return (
   <View style={styles.container}>
 
       {/* Calendário sempre visível */}
       {showCalendar && (
-        <View style={{ backgroundColor: colors.white, borderRadius: 14, padding: 8, marginTop: 8, marginBottom: 8, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 }}>
+        <View style={{ backgroundColor: colors.white, borderRadius: 10, padding: 4, marginTop: 0, marginBottom: 4, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 2 }}>
           {showFullCalendar ? (
             <>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 4 }}>
-                <TouchableOpacity onPress={() => setShowFullCalendar(false)} style={{ flexDirection: 'row', alignItems: 'center', padding: 4 }}>
+                <TouchableOpacity onPress={() => { setShowFullCalendar(false); setSelectedDate(getLocalDateString()); }} style={{ flexDirection: 'row', alignItems: 'center', padding: 4 }}>
                   <Ionicons name="chevron-up-outline" size={18} color={colors.secondary} />
                   <Text style={{ color: colors.secondary, fontSize: 13, marginLeft: 2 }}>Recolher calendário</Text>
                 </TouchableOpacity>
               </View>
               <Calendar
                 onDayPress={day => {
-                  setSelectedDate(day.dateString);
+                  // Só permite selecionar hoje ou datas futuras
+                  if (day.dateString >= getLocalDateString()) {
+                    setSelectedDate(day.dateString);
+                  }
                 }}
                 markingType={'multi-dot'}
                 markedDates={markedDates}
+                minDate={getLocalDateString()}
                 style={{ borderRadius: 10, minWidth: 300 }}
                 theme={{
                   todayTextColor: colors.primary,
@@ -470,13 +500,16 @@ export default function Home() {
                   const bgColor = isSelected ? colors.secondary : marking.selectedColor || 'transparent';
                   const textColor = isSelected ? colors.white : colors.text;
                   const fontWeight = isSelected ? 'bold' : 'normal';
+                  // Desabilita visualmente dias anteriores a hoje
+                  const isPast = dateStr < getLocalDateString();
                   return (
                     <TouchableOpacity
-                      style={{ alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 17, backgroundColor: bgColor }}
+                      style={{ alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 17, backgroundColor: bgColor, opacity: isPast ? 0.3 : 1 }}
                       onPress={() => {
-                        setSelectedDate(dateStr);
+                        if (!isPast) setSelectedDate(dateStr);
                       }}
-                      activeOpacity={0.7}
+                      activeOpacity={isPast ? 1 : 0.7}
+                      disabled={isPast}
                     >
                       <Text style={{ color: textColor, fontWeight, fontSize: 14 }}>{date.day}</Text>
                       {marking && marking.count > 0 && (
@@ -490,8 +523,8 @@ export default function Home() {
               />
             </>
           ) : (
-            <TouchableOpacity onPress={() => setShowFullCalendar(true)} activeOpacity={0.8} style={{paddingVertical: 4}}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 8 }}>
+            <TouchableOpacity onPress={() => setShowFullCalendar(true)} activeOpacity={0.8} style={{paddingVertical: 2}}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 2 }}>
                 {getWeekDays(selectedDate).map((d, idx) => {
                   const isSelected = d.date === selectedDate;
                   return (
@@ -514,7 +547,7 @@ export default function Home() {
                   );
                 })}
               </View>
-              <Text style={{ textAlign: 'center', color: colors.secondary, marginTop: 4, fontSize: 13 }}>Toque para expandir o calendário</Text>
+              <Text style={{ textAlign: 'center', color: colors.secondary, marginTop: 2, fontSize: 12 }}>Toque para expandir o calendário</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -756,9 +789,9 @@ export default function Home() {
       <TouchableOpacity
         style={styles.fab}
         activeOpacity={0.8}
-        onPress={() => setModalVisible(true)}
+        onPress={() => Navigation.navigate('Agendar')}
       >
-  <Ionicons name="add" size={32} color={colors.white} />
+        <Ionicons name="add" size={32} color={colors.white} />
       </TouchableOpacity>
     </View>
   );

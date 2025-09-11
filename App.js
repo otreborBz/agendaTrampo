@@ -9,7 +9,7 @@ import Loading from './src/components/loading/loading';
 export default function App() {
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
         <AuthProvider>
           <Routes />
         </AuthProvider>

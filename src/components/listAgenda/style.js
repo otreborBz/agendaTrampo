@@ -7,14 +7,24 @@ const styles = StyleSheet.create({
   // ===== Card =====
   card: {
     backgroundColor: colors.white,
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#eee",
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 8,
+    marginBottom: 4,
+    borderWidth: 2,
+    borderColor: colors.secondary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 6,
+    // Animação de destaque ao tocar será aplicada inline
   },
   cardPressed: {
-    backgroundColor: "#fafafa",
+    backgroundColor: '#f0f7ff',
+    borderColor: colors.primary,
+    elevation: 10,
+    shadowOpacity: 0.18,
   },
   cardHeader: {
     flexDirection: "row",

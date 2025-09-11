@@ -12,9 +12,9 @@ export default function Sobre() {
         <Ionicons name="arrow-back" size={28} color={colors.secondary} />
       </TouchableOpacity>
       <View style={styles.logoBox}>
-        <Image source={require('../../image/logo/iconMain.png')} style={styles.logo} />
+        <Image source={require('../../image/logo/iconName.png')} style={styles.logo} />
       </View>
-      <Text style={styles.title}>AgendaTrampo</Text>
+      {/* <Text style={styles.title}>AgendaTrampo</Text> */}
       <Text style={styles.desc}>Facilite o agendamento de serviços e organize seu dia a dia de forma prática e moderna.</Text>
       <View style={styles.versionBox}>
         <Ionicons name="information-circle-outline" size={18} color={colors.secondary} />
@@ -56,8 +56,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: 180,
+    height: 180,
     borderRadius: 20,
     marginBottom: 4,
   },
