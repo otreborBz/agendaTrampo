@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useNavigation } from '@react-navigation/native';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../service/firebaseConnection';
+import { db } from '../../services/firebase/firebaseConnection';
 import {
   View,
   Text,

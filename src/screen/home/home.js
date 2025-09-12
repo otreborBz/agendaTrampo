@@ -13,7 +13,7 @@ LocaleConfig.locales['pt-br'] = {
 LocaleConfig.defaultLocale = 'pt-br';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { db } from '../../service/firebaseConnection';
+import { db } from '../../services/firebase/firebaseConnection';
 import { collection, addDoc, getDocs, updateDoc, doc, setDoc, query, where, onSnapshot } from 'firebase/firestore';
 
 import styles from './style';
@@ -23,7 +23,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ListAgenda from '../../components/listAgenda/listAgenda';
 import { AuthContext } from '../../contexts/auth';
 
-import apiViaCep from '../../service/apiViaCep';
+import apiViaCep from '../../services/apiViaCep/apiViaCep';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Home() {

@@ -14,12 +14,14 @@ import {
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { colors } from '../../colors/colors';
-import { db } from '../../service/firebaseConnection';
+import { db } from '../../services/firebase/firebaseConnection';
 import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { AuthContext } from '../../contexts/auth';
-import apiViaCep from '../../service/apiViaCep';
+import apiViaCep from '../../services/apiViaCep/apiViaCep';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './style';
+
+import { buscarCep } from '../../services/apiViaCep/apiViaCepService';
 
 export default function Agendamentos({ route, navigation }) {
   const { user } = useContext(AuthContext);
@@ -151,39 +153,22 @@ export default function Agendamentos({ route, navigation }) {
   };
 
   const selecionarServico = (servicoSelecionado) => {
-    setServico(servicoSelecionado);
-    setModalServicoVisible(false);
-  };
+      setServico(servicoSelecionado);
+      setModalServicoVisible(false);
+    };
 
+
+  // busca o cep
   const handleSearchCep = async () => {
-    try {
-      setLoadingCep(true);
-      const cepSanitized = endereco.cep.replace(/\D/g, '');
-      if (cepSanitized.length !== 8) {
-        Alert.alert('Erro', 'CEP inválido! Deve conter 8 dígitos.');
-        setLoadingCep(false);
-        return;
-      }
-      const response = await apiViaCep.get(`${cepSanitized}/json/`);
-      const data = response.data;
-      setLoadingCep(false);
-      if (data.erro) {
-        Alert.alert('Erro', 'CEP não encontrado.');
-        return;
-      }
-      setEndereco(prev => ({
-        ...prev,
-        rua: data.logradouro || '',
-        bairro: data.bairro || '',
-        cidade: data.localidade || '',
-        estado: data.uf || '',
-        cep: cepSanitized
-      }));
-    } catch {
-      setLoadingCep(false);
-      Alert.alert('Erro', 'Não foi possível buscar o CEP. Tente novamente.');
+    setLoadingCep(true);
+    const resultado = await buscarCep(endereco.cep);
+    setLoadingCep(false);
+
+    if (resultado) {
+      setEndereco(prev => ({ ...prev, ...resultado }));
     }
   };
+
 
   const saveEndereco = () => {
     const { rua, numero, bairro, cidade, estado, cep } = endereco;
