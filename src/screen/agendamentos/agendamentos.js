@@ -58,6 +58,12 @@ export default function Agendamentos({ route, navigation }) {
       return;
     }
 
+    // 🚨 Nova validação: impedir salvar com data/hora passada
+    if (dataHora < new Date()) {
+      Alert.alert('Erro', 'Não é permitido agendar para uma data/hora anterior à atual!');
+      return;
+    }
+
     const agendamentoData = {
       nomeCliente,
       telefone,
@@ -77,30 +83,27 @@ export default function Agendamentos({ route, navigation }) {
         await addDoc(collection(db, 'agendamentos'), agendamentoData);
         Alert.alert('Sucesso', 'Agendamento criado!');
       }
-	   	setNomeCliente('');
-		setTelefone('');
-		setDataHora(new Date());
-		setServico('');
-		setValor('');
-		setEndereco({ rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '' });
-		setStatus('Pendente');
-      	navigation.goBack();
+      setNomeCliente('');
+      setTelefone('');
+      setDataHora(new Date());
+      setServico('');
+      setValor('');
+      setEndereco({ rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '' });
+      setStatus('Pendente');
+      navigation.goBack();
     } catch {
       Alert.alert('Erro', 'Não foi possível salvar o agendamento.');
     }
-	finally {
-	 	
-	}
+    finally {
+
+    }
   };
 
   const onChangeDate = (event, selectedDate) => {
     setShowDatePicker(false);
     if (event.type === 'dismissed') return;
     const currentDate = selectedDate || dataHora;
-    if (currentDate < new Date()) {
-      Alert.alert('Erro', 'Não é permitido escolher datas anteriores!');
-      return;
-    }
+    // 🚨 Removido bloqueio direto de datas passadas aqui
     setDataHora(currentDate);
     if (Platform.OS === 'android') setShowTimePicker(true);
   };
@@ -213,7 +216,7 @@ export default function Agendamentos({ route, navigation }) {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        <View style={{ alignItems: 'center', marginBottom: 24 }}>
+        <View style={{ alignItems: 'center' }}>
           <Text style={styles.headerTitle}>{agendamentoEdit ? 'Editar Agendamento' : 'Novo Agendamento'}</Text>
         </View>
 
@@ -249,7 +252,7 @@ export default function Agendamentos({ route, navigation }) {
         </TouchableOpacity>
 
         {showDatePicker && (
-          <DateTimePicker value={dataHora} mode="date" display="default" onChange={onChangeDate} minimumDate={new Date()} />
+          <DateTimePicker value={dataHora} mode="date" display="default" onChange={onChangeDate} />
         )}
         {showTimePicker && (
           <DateTimePicker value={dataHora} mode="time" display="default" onChange={onChangeTime} />
