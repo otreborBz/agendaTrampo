@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, KeyboardAvoidingView, Platform, Animated, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity, KeyboardAvoidingView, Platform, Animated, ActivityIndicator } from 'react-native';
 import styles from './style';
 import { AuthContext } from '../../contexts/auth';
 import { useNavigation } from '@react-navigation/native';
+import CustomAlert from '../../components/customAlert/CustomAlert';
 
 export default function Login() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -14,6 +15,15 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Estado para o alerta customizado
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertInfo, setAlertInfo] = useState({ title: '', message: '' });
+
+  const showAlert = (title, message) => {
+    setAlertInfo({ title, message });
+    setAlertVisible(true);
+  };
 
   // Animação de entrada
   useEffect(() => {
@@ -44,16 +54,17 @@ export default function Login() {
   // Função de login
   async function handleLogin() {
     if (email === '' || password === '') {
-      alert('Por favor, preencha todos os campos.');
+      showAlert('Atenção', 'Por favor, preencha todos os campos.');
       return;
     }
 
     try {
       const result = await signIn(email, password);
-
-      if (!result.success) Alert.alert('Erro no Login', result.message);
+      if (!result.success) {
+        showAlert('Erro no Login', result.message);
+      }
     } catch (error) {
-      Alert.alert('Erro', 'Ocorreu um erro ao fazer login.');
+      showAlert('Erro', 'Ocorreu um erro inesperado ao fazer login.');
     }
   }
 
@@ -62,6 +73,12 @@ export default function Login() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
+      <CustomAlert
+        visible={alertVisible}
+        title={alertInfo.title}
+        message={alertInfo.message}
+        onClose={() => setAlertVisible(false)}
+      />
       <Animated.Image 
         source={require('../../image/logo/iconName.png')} 
         style={[

@@ -4,80 +4,92 @@ import { colors } from "../../colors/colors";
 const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
+  // ===== Grid Container =====
+  gridItemContainer: {
+    width: '50%', // Garante que cada item ocupe metade da tela
+    padding: 3,   // Cria o espaçamento visual entre os cards
+  },
+
   // ===== Card =====
   card: {
     backgroundColor: colors.white,
-    padding: 16,
-    borderRadius: 16,
-    marginTop: 8,
-    marginBottom: 4,
-    borderWidth: 2,
-    borderColor: colors.secondary,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
+    borderRadius: 18,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
     elevation: 6,
-    // Animação de destaque ao tocar será aplicada inline
+    borderRightWidth: 4, // Adiciona a borda na direita
+    borderRightColor: '#ccc', // Cor padrão, será sobrescrita
   },
   cardPressed: {
-    backgroundColor: '#f0f7ff',
-    borderColor: colors.primary,
-    elevation: 10,
-    shadowOpacity: 0.18,
+    transform: [{ scale: 0.98 }],
+    shadowOpacity: 0.15,
+  },
+  cardContent: {
+    flex: 1,
+    padding: 14,
+    justifyContent: 'space-between', // Empurra o conteúdo para o topo e para o fundo
   },
   cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
   },
   cardNome: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.secondary,
-    flex: 1,
-    marginRight: 8,
+    flex: 1, // Permite que o nome ocupe o espaço disponível
+    marginRight: 8, // Adiciona um espaço antes do botão de opções
+  },
+  moreButton: { padding: 4 },
+  cardServico: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 4, // Adiciona um pequeno espaço abaixo do nome
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start', // Alinha o status à esquerda
+    alignItems: 'center',
+    marginTop: 8, // Adiciona um espaço entre a data e o status
   },
   cardInfoRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    flexShrink: 1, // Permite que este container encolha se necessário
+    marginBottom: 6, // Espaço entre as linhas de informação
+  },
+  cardIcon: {
+    marginRight: 8,
+    width: 16, // Garante alinhamento consistente dos ícones
   },
   cardDataHora: {
     fontSize: 13,
     color: "#666",
-    marginLeft: 4,
-  },
-  cardServico: {
-    fontSize: 14,
-    color: "#444",
-    marginTop: 4,
   },
 
   // ===== Status Badge =====
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: 70,
-  },
   statusText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#fff",
-    textAlign: "center",
+    paddingVertical: 2,
+    paddingHorizontal: 15,
+    borderRadius: 14,
+    overflow: 'hidden',
   },
   statusConfirmado: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#E6F4EA", // verde suave
+    color: "#388E3C",
   },
   statusPendente: {
-    backgroundColor: "#FFC107",
+    backgroundColor: "#FFF9E6", // amarelo suave
+    color: "#FFA000",
   },
   statusCancelado: {
-    backgroundColor: "#F44336",
+    backgroundColor: "#FDEAEA", // vermelho suave
+    color: "#D32F2F",
   },
 
   // ===== Modal Overlay =====
@@ -95,9 +107,9 @@ const styles = StyleSheet.create({
   },
   modalContentCentered: {
     width: width * 0.9,
-    maxHeight: height * 0.8,
+    maxHeight: height * 0.85,
     backgroundColor: "#fff",
-    borderRadius: 16,
+    borderRadius: 18,
     overflow: "hidden",
   },
 
@@ -115,19 +127,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  closeButton: {
-    padding: 4,
-  },
+  closeButton: { padding: 4 },
 
   // ===== Conteúdo do Modal =====
   modalScrollView: {
     paddingHorizontal: 20,
-    maxHeight: height * 0.9,
+    maxHeight: height * 0.85,
   },
-  infoSection: {
-    marginTop: 20,
-    marginBottom: 10,
-  },
+  infoSection: { marginTop: 20, marginBottom: 10 },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
@@ -137,70 +144,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 14,
-  },
-  infoIcon: {
-    width: 24,
-    marginRight: 12,
-    marginTop: 2,
-  },
-  infoContent: {
-    flex: 1,
-  },
-  infoLabel: {
-    fontSize: 13,
-    color: "#777",
-    marginBottom: 2,
-    fontWeight: "500",
-  },
-  infoText: {
-    fontSize: 15,
-    color: "#444",
-  },
+  infoRow: { flexDirection: "row", alignItems: "flex-start", marginBottom: 14 },
+  infoIcon: { width: 24, marginRight: 12, marginTop: 2 },
+  infoContent: { flex: 1 },
+  infoLabel: { fontSize: 13, color: "#777", marginBottom: 2, fontWeight: "500" },
+  infoText: { fontSize: 15, color: "#444" },
 
-  // ===== ActionSheet Android =====
-  actionSheetOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  actionSheetContainer: {
-    backgroundColor: "white",
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    padding: 10,
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  actionSheetButton: {
-    padding: 14,
-    borderRadius: 8,
-    marginBottom: 6,
-    backgroundColor: "#f8f8f8",
-  },
-  actionSheetDestructive: {
-    backgroundColor: "#fff0f0",
-  },
-  actionSheetText: {
-    fontSize: 15,
-    textAlign: "center",
-  },
-  actionSheetDestructiveText: {
-    color: "red",
-  },
-  actionSheetCancel: {
-    padding: 14,
-    borderRadius: 8,
-    backgroundColor: "#f8f8f8",
-    marginTop: 5,
-  },
-  actionSheetCancelText: {
-    fontSize: 15,
-    textAlign: "center",
-    fontWeight: "600",
+  // ===== Status Badge Modal =====
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "transparent",
   },
 });
 

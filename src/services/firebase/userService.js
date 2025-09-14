@@ -22,7 +22,7 @@ export async function signInUser(email, password) {
       throw new Error("Dados do usuário não encontrados no banco de dados.");
     }
   } catch (error) {
-    if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+    if (["auth/user-not-found", "auth/wrong-password", "auth/invalid-credential"].includes(error.code)) {
       throw new Error("E-mail ou senha inválidos.");
     }
     console.error("Erro em signInUser:", error);

@@ -40,25 +40,31 @@ export async function getAgendamentos(userId) {
 /**
  * Listener em tempo real
  * @param {string} userId
- * @param {function} callback
+ * @param {function} onData - Callback para sucesso, recebe a lista de agendamentos.
+ * @param {function} onError - Callback para falha.
  * @returns {function} unsubscribe
  */
-export function listenAgendamentos(userId, callback) {
+export function listenAgendamentos(userId, onData, onError) {
   const agendamentosRef = collection(db, 'agendamentos');
   const q = query(agendamentosRef, where('uid', '==', userId));
 
-  return onSnapshot(q, (querySnapshot) => {
-    const agendamentos = [];
-    querySnapshot.forEach((doc) => {
-      agendamentos.push({ ...doc.data(), id: doc.id });
-    });
-    callback(
-      agendamentos.map((agenda) => ({
-        ...agenda,
-        status: agenda.status || 'Pendente',
-      }))
-    );
-  });
+  return onSnapshot(q, 
+    (querySnapshot) => { // Callback de sucesso
+      const agendamentos = [];
+      querySnapshot.forEach((doc) => {
+        agendamentos.push({ ...doc.data(), id: doc.id });
+      });
+      const mappedData = agendamentos.map((agenda) => ({
+          ...agenda,
+          status: agenda.status || 'Pendente',
+      }));
+      onData(mappedData);
+    },
+    (error) => { // Callback de erro
+      console.error("Erro no listener de agendamentos:", error);
+      onError(error);
+    }
+  );
 }
 
 /**
