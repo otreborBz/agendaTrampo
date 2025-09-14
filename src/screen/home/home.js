@@ -155,10 +155,10 @@ export default function Home() {
         <View style={{ backgroundColor: colors.white, borderRadius: 10, padding: 4, marginTop: 0, marginBottom: 4, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 2 }}>
           {showFullCalendar ? (
             <>
-              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 4 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 4, marginTop: 4, paddingHorizontal: 2 }}>
                 <TouchableOpacity onPress={() => setShowFullCalendar(false)} style={{ flexDirection: 'row', alignItems: 'center', padding: 4 }}>
                   <Ionicons name="chevron-up-outline" size={18} color={colors.secondary} />
-                  <Text style={{ color: colors.secondary, fontSize: 13, marginLeft: 2 }}>Recolher calendário</Text>
+                  <Text style={{ color: colors.secondary, fontSize: 13, marginLeft: 2 }}>Toque para recolher o calendário</Text>
                 </TouchableOpacity>
               </View>
               <Calendar
@@ -226,7 +226,7 @@ export default function Home() {
                   );
                 })}
               </View>
-              <Text style={{ textAlign: 'center', color: colors.secondary, marginTop: 2, fontSize: 12 }}>Toque para expandir o calendário</Text>
+              <Text style={{ textAlign: 'center', color: colors.secondary, marginTop: 10, marginBottom: 10, fontSize: 12 }}>Toque para expandir o calendário</Text>
             </TouchableOpacity>
           )}
         </View>

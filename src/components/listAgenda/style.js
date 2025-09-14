@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     maxHeight: height * 0.85,
   },
-  infoSection: { marginTop: 20, marginBottom: 10 },
+  infoSection: { marginTop: 10, marginBottom: 10 },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
@@ -152,8 +152,8 @@ const styles = StyleSheet.create({
 
   // ===== Status Badge Modal =====
   statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 3,
+    paddingVertical: 4,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "transparent",

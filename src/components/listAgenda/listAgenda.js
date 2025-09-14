@@ -269,7 +269,7 @@ export default function ListAgenda({ data }) {
                   {/* Status clicável */}
                   <View style={{ marginTop: 10 }}>
                     <Text style={{ fontSize: 14, fontWeight: "600", marginBottom: 6 }}>Status:</Text>
-                    <View style={{ flexDirection: "row", gap: 10 }}>
+                    <View style={{ flexDirection: "row", gap:5 }}>
                       {["Concluido", "Pendente", "Cancelado"].map((s) => (
                         <Pressable
                           key={s}
