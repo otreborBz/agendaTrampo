@@ -1,0 +1,72 @@
+import { db } from './firebaseConnection';
+import {doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth } from './firebaseConnection';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+
+/**
+ * Autentica um usuário com email e senha e busca seus dados no Firestore.
+ * @param {string} email - O email do usuário.
+ * @param {string} password - A senha do usuário.
+ * @returns {Promise<object>} - Retorna o objeto do usuário do Firestore.
+ * @throws {Error} - Lança um erro com uma mensagem amigável em caso de falha.
+ */
+export async function signInUser(email, password) {
+  try {
+    const { user } = await signInWithEmailAndPassword(auth, email, password);
+    const userDocRef = doc(db, "users", user.uid);
+    const userSnapshot = await getDoc(userDocRef);
+
+    if (userSnapshot.exists()) {
+      return userSnapshot.data();
+    } else {
+      throw new Error("Dados do usuário não encontrados no banco de dados.");
+    }
+  } catch (error) {
+    if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+      throw new Error("E-mail ou senha inválidos.");
+    }
+    console.error("Erro em signInUser:", error);
+    throw new Error("Não foi possível fazer login. Tente novamente.");
+  }
+}
+
+/**
+ * Cria um novo usuário com email/senha e salva seus dados no Firestore.
+ * @param {string} name - O nome do usuário.
+ * @param {string} email - O email do usuário.
+ * @param {string} password - A senha do usuário.
+ * @returns {Promise<void>} - Retorna uma promise vazia em caso de sucesso.
+ * @throws {Error} - Lança um erro com uma mensagem amigável em caso de falha.
+ */
+export async function signUpUser(name, email, password) {
+  try {
+    const { user } = await createUserWithEmailAndPassword(auth, email, password);
+    const userDocRef = doc(db, "users", user.uid);
+    await setDoc(userDocRef, { uid: user.uid, name, email, createdAt: new Date() });
+  } catch (error) {
+    if (error.code === "auth/email-already-in-use") {
+      throw new Error("Este e-mail já está em uso.");
+    } else if (error.code === "auth/weak-password") {
+      throw new Error("A senha deve ter pelo menos 6 caracteres.");
+    } else if (error.code === "auth/invalid-email") {
+      throw new Error("O e-mail informado não é válido.");
+    }
+    console.error("Erro em signUpUser:", error);
+    throw new Error("Não foi possível criar o usuário. Tente novamente.");
+  }
+}
+
+
+/**
+ * Desloga o usuário atual do Firebase.
+ * @returns {Promise<void>}
+ * @throws {Error} Lança um erro se não for possível fazer logout.
+ */
+export async function logoutUser() {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Erro em logoutUser:", error);
+    throw new Error("Não foi possível fazer logout. Tente novamente.");
+  }
+}

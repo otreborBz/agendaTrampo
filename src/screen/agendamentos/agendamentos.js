@@ -1,27 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Platform,
-  KeyboardAvoidingView,
-  Modal,
-  ActivityIndicator
-} from 'react-native';
-import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { colors } from '../../colors/colors';
-import { db } from '../../services/firebase/firebaseConnection';
-import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
+import {  View,  Text,  TextInput, TouchableOpacity,  Alert, ScrollView,  Platform, KeyboardAvoidingView, Modal, ActivityIndicator} from 'react-native';
+
 import { AuthContext } from '../../contexts/auth';
-import apiViaCep from '../../services/apiViaCep/apiViaCep';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import styles from './style';
 
 import { buscarCep } from '../../services/apiViaCep/apiViaCepService';
+import { salvarAgendamento } from '../../services/agendamentoService/agendamentoService';
+
+import styles from './style';
+import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { colors } from '../../colors/colors';
+
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 
 export default function Agendamentos({ route, navigation }) {
   const { user } = useContext(AuthContext);
@@ -54,50 +45,25 @@ export default function Agendamentos({ route, navigation }) {
     loadServicos();
   }, []);
 
-  const handleSave = async () => {
-    if (!nomeCliente || !telefone || !dataHora) {
-      Alert.alert('Erro', 'Preencha todos os campos obrigatórios!');
-      return;
-    }
 
-    // 🚨 Nova validação: impedir salvar com data/hora passada
-    if (dataHora < new Date()) {
-      Alert.alert('Erro', 'Não é permitido agendar para uma data/hora anterior à atual!');
-      return;
-    }
+  const limparCampos = () => {
+    setNomeCliente('');
+    setTelefone('');
+    setDataHora(new Date());
+    setServico('');
+    setValor('');
+    setEndereco({ rua:'', numero:'', bairro:'', cidade:'', estado:'', cep:'' });
+  };
 
-    const agendamentoData = {
-      nomeCliente,
-      telefone,
-      dataHora: dataHora.toISOString(),
-      servico: servico || null,
-      valor: valor || null,
-      endereco: Object.values(endereco).some(e => e) ? endereco : null,
-      status,
-      uid: user?.uid || agendamentoEdit?.uid || null
-    };
-
+  const handleSaveAgendamento = async () => {
     try {
-      if (agendamentoEdit?.id) {
-        await updateDoc(doc(db, 'agendamentos', agendamentoEdit.id), agendamentoData);
-        Alert.alert('Sucesso', 'Agendamento atualizado!');
-      } else {
-        await addDoc(collection(db, 'agendamentos'), agendamentoData);
-        Alert.alert('Sucesso', 'Agendamento criado!');
-      }
-      setNomeCliente('');
-      setTelefone('');
-      setDataHora(new Date());
-      setServico('');
-      setValor('');
-      setEndereco({ rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '' });
-      setStatus('Pendente');
+      await salvarAgendamento({nomeCliente, telefone, dataHora, servico, valor, endereco, status, uid: user.uid  }, agendamentoEdit?.id);
+      Alert.alert("Sucesso", `Agendamento ${agendamentoEdit ? 'atualizado' : 'cadastrado'}!`);
+      limparCampos();
       navigation.goBack();
-    } catch {
-      Alert.alert('Erro', 'Não foi possível salvar o agendamento.');
-    }
-    finally {
 
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível salvar o agendamento. Tente novamente.");
     }
   };
 
@@ -105,7 +71,6 @@ export default function Agendamentos({ route, navigation }) {
     setShowDatePicker(false);
     if (event.type === 'dismissed') return;
     const currentDate = selectedDate || dataHora;
-    // 🚨 Removido bloqueio direto de datas passadas aqui
     setDataHora(currentDate);
     if (Platform.OS === 'android') setShowTimePicker(true);
   };
@@ -375,7 +340,7 @@ export default function Agendamentos({ route, navigation }) {
         <TouchableOpacity style={styles.buttonFooterCancel} onPress={() => navigation.goBack()}>
           <Text style={styles.buttonTextCancel}>Cancelar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonFooter} onPress={handleSave}>
+        <TouchableOpacity style={styles.buttonFooter} onPress={handleSaveAgendamento}>
           <Text style={styles.buttonTextFooter}>{agendamentoEdit ? 'Salvar' : 'Agendar'}</Text>
         </TouchableOpacity>
       </View>

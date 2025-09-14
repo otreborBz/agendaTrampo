@@ -51,12 +51,8 @@ export default function Login() {
     try {
       const result = await signIn(email, password);
 
-      if (!result.success) {
-        Alert.alert('Erro', 'Não foi possível fazer login. Verifique seus dados.');
-      }
-
+      if (!result.success) Alert.alert('Erro no Login', result.message);
     } catch (error) {
-      console.log("Erro ao logar:", error);
       Alert.alert('Erro', 'Ocorreu um erro ao fazer login.');
     }
   }

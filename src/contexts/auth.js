@@ -1,7 +1,10 @@
 import React, { createContext, useState, useEffect } from "react";
 import { collection, query, where, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
 import { db, auth } from "../services/firebase/firebaseConnection";
-import {createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged} from "firebase/auth";
+import {signOut as firebaseSignOut, onAuthStateChanged} from "firebase/auth";
+
+
+import { signInUser, signUpUser, logoutUser } from "../services/firebase/loginService";
 
 export const AuthContext = createContext({});
 
@@ -58,72 +61,41 @@ function AuthProvider({ children }) {
     return () => unsubscribe(); 
   }, []);
 
-  // Login
+  // Logar o usuario
   async function signIn(email, password) {
     setLoading(true);
     try {
-      const value = await signInWithEmailAndPassword(auth, email, password);
-      const uid = value.user.uid;
-
-      const docRef = doc(db, "users", uid);
-      const snapshot = await getDoc(docRef);
-
-      if (snapshot.exists()) {
-        setUser(snapshot.data());
-        await fetchAppointmentsByUser(uid);
-        return { success: true, user: snapshot.data() };
-      } else {
-        alert("Usuário não encontrado no banco de dados.");
-        return { success: false };
-      }
+      await signInUser(email, password);
+      return { success: true };
     } catch (error) {
-      if (error.code === "auth/user-not-found") alert("Usuário não encontrado.");
-      else if (error.code === "auth/wrong-password") alert("Senha incorreta.");
-      else if (error.code === "auth/invalid-email") alert("E-mail inválido.");
-      else {
-        console.log("Erro no login:", error);
-        alert("Erro ao fazer login. Tente novamente.");
-      }
-      return { success: false };
+      return { success: false, message: error.message };
     } finally {
       setLoading(false);
     }
   }
 
-  // Cadastro
+  // Cadastro novo usuário
   async function signUp(name, email, password) {
     setLoading(true);
     try {
-      const value = await createUserWithEmailAndPassword(auth, email, password);
-      const uid = value.user.uid;
-      const docRef = doc(db, "users", uid);
-      await setDoc(docRef, { uid, name, email, createdAt: new Date() });
-      alert("Usuário criado com sucesso!");
+      await signUpUser(name, email, password);
       return { success: true };
     } catch (error) {
-      if (error.code === "auth/email-already-in-use") alert("Esse e-mail já está cadastrado.");
-      else if (error.code === "auth/weak-password") alert("A senha deve ter pelo menos 6 caracteres.");
-      else if (error.code === "auth/invalid-email") alert("O e-mail informado não é válido.");
-      else {
-        console.log("Erro no cadastro:", error);
-        alert("Erro ao criar usuário. Tente novamente.");
-      }
-      return { success: false };
+      return { success: false, message: error.message };
     } finally {
-      setLoading(false);
+      setLoading(false);  
     }
+  
   }
 
-  // Logout
+  // Deslogar o usuario
   async function logout() {
     try {
-      await firebaseSignOut(auth);
-      setUser(null);
-      setAppointments([]);
+      await logoutUser();
       return { success: true };
     } catch (error) {
       console.log("Erro ao deslogar:", error);
-      return { success: false };
+      return { success: false, message: error.message };
     }
   }
 

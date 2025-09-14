@@ -72,39 +72,52 @@ export default function Home() {
     return () => unsubscribe();
   }, [user]);
 
-  // Funções Firestore
-  const saveAgendamentoFirestore = async (agendamento) => await createAgendamento(agendamento);
-  const updateAgendamentoFirestore = async (id, data) => await updateAgendamento(id, data);
+  // Limpa os campos do formulário do modal
+  const limparCampos = () => {
+    setNomeCliente('');
+    setTelefone('');
+    setDataHora(new Date());
+    setServico('');
+    setValor('');
+    setEndereco({ rua:'', numero:'', bairro:'', cidade:'', estado:'', cep:'' });
+  };
 
   // Função salvar agendamento
-  const saveAgenda = async () => {
-    if (!nomeCliente || !telefone || !dataHora) {
-      Alert.alert("Erro", "Preencha todos os campos obrigatórios!");
-      return;
+  const handleSaveAgendamento = async () => {
+    try {
+      // Chama o serviço para criar um novo agendamento (o segundo parâmetro é null)
+      await salvarAgendamento({  nomeCliente,   telefone,  dataHora,  servico,  valor,  endereco,  status: 'Pendente', // Status padrão para novos agendamentos  uid: user.uid
+       uid: user.uid,});
+      Alert.alert("Sucesso", "Agendamento cadastrado!");
+      setModalVisible(false); // Fecha o modal
+      limparCampos(); // Limpa os campos para o próximo uso
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível salvar o agendamento. Tente novamente.");
     }
-    const novoAgendamento = {
-      nomeCliente,
-      telefone,
-      dataHora: dataHora.toISOString(),
-      servico: servico || null,
-      valor: valor || null,
-      endereco: Object.values(endereco).some(e => e) ? endereco : null,
-      status: 'Pendente',
-      uid: user?.uid || null
-    };
-    await saveAgendamentoFirestore(novoAgendamento);
-    setModalVisible(false);
-    setNomeCliente(''); setTelefone(''); setDataHora(new Date()); setServico(''); setValor('');
-    setEndereco({ rua:'', numero:'', bairro:'', cidade:'', estado:'', cep:'' });
-    Alert.alert("Sucesso", "Agendamento cadastrado!");
   };
 
+
   // Atualizar status
-  const updateStatus = async (id, novoStatus) => {
-    const novosAgendamentos = agendamentos.map(a => a.id === id ? { ...a, status: novoStatus } : a);
-    setAgendamentos(novosAgendamentos);
-    await updateAgendamentoFirestore(id, { status: novoStatus });
+ const updateStatus = async (id, novoStatus) => {
+  const agendamentoAnterior = agendamentos.find(a => a.id === id);
+  const novosAgendamentos = agendamentos.map(a =>
+    a.id === id ? { ...a, status: novoStatus } : a
+  );
+  setAgendamentos(novosAgendamentos);
+
+  try {
+      await updateAgendamento(id, { status: novoStatus });
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+      Alert.alert("Erro", "Não foi possível atualizar o status. Tente novamente.");
+      
+      // Reverte para o status anterior
+      setAgendamentos(agendamentos.map(a =>
+        a.id === id ? agendamentoAnterior : a
+      ));
+    }
   };
+
 
   // Buscar CEP
   const handleSearchCep = async () => {
@@ -370,7 +383,6 @@ export default function Home() {
                   mode="date"
                   display="default"
                   onChange={onChangeDate}
-                  minimumDate={new Date()}
                 />
               )}
               {showTimePicker && (
@@ -406,7 +418,7 @@ export default function Home() {
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.buttonFooterCancel}>
                 <Text style={styles.buttonTextCancel}>Cancelar</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={saveAgenda} style={styles.buttonFooter}>
+              <TouchableOpacity onPress={handleSaveAgendamento} style={styles.buttonFooter}>
                 <Text style={styles.buttonTextFooter}>Salvar</Text>
               </TouchableOpacity>
             </View>

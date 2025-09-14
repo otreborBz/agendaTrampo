@@ -8,8 +8,13 @@ import {
   getDocs,
   query,
   where,
-  onSnapshot
+  onSnapshot,
+  getDoc
 } from 'firebase/firestore';
+import { auth } from './firebaseConnection';
+import {signInWithEmailAndPassword} from 'firebase/auth';
+
+
 
 /**
  * Buscar agendamentos do usuário
