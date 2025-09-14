@@ -1,311 +1,82 @@
 import React, { useEffect, useState, useContext, useMemo } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, FlatList, TouchableOpacity, Modal, TextInput,  ScrollView, Platform, Alert, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Modal, TextInput, ScrollView, Platform, Alert, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-// Configuração do calendário para o padrão brasileiro
+import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+
+import { AuthContext } from '../../contexts/auth';
+import ListAgenda from '../../components/listAgenda/listAgenda';
+import styles from './style';
+import { colors } from '../../colors/colors';
+import { buscarCep } from '../../services/apiViaCep/apiViaCepService';
+import { listenAgendamentos, createAgendamento, updateAgendamento } from '../../services/firebase/firestoreService';
+
+// Configuração do calendário para padrão brasileiro
 LocaleConfig.locales['pt-br'] = {
   monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-  monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+  monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Nov','Dez'],
   dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
   dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
   today: 'Hoje'
 };
 LocaleConfig.defaultLocale = 'pt-br';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { db } from '../../services/firebase/firebaseConnection';
-import { collection, addDoc, getDocs, updateDoc, doc, setDoc, query, where, onSnapshot } from 'firebase/firestore';
-
-import styles from './style';
-import { colors } from '../../colors/colors';
-import { Ionicons } from '@expo/vector-icons';
-
-import ListAgenda from '../../components/listAgenda/listAgenda';
-import { AuthContext } from '../../contexts/auth';
-
-import apiViaCep from '../../services/apiViaCep/apiViaCep';
-import { useNavigation } from '@react-navigation/native';
 
 export default function Home() {
 
-  const Navigation = useNavigation();
-  // Função utilitária para obter os dias da semana da data selecionada
-  function getWeekDays(dateStr) {
-    const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-    const date = new Date(dateStr);
-    const week = [];
-    // Encontra o domingo da semana
-    const sunday = new Date(date);
-    sunday.setDate(date.getDate() - date.getDay());
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(sunday);
-      d.setDate(sunday.getDate() + i);
-     week.push({
-    label: diasSemana[i],
-    date: formatDateLocal(d),
-    day: d.getDate(),
-});
+  const navigation = useNavigation();
+  const { user } = useContext(AuthContext);
 
-    }
-    return week;
-  }
-  // Estado para mostrar/esconder o calendário
-  const [showCalendar, setShowCalendar] = useState(true);
-  const [showFullCalendar, setShowFullCalendar] = useState(false); // Começa reduzido
-  const scrollOffset = React.useRef(0);
-  const { user, loading } = useContext(AuthContext);
+  // Estados
   const [agendamentos, setAgendamentos] = useState([]);
-  // Corrige fuso horário para garantir a data local
-  function getLocalDateString() {
-    // Retorna a data local no formato YYYY-MM-DD, sem ajuste manual de fuso
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-  const [selectedDate, setSelectedDate] = useState(getLocalDateString());
-  // Filtro de status
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [statusFiltro, setStatusFiltro] = useState('Todos');
-  // Marcações do calendário: sempre atualizadas conforme agendamentos e selectedDate
-  const markedDates = useMemo(() => {
-    const marks = {};
-    agendamentos.map(agenda => {
-      let dataStr = '';
-      if (agenda.dataHora) {
-       if (typeof agenda.dataHora === 'string') {
-          dataStr = agenda.dataHora.split('T')[0];
-        } else if (agenda.dataHora.toDate) {
-          dataStr = formatDateLocal(agenda.dataHora.toDate()); // 🔥 aqui troca
-}
-
-      }
-      if (!dataStr) return;
-      if (!marks[dataStr]) marks[dataStr] = { count: 0, status: {} };
-      marks[dataStr].count++;
-      marks[dataStr].status[agenda.status] = (marks[dataStr].status[agenda.status] || 0) + 1;
-    });
-    const calendarMarks = {};
-    Object.keys(marks).forEach(date => {
-      let bg = colors.success;
-      if (marks[date].status['Cancelado']) bg = colors.error;
-      else if (marks[date].status['Pendente']) bg = colors.warning;
-      else if (marks[date].status['Concluído']) bg = colors.success;
-      calendarMarks[date] = {
-        selected: date === selectedDate,
-        selectedColor: date === selectedDate ? colors.secondary : bg,
-        count: marks[date].count,
-      };
-    });
-    if (!calendarMarks[selectedDate]) {
-      calendarMarks[selectedDate] = {
-        selected: true,
-        selectedColor: colors.secondary,
-      };
-    }
-    return calendarMarks;
-  }, [agendamentos, selectedDate]);
-
-
-
-  // Função para formatar data
-  function formatDateHeader(dateStr) {
-    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    const [ano, mes, dia] = dateStr.split('-');
-    return `${dia} ${meses[parseInt(mes,10)-1]} ${ano}`;
-  }
-
 
   // Modais
   const [modalVisible, setModalVisible] = useState(false);
   const [modalEnderecoVisible, setModalEnderecoVisible] = useState(false);
   const [modalServicoVisible, setModalServicoVisible] = useState(false);
 
-  // Picker
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-
-  // Campos do agendamento
+  // Campos agendamento
   const [nomeCliente, setNomeCliente] = useState('');
   const [telefone, setTelefone] = useState('');
   const [dataHora, setDataHora] = useState(new Date());
   const [servico, setServico] = useState('');
   const [valor, setValor] = useState('');
-  const [endereco, setEndereco] = useState({
-    rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: ''
-  });
+  const [endereco, setEndereco] = useState({ rua:'', numero:'', bairro:'', cidade:'', estado:'', cep:'' });
 
-  // Serviços e novo serviço
+  // Serviços
   const [servicosExistentes, setServicosExistentes] = useState([]);
   const [novoServico, setNovoServico] = useState('');
-  const [ loadingCep, setLoadingCep] = useState(false);
+  const [loadingCep, setLoadingCep] = useState(false);
 
+  const [showCalendar, setShowCalendar] = useState(true);
+  const [showFullCalendar, setShowFullCalendar] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
-
-  // Listener em tempo real para agendamentos do usuário
+  // Carrega serviços do AsyncStorage
   useEffect(() => {
-    loadServicos();
-    if (!user?.uid) return;
-    const agendamentosRef = collection(db, 'agendamentos');
-    const q = query(agendamentosRef, where('uid', '==', user.uid));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const agendamentosData = [];
-      querySnapshot.forEach((doc) => {
-        agendamentosData.push({ ...doc.data(), id: doc.id });
-      });
-      const agendamentosComStatus = agendamentosData.map(agenda => ({
-        ...agenda,
-        status: agenda.status || 'Pendente'
-      }));
-      setAgendamentos(agendamentosComStatus);
-    });
-    return () => unsubscribe();
-    
-  // Marcações do calendário: sempre atualizadas conforme agendamentos e selectedDate
-  const markedDates = useMemo(() => {
-    const marks = {};
-    agendamentos.map(agenda => {
-      let dataStr = '';
-      if (agenda.dataHora) {
-        if (typeof agenda.dataHora === 'string') {
-          dataStr = agenda.dataHora.split('T')[0];
-        } else if (agenda.dataHora.toDate) {
-          dataStr = agenda.dataHora.toDate().toISOString().split('T')[0];
-        }
-      }
-      if (!dataStr) return;
-      if (!marks[dataStr]) marks[dataStr] = { count: 0, status: {} };
-      marks[dataStr].count++;
-      marks[dataStr].status[agenda.status] = (marks[dataStr].status[agenda.status] || 0) + 1;
-    });
-    const calendarMarks = {};
-    Object.keys(marks).forEach(date => {
-      let bg = colors.success;
-      if (marks[date].status['Cancelado']) bg = colors.error;
-      else if (marks[date].status['Pendente']) bg = colors.warning;
-      else if (marks[date].status['Concluído']) bg = colors.success;
-      calendarMarks[date] = {
-        selected: date === selectedDate,
-        selectedColor: date === selectedDate ? colors.secondary : bg,
-        customStyles: {
-          container: {
-            backgroundColor: date === selectedDate ? colors.secondary : bg,
-            borderRadius: 16,
-          },
-          text: {
-            color: date === selectedDate ? colors.white : colors.text,
-            fontWeight: date === selectedDate ? 'bold' : 'normal',
-          },
-        },
-        dots: [
-          { key: 'count', color: colors.primary, selectedDotColor: colors.white }
-        ],
-        count: marks[date].count
-      };
-    });
-    // Garante que o dia selecionado sempre aparece como selecionado
-    if (!calendarMarks[selectedDate]) {
-      calendarMarks[selectedDate] = {
-        selected: true,
-        selectedColor: colors.secondary,
-        customStyles: {
-          container: { backgroundColor: colors.secondary, borderRadius: 16 },
-          text: { color: colors.white, fontWeight: 'bold' },
-        },
-        count: 0
-      };
-    }
-    return calendarMarks;
-  }, [agendamentos, selectedDate]);
-  }, [user]);
-
-  const loadServicos = async () => {
-    try {
+    const loadServicos = async () => {
       const saved = await AsyncStorage.getItem('@servicos');
       if (saved) setServicosExistentes(JSON.parse(saved));
-    } catch (e) {
-      console.log('Erro ao carregar serviços', e);
-    }
-  };
+    };
+    loadServicos();
+  }, []);
 
-  // Carregar agendamentos do Firestore apenas do usuário logado
-  const loadAgendamentosFirestore = async () => {
+  // Listener de agendamentos em tempo real
+  useEffect(() => {
     if (!user?.uid) return;
-    try {
-      const agendamentosRef = collection(db, 'agendamentos');
-      const q = query(agendamentosRef, where('uid', '==', user.uid));
-      const querySnapshot = await getDocs(q);
-      const agendamentosData = [];
-      querySnapshot.forEach((doc) => {
-        agendamentosData.push({ ...doc.data(), id: doc.id });
-      });
-      // Garante que todos tenham status
-      const agendamentosComStatus = agendamentosData.map(agenda => ({
-        ...agenda,
-        status: agenda.status || 'Pendente'
-      }));
-      setAgendamentos(agendamentosComStatus);
-    } catch (e) {
-      console.log('Erro ao carregar agendamentos do Firestore', e);
-    }
-  };
+    const unsubscribe = listenAgendamentos(user.uid, setAgendamentos);
+    return () => unsubscribe();
+  }, [user]);
 
-  const saveServicosStorage = async (list) => {
-    try {
-      await AsyncStorage.setItem('@servicos', JSON.stringify(list));
-    } catch (e) {
-      console.log('Erro ao salvar serviços', e);
-    }
-  };
+  // Funções Firestore
+  const saveAgendamentoFirestore = async (agendamento) => await createAgendamento(agendamento);
+  const updateAgendamentoFirestore = async (id, data) => await updateAgendamento(id, data);
 
-  // Salvar novo agendamento no Firestore
-  const saveAgendamentoFirestore = async (agendamento) => {
-    try {
-      await addDoc(collection(db, 'agendamentos'), agendamento);
-    } catch (e) {
-      console.log('Erro ao salvar agendamento no Firestore', e);
-    }
-  };
-
-  // Atualizar agendamento no Firestore
-  const updateAgendamentoFirestore = async (id, data) => {
-    try {
-      const agendamentoRef = doc(db, 'agendamentos', id);
-      await updateDoc(agendamentoRef, data);
-    } catch (e) {
-      console.log('Erro ao atualizar agendamento no Firestore', e);
-    }
-  };
-
-  // Abrir modais
-  const openModal = () => {
-    // Sincroniza dataHora com o dia selecionado ao abrir o modal
-    const [year, month, day] = selectedDate.split('-');
-    const now = new Date();
-    // Se selectedDate for hoje, mantém hora atual, senão zera hora
-    if (selectedDate === getLocalDateString()) {
-      setDataHora(new Date(year, month - 1, day, now.getHours(), now.getMinutes()));
-    } else {
-      setDataHora(new Date(year, month - 1, day, 0, 0));
-    }
-    setModalVisible(true);
-  };
-
-  const openModalEndereco = () => setModalEnderecoVisible(true);
-  const openModalServico = () => setModalServicoVisible(true);
-
-  // Salvar endereço
-  const saveEndereco = () => {
-    const { rua, numero, bairro, cidade, estado, cep } = endereco;
-    if (!rua || !numero || !bairro || !cidade || !estado || !cep) {
-      Alert.alert("Erro", "Preencha todos os campos do endereço!");
-      return;
-    }
-    setModalEnderecoVisible(false);
-    Alert.alert("Sucesso", "Endereço salvo com sucesso!");
-  };
-
-  // Salvar agendamento
+  // Função salvar agendamento
   const saveAgenda = async () => {
     if (!nomeCliente || !telefone || !dataHora) {
       Alert.alert("Erro", "Preencha todos os campos obrigatórios!");
@@ -323,85 +94,56 @@ export default function Home() {
     };
     await saveAgendamentoFirestore(novoAgendamento);
     setModalVisible(false);
-    // Reset dos campos
-    setNomeCliente('');
-    setTelefone('');
-    setDataHora(new Date());
-    setServico('');
-    setValor('');
-    setEndereco({ rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '' });
-    // Recarrega agendamentos
-    loadAgendamentosFirestore();
+    setNomeCliente(''); setTelefone(''); setDataHora(new Date()); setServico(''); setValor('');
+    setEndereco({ rua:'', numero:'', bairro:'', cidade:'', estado:'', cep:'' });
     Alert.alert("Sucesso", "Agendamento cadastrado!");
   };
 
-  // Atualizar status do agendamento
+  // Atualizar status
   const updateStatus = async (id, novoStatus) => {
-    // Atualiza localmente
-    const novosAgendamentos = agendamentos.map(agenda => 
-      agenda.id === id ? { ...agenda, status: novoStatus } : agenda
-    );
+    const novosAgendamentos = agendamentos.map(a => a.id === id ? { ...a, status: novoStatus } : a);
     setAgendamentos(novosAgendamentos);
-    // Atualiza no Firestore
     await updateAgendamentoFirestore(id, { status: novoStatus });
   };
 
-  // Picker
-  const onChangeDate = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (event.type === 'dismissed') return;
-    const currentDate = selectedDate || dataHora;
-    // Permite qualquer horário do dia de hoje, bloqueia apenas datas anteriores a hoje
-    const hoje = new Date();
-    hoje.setHours(0,0,0,0);
-    const dataSelecionada = new Date(currentDate);
-    dataSelecionada.setHours(0,0,0,0);
-    if (dataSelecionada < hoje) {
-      Alert.alert("Erro", "Não é permitido escolher datas anteriores!");
-      return;
+  // Buscar CEP
+  const handleSearchCep = async () => {
+    setLoadingCep(true);
+    try {
+      const data = await buscarCep(endereco.cep);
+      setEndereco(prev => ({ ...prev, ...data }));
+    } catch (error) {
+      Alert.alert("Erro", error.message);
+    } finally {
+      setLoadingCep(false);
     }
-    setDataHora(currentDate);
-    if (Platform.OS === 'android') setShowTimePicker(true);
-  };
-
-  const onChangeTime = (event, selectedTime) => {
-    setShowTimePicker(false);
-    if (event.type === 'dismissed') return;
-    const updatedDateTime = new Date(dataHora);
-    updatedDateTime.setHours(selectedTime.getHours());
-    updatedDateTime.setMinutes(selectedTime.getMinutes());
-    setDataHora(updatedDateTime);
   };
 
   // Adicionar serviço
-  const adicionarServico = () => {
+  const adicionarServico = async () => {
     if (!novoServico.trim()) {
       Alert.alert("Erro", "Digite o nome do serviço!");
       return;
     }
-    
     const newList = [...servicosExistentes, novoServico.trim()];
     setServicosExistentes(newList);
-    saveServicosStorage(newList);
+    await AsyncStorage.setItem('@servicos', JSON.stringify(newList));
     setServico(novoServico.trim());
     setNovoServico('');
     setModalServicoVisible(false);
   };
 
-  // Remover serviço
   const removerServico = async (index) => {
     Alert.alert(
       "Confirmar Exclusão",
       "Tem certeza que deseja excluir este serviço?",
       [
         { text: "Cancelar", style: "cancel" },
-        { 
-          text: "Excluir", 
-          onPress: async () => {
+        { text: "Excluir", onPress: async () => {
             const newList = [...servicosExistentes];
             newList.splice(index, 1);
             setServicosExistentes(newList);
-            await saveServicosStorage(newList);
+            await AsyncStorage.setItem('@servicos', JSON.stringify(newList));
             if (servico === servicosExistentes[index]) setServico('');
           }
         }
@@ -409,55 +151,74 @@ export default function Home() {
     );
   };
 
-  // Selecionar serviço existente
-  const selecionarServico = (servicoSelecionado) => {
-    setServico(servicoSelecionado);
+  const selecionarServico = (s) => {
+    setServico(s);
     setModalServicoVisible(false);
   };
 
-  // Buscar CEP e preencher endereço
-  const handleSearchCep = async () => {
-    
-    try {
-      setLoadingCep(true);
-      const cepSanitized = endereco.cep.replace(/\D/g, '');
-      if (cepSanitized.length !== 8) {
-        Alert.alert("Erro", "CEP inválido! Deve conter 8 dígitos.");
-        return;
-      }
+  // Funções para abrir modais
+  const openModalServico = () => setModalServicoVisible(true);
+  const openModalEndereco = () => setModalEnderecoVisible(true);
 
-      const response = await apiViaCep.get(`${cepSanitized}/json/`);
-      const data = response.data;
-      setLoadingCep(false);
-
-      if (data.erro) {
-        Alert.alert("Erro", "CEP não encontrado.");
-        return;
-      }
-
-      setEndereco(prev => ({
-        ...prev,
-        rua: data.logradouro || '',
-        bairro: data.bairro || '',
-        cidade: data.localidade || '',
-        estado: data.uf || '',
-        cep: cepSanitized
-      }));
-
-    } catch (error) {
-      console.error("Erro ao buscar CEP:", error.message);
-      Alert.alert("Erro", "Não foi possível buscar o CEP. Tente novamente.");
-      setLoadingCep(false);
-    }
+  // DateTimePicker
+  const onChangeDate = (event, selected) => {
+    const currentDate = selected || dataHora;
+    setShowDatePicker(false);
+    setDataHora(currentDate);
+    setShowTimePicker(true);
+  };
+  const onChangeTime = (event, selected) => {
+    const currentTime = selected || dataHora;
+    setShowTimePicker(false);
+    setDataHora(currentTime);
   };
 
-  function formatDateLocal(date) {
+  // Salvar endereço
+  const saveEndereco = () => {
+    setModalEnderecoVisible(false);
+    Alert.alert("Sucesso", "Endereço salvo!");
+  };
+
+  // Função para obter dias da semana
+  const getWeekDays = (dateStr) => {
+    const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    const date = new Date(dateStr);
+    const sunday = new Date(date); sunday.setDate(date.getDate() - date.getDay());
+    return Array.from({length: 7}).map((_, i) => {
+      const d = new Date(sunday); d.setDate(sunday.getDate() + i);
+      return { label: diasSemana[i], date: formatDateLocal(d), day: d.getDate() };
+    });
+  };
+
+  const formatDateLocal = (date) => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+    const month = String(date.getMonth()+1).padStart(2,'0');
+    const day = String(date.getDate()).padStart(2,'0');
+    return `${year}-${month}-${day}`;
   };
 
+  const getLocalDateString = () => formatDateLocal(new Date());
+
+  // Marcação calendário
+  const markedDates = useMemo(() => {
+    const marks = {};
+    agendamentos.forEach(agenda => {
+      let dataStr = '';
+      if (agenda.dataHora) dataStr = typeof agenda.dataHora === 'string' ? agenda.dataHora.split('T')[0] : agenda.dataHora.toDate().toISOString().split('T')[0];
+      if (!dataStr) return;
+      if (!marks[dataStr]) marks[dataStr] = { count: 0, status: {} };
+      marks[dataStr].count++; marks[dataStr].status[agenda.status] = (marks[dataStr].status[agenda.status] || 0) + 1;
+    });
+    const calendarMarks = {};
+    Object.keys(marks).forEach(date => {
+      let bg = colors.success;
+      if (marks[date].status['Cancelado']) bg = colors.error;
+      else if (marks[date].status['Pendente']) bg = colors.warning;
+      calendarMarks[date] = { selected: date===selectedDate, selectedColor: date===selectedDate?colors.secondary:bg, count: marks[date].count };
+    });
+    if (!calendarMarks[selectedDate]) calendarMarks[selectedDate] = { selected: true, selectedColor: colors.secondary };
+    return calendarMarks;
+  }, [agendamentos, selectedDate]);
 
   return (
   <View style={styles.container}>
@@ -475,14 +236,10 @@ export default function Home() {
               </View>
               <Calendar
                 onDayPress={day => {
-                  // Só permite selecionar hoje ou datas futuras
-                  if (day.dateString >= getLocalDateString()) {
-                    setSelectedDate(day.dateString);
-                  }
+                 setSelectedDate(day.dateString); 
                 }}
                 markingType={'multi-dot'}
                 markedDates={markedDates}
-                minDate={getLocalDateString()}
                 style={{ borderRadius: 10, minWidth: 300 }}
                 theme={{
                   todayTextColor: colors.primary,
@@ -500,16 +257,11 @@ export default function Home() {
                   const bgColor = isSelected ? colors.secondary : marking.selectedColor || 'transparent';
                   const textColor = isSelected ? colors.white : colors.text;
                   const fontWeight = isSelected ? 'bold' : 'normal';
-                  // Desabilita visualmente dias anteriores a hoje
-                  const isPast = dateStr < getLocalDateString();
                   return (
                     <TouchableOpacity
-                      style={{ alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 17, backgroundColor: bgColor, opacity: isPast ? 0.3 : 1 }}
-                      onPress={() => {
-                        if (!isPast) setSelectedDate(dateStr);
-                      }}
-                      activeOpacity={isPast ? 1 : 0.7}
-                      disabled={isPast}
+                      style={{ alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 17, backgroundColor: bgColor }}
+                      onPress={() => setSelectedDate(dateStr)}
+                      activeOpacity={0.7}
                     >
                       <Text style={{ color: textColor, fontWeight, fontSize: 14 }}>{date.day}</Text>
                       {marking && marking.count > 0 && (
@@ -789,7 +541,7 @@ export default function Home() {
       <TouchableOpacity
         style={styles.fab}
         activeOpacity={0.8}
-        onPress={() => Navigation.navigate('Agendar')}
+        onPress={() => navigation.navigate('Agendar')}
       >
         <Ionicons name="add" size={32} color={colors.white} />
       </TouchableOpacity>
