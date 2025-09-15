@@ -20,7 +20,7 @@ export default StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: colors.text,
-    marginBottom: 6,
+    marginBottom: 4,
   },
 
   input: {
@@ -58,7 +58,7 @@ export default StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 12,
     marginBottom: 12,
-    height: 50,
+    height: 48,
   },
 
   inputBox: {
@@ -75,11 +75,27 @@ export default StyleSheet.create({
   buttonEndereco: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.secondary,
     borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginBottom: 16,
+    paddingVertical: 14,
+    marginBottom: 12,
+  },
+
+  inputIcon: {
+    borderWidth: 1,
+    borderColor: colors.secondary,
+    borderRadius: 10,
+    paddingVertical: 14,
+    marginBottom: 12,
+  },
+
+  textButton: {
+    width: '100%',
+    height: 50,
+    backgroundColor: colors.secondary,
+    borderRadius: 10,
   },
 
   textButtonEndereco: {
@@ -116,6 +132,22 @@ export default StyleSheet.create({
     textAlign: 'center',
     color: colors.secondary,
   },
+
+  // Estilos específicos para o Modal de Endereço
+  modalEnderecoLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  modalEnderecoInputContainer: {
+    height: 44,
+    marginBottom: 8,
+  },
+  modalEnderecoCepContainer: {
+    marginBottom: 8,
+  },
+  // Fim dos estilos específicos
 
   servicoItem: {
     flexDirection: 'row',

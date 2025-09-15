@@ -11,9 +11,7 @@ export async function buscarCep(cep) {
   if (cepSanitized.length !== 8) {
     throw new Error('CEP inválido! Deve conter 8 dígitos.');
   }
-
   const { data } = await apiViaCep.get(`${cepSanitized}/json/`);
-
   if (data.erro) {
     throw new Error('CEP não encontrado.');
   }

@@ -17,7 +17,7 @@ const CustomAlert = ({ visible, title, message, onClose, type = 'error' }) => {
     >
       <View style={styles.modalContainer}>
         <View style={styles.alertBox}>
-          <Ionicons name={iconName} size={48} color={iconColor} style={styles.icon} />
+          {/* <Ionicons name={iconName} size={48} color={iconColor} style={styles.icon} /> */}
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.message}>{message}</Text>
           <TouchableOpacity style={styles.button} onPress={onClose}>
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   button: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 30,

@@ -119,14 +119,14 @@ export default function ListAgenda({ data }) {
   const lowerCaseStatus = status.toLowerCase();
 
   if (lowerCaseStatus === 'pendente') {
-    cardStyle = { borderRightColor: colors.statusPendenteColor || "#FFA000" };
     statusStyle = styles.statusPendente;
+    cardStyle = { borderRightColor: colors.statusPendenteColor || "#FFA000", backgroundColor: statusStyle.backgroundColor };
   } else if (lowerCaseStatus === 'concluido' || lowerCaseStatus === 'concluído') {
-    cardStyle = { borderRightColor: colors.statusConfirmadoColor || "#388E3C" };
     statusStyle = styles.statusConfirmado;
+    cardStyle = { borderRightColor: colors.statusConfirmadoColor || "#388E3C", backgroundColor: statusStyle.backgroundColor };
   } else if (lowerCaseStatus === 'cancelado') {
-    cardStyle = { borderRightColor: colors.statusCanceladoColor || "#D32F2F" };
     statusStyle = styles.statusCancelado;
+    cardStyle = { borderRightColor: colors.statusCanceladoColor || "#D32F2F", backgroundColor: statusStyle.backgroundColor };
   }
 
   // Map de cores da barra lateral
@@ -157,7 +157,12 @@ export default function ListAgenda({ data }) {
 
   const handleEdit = () => {
     closeDetail();
-    navigation.navigate('Agendamentos', { agendamento: item });
+    const agendamentoParaNavegar = {
+      ...item,
+      dataHora: item.dataHora?.toDate ? item.dataHora.toDate().toISOString() : item.dataHora,
+    };
+
+    navigation.navigate('Agendar', { agendamento: agendamentoParaNavegar });
   };
 
   const deleteFromFirestore = async () => {
@@ -217,7 +222,7 @@ export default function ListAgenda({ data }) {
               <Text style={styles.cardDataHora}>{formattedDateTimeValue}</Text>
             </View>
             <View style={styles.cardFooter}>
-              <Ionicons name="information-circle-outline" size={14} color={statusStyle.color} style={styles.cardIcon} />
+              <Ionicons name="information-circle-outline" size={14} color={statusStyle.color}  />
               <Text style={[styles.statusText, statusStyle]}>{status}</Text>
             </View>
           </View>

@@ -77,22 +77,21 @@ export default function Home() {
 
   // Atualizar status
  const updateStatus = async (id, novoStatus) => {
-  const agendamentoAnterior = agendamentos.find(a => a.id === id);
-  const novosAgendamentos = agendamentos.map(a =>
-    a.id === id ? { ...a, status: novoStatus } : a
+  // Atualiza o estado localmente de forma otimista
+  setAgendamentos(prevAgendamentos =>
+    prevAgendamentos.map(a => (a.id === id ? { ...a, status: novoStatus } : a))
   );
-  setAgendamentos(novosAgendamentos);
 
   try {
       await updateAgendamento(id, { status: novoStatus });
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
       Alert.alert("Erro", "Não foi possível atualizar o status. Tente novamente.");
-      
-      // Reverte para o status anterior
-      setAgendamentos(agendamentos.map(a =>
-        a.id === id ? agendamentoAnterior : a
-      ));
+
+      // Reverte a mudança no estado local em caso de erro
+      setAgendamentos(prevAgendamentos =>
+        prevAgendamentos.map(a => (a.id === id ? { ...a, status: a.status } : a))
+      );
     }
   };
 
@@ -251,7 +250,7 @@ export default function Home() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <ListAgenda 
-              data={{...item, onDelete: (id) => setAgendamentos(agendamentos.filter(a => a.id !== id))}}
+              data={{...item, onDelete: (id) => setAgendamentos(prev => prev.filter(a => a.id !== id))}}
               onUpdateStatus={updateStatus} 
             />
           )}

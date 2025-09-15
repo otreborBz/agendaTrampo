@@ -13,13 +13,15 @@ const styles = StyleSheet.create({
   // ===== Card =====
   card: {
     backgroundColor: colors.white,
-    borderRadius: 18,
+    borderRadius: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
-    elevation: 6,
-    borderRightWidth: 4, // Adiciona a borda na direita
+    borderWidth: 1,
+    borderColor: colors.darkGray,
+    borderLeft: 6, // Adiciona a borda na esquerda
+    borderRightWidth: 6, // Adiciona a borda na direita
     borderRightColor: '#ccc', // Cor padrão, será sobrescrita
   },
   cardPressed: {
@@ -53,7 +55,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start', // Alinha o status à esquerda
     alignItems: 'center',
-    marginTop: 8, // Adiciona um espaço entre a data e o status
   },
   cardInfoRow: {
     flexDirection: "row",
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     paddingVertical: 2,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     borderRadius: 14,
     overflow: 'hidden',
   },

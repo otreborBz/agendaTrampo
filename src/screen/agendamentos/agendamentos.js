@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import {  View,  Text,  TextInput, TouchableOpacity,  Alert, ScrollView,  Platform, KeyboardAvoidingView, Modal, ActivityIndicator} from 'react-native';
+import {  View,  Text,  TextInput, TouchableOpacity,  Alert, ScrollView,  Platform, KeyboardAvoidingView, Modal, ActivityIndicator } from 'react-native';
 
 import { AuthContext } from '../../contexts/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,6 +12,9 @@ import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { colors } from '../../colors/colors';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
+import CustomAlert from '../../components/customAlert/CustomAlert';
+
+
 
 
 export default function Agendamentos({ route, navigation }) {
@@ -22,7 +25,7 @@ export default function Agendamentos({ route, navigation }) {
   const [telefone, setTelefone] = useState(agendamentoEdit?.telefone || '');
   const [dataHora, setDataHora] = useState(agendamentoEdit?.dataHora ? new Date(agendamentoEdit.dataHora) : new Date());
   const [servico, setServico] = useState(agendamentoEdit?.servico || '');
-  const [valor, setValor] = useState(agendamentoEdit?.valor || '');
+  const [valor, setValor] = useState('');
   const [endereco, setEndereco] = useState(agendamentoEdit?.endereco || { rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '' });
   const [status, setStatus] = useState(agendamentoEdit?.status || 'Pendente');
   const [servicosExistentes, setServicosExistentes] = useState([]);
@@ -32,6 +35,30 @@ export default function Agendamentos({ route, navigation }) {
   const [modalEnderecoVisible, setModalEnderecoVisible] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertInfo, setAlertInfo] = useState({ title: '', message: '' });
+  const [onAlertCloseAction, setOnAlertCloseAction] = useState(null);
+
+  // Efeito para carregar e atualizar os dados quando `agendamentoEdit` mudar
+  useEffect(() => {
+    if (agendamentoEdit) {
+      setNomeCliente(agendamentoEdit.nomeCliente || '');
+      setTelefone(agendamentoEdit.telefone || '');
+      setDataHora(agendamentoEdit.dataHora ? new Date(agendamentoEdit.dataHora) : new Date());
+      setServico(agendamentoEdit.servico || '');
+      setEndereco(agendamentoEdit.endereco || { rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '' });
+      setStatus(agendamentoEdit.status || 'Pendente');
+
+      // Limpa e formata o valor
+      if (agendamentoEdit.valor) {
+        const valorLimpo = String(agendamentoEdit.valor).replace(/\D/g, '');
+        setValor(formatValor(valorLimpo));
+      } else {
+        setValor('');
+      }
+    }
+  }, [agendamentoEdit]); // Dependência do efeito
 
   useEffect(() => {
     async function loadServicos() {
@@ -56,14 +83,23 @@ export default function Agendamentos({ route, navigation }) {
   };
 
   const handleSaveAgendamento = async () => {
+    if (!nomeCliente || !telefone || !dataHora) {
+      setAlertInfo({ title: 'Atenção', message: 'Por favor, preencha todos os campos.' });
+      setAlertVisible(true);
+      return;
+    }
     try {
       await salvarAgendamento({nomeCliente, telefone, dataHora, servico, valor, endereco, status, uid: user.uid  }, agendamentoEdit?.id);
-      Alert.alert("Sucesso", `Agendamento ${agendamentoEdit ? 'atualizado' : 'cadastrado'}!`);
-      limparCampos();
-      navigation.goBack();
-
+      setAlertInfo({ title: "Sucesso", message: `Agendamento ${agendamentoEdit ? 'atualizado' : 'cadastrado'}!` });
+      // Define a ação a ser executada quando o alerta de sucesso for fechado
+      setOnAlertCloseAction(() => () => {
+        limparCampos();
+        navigation.goBack();
+      });
+      setAlertVisible(true);
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível salvar o agendamento. Tente novamente.");
+      setAlertInfo({ title: "Erro", message: "Não foi possível salvar o agendamento. Tente novamente." });
+      setAlertVisible(true);
     }
   };
 
@@ -125,24 +161,41 @@ export default function Agendamentos({ route, navigation }) {
 
   // busca o cep
   const handleSearchCep = async () => {
-    setLoadingCep(true);
-    const resultado = await buscarCep(endereco.cep);
-    setLoadingCep(false);
+  setLoadingCep(true);
 
+  if (!endereco.cep || endereco.cep.length !== 8) {
+    setAlertInfo({ title: 'Atenção', message: 'Por favor, informe um CEP válido.' });
+    setAlertVisible(true);
+    setLoadingCep(false);
+    return;
+  }
+
+  try {
+    const resultado = await buscarCep(endereco.cep);
     if (resultado) {
       setEndereco(prev => ({ ...prev, ...resultado }));
     }
-  };
+  } catch (error) {
+    setAlertInfo({ title: 'Erro', message: error.message });
+    setAlertVisible(true);
+  } finally {
+    setLoadingCep(false);
+  }
+};
+
 
 
   const saveEndereco = () => {
     const { rua, numero, bairro, cidade, estado, cep } = endereco;
     if (!rua || !numero || !bairro) {
-      Alert.alert('Erro', 'Preencha todos os campos do endereço!');
+      setAlertInfo({ title: 'Erro', message: 'Preencha todos os campos do endereço!' });
+      setAlertVisible(true);
       return;
     }
     setModalEnderecoVisible(false);
-    Alert.alert('Sucesso', 'Endereço salvo com sucesso!');
+    setAlertInfo({ title: 'Sucesso', message: 'Endereço salvo!' });
+    setAlertVisible(true);
+
   };
 
   const formatTelefone = (text) => {
@@ -165,6 +218,16 @@ export default function Agendamentos({ route, navigation }) {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+      <CustomAlert
+        visible={alertVisible}
+        title={alertInfo.title}
+        message={alertInfo.message}
+        onClose={() => {
+          setAlertVisible(false);
+          if (typeof onAlertCloseAction === 'function') onAlertCloseAction();
+          setOnAlertCloseAction(null); // Limpa a ação após a execução
+        }}
+      />
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={{ alignItems: 'center' }}>
           <Text style={styles.headerTitle}>{agendamentoEdit ? 'Editar Agendamento' : 'Novo Agendamento'}</Text>
@@ -172,7 +235,7 @@ export default function Agendamentos({ route, navigation }) {
 
         <Text style={styles.label}>Nome do Cliente*</Text>
         <View style={styles.inputIconRowBox}>
-          <Ionicons name="person-outline" size={20} color={colors.secondary} style={styles.inputIcon} />
+          <Ionicons name="person-outline" size={20} color={colors.secondary}  />
           <TextInput
             style={styles.inputBox}
             value={nomeCliente}
@@ -184,7 +247,7 @@ export default function Agendamentos({ route, navigation }) {
 
         <Text style={styles.label}>Telefone*</Text>
         <View style={styles.inputIconRowBox}>
-          <Ionicons name="call-outline" size={20} color={colors.secondary} style={styles.inputIcon} />
+          <Ionicons name="call-outline" size={20} color={colors.secondary} />
           <TextInput
             style={styles.inputBox}
             value={telefone}
@@ -197,7 +260,7 @@ export default function Agendamentos({ route, navigation }) {
 
         <Text style={styles.label}>Data e Hora*</Text>
         <TouchableOpacity style={[styles.input, styles.inputIconRow]} onPress={() => setShowDatePicker(true)}>
-          <MaterialIcons name="date-range" size={20} color={colors.secondary} style={styles.inputIcon} />
+          <MaterialIcons name="date-range" size={20} color={colors.secondary} />
           <Text style={{ color: colors.text }}>{dataHora.toLocaleString('pt-BR')}</Text>
         </TouchableOpacity>
 
@@ -210,14 +273,14 @@ export default function Agendamentos({ route, navigation }) {
 
         <Text style={styles.label}>Serviço</Text>
         <TouchableOpacity style={[styles.input, styles.inputIconRow]} onPress={() => setModalServicoVisible(true)}>
-          <FontAwesome5 name="tools" size={18} color={colors.secondary} style={styles.inputIcon} />
+          <FontAwesome5 name="tools" size={18} color={colors.secondary} />
           <View style={{ width: 8 }} />
           <Text style={{ color: servico ? colors.text : colors.gray }}>{servico || 'Selecione um serviço'}</Text>
         </TouchableOpacity>
 
         <Text style={styles.label}>Valor (R$)</Text>
         <View style={styles.inputIconRowBox}>
-          <FontAwesome5 name="money-bill-wave" size={18} color={colors.secondary} style={styles.inputIcon} />
+          <FontAwesome5 name="money-bill-wave" size={18} color={colors.secondary} />
           <TextInput
             style={styles.inputBox}
             value={valor}
@@ -229,7 +292,7 @@ export default function Agendamentos({ route, navigation }) {
         </View>
 
         <TouchableOpacity style={styles.buttonEndereco} onPress={() => setModalEnderecoVisible(true)}>
-          <Ionicons name="location-outline" size={18} color={colors.secondary} style={{ marginRight: 6 }} />
+          <Ionicons name="location-outline" size={18} color={colors.white} />
           <Text style={styles.textButtonEndereco}>Cadastrar Endereço</Text>
         </TouchableOpacity>
 
@@ -289,7 +352,7 @@ export default function Agendamentos({ route, navigation }) {
                 <Text style={styles.label}>CEP*</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                   <View style={[styles.inputIconRowBox, { flex: 1, marginBottom: 0 }]}>
-                    <MaterialIcons name="location-searching" size={20} color={colors.secondary} style={styles.inputIcon} />
+                    <MaterialIcons name="location-searching" size={20} color={colors.secondary} />
                     <TextInput
                       style={styles.inputBox}
                       value={endereco.cep}
@@ -299,8 +362,8 @@ export default function Agendamentos({ route, navigation }) {
                       placeholderTextColor={colors.gray}
                     />
                   </View>
-                  <TouchableOpacity style={styles.buttonBuscarCep} onPress={handleSearchCep}>
-                    {loadingCep ? <ActivityIndicator color="#fff" /> : <MaterialIcons name="search" size={22} color="#fff" />}
+                  <TouchableOpacity style={styles.buttonBuscarCep} onPress={ handleSearchCep }>
+                    { loadingCep ? <ActivityIndicator color="#fff" /> : <MaterialIcons name="search" size={22} color="#fff" />}
                   </TouchableOpacity>
                 </View>
 
@@ -308,7 +371,7 @@ export default function Agendamentos({ route, navigation }) {
                   <React.Fragment key={i}>
                     <Text style={styles.label}>{campo.charAt(0).toUpperCase() + campo.slice(1)}*</Text>
                     <View style={styles.inputIconRowBox}>
-                      <MaterialIcons name={campo === 'numero' ? 'pin' : campo === 'cidade' ? 'location-city' : 'streetview'} size={20} color={colors.secondary} style={styles.inputIcon} />
+                      <MaterialIcons name={campo === 'numero' ? 'pin' : campo === 'cidade' ? 'location-city' : 'streetview'} size={20} color={colors.secondary} style={{ marginRight: 8 }} />
                       <TextInput
                         style={styles.inputBox}
                         value={endereco[campo]}
@@ -340,7 +403,7 @@ export default function Agendamentos({ route, navigation }) {
         <TouchableOpacity style={styles.buttonFooterCancel} onPress={() => navigation.goBack()}>
           <Text style={styles.buttonTextCancel}>Cancelar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonFooter} onPress={handleSaveAgendamento}>
+        <TouchableOpacity style={styles.buttonFooter} onPress={ handleSaveAgendamento }>
           <Text style={styles.buttonTextFooter}>{agendamentoEdit ? 'Salvar' : 'Agendar'}</Text>
         </TouchableOpacity>
       </View>
