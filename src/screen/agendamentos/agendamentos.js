@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {  View,  Text,  TextInput, TouchableOpacity,  Alert, ScrollView,  Platform, KeyboardAvoidingView, Modal, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { AuthContext } from '../../contexts/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,7 +20,7 @@ import CustomAlert from '../../components/customAlert/CustomAlert';
 
 export default function Agendamentos({ route, navigation }) {
   const { user } = useContext(AuthContext);
-  const agendamentoEdit = route?.params?.agendamento || null;
+  const [agendamentoEdit, setAgendamentoEdit] = useState(route?.params?.agendamento || null);
 
   const [nomeCliente, setNomeCliente] = useState(agendamentoEdit?.nomeCliente || '');
   const [telefone, setTelefone] = useState(agendamentoEdit?.telefone || '');
@@ -40,25 +41,38 @@ export default function Agendamentos({ route, navigation }) {
   const [alertInfo, setAlertInfo] = useState({ title: '', message: '' });
   const [onAlertCloseAction, setOnAlertCloseAction] = useState(null);
 
-  // Efeito para carregar e atualizar os dados quando `agendamentoEdit` mudar
-  useEffect(() => {
-    if (agendamentoEdit) {
-      setNomeCliente(agendamentoEdit.nomeCliente || '');
-      setTelefone(agendamentoEdit.telefone || '');
-      setDataHora(agendamentoEdit.dataHora ? new Date(agendamentoEdit.dataHora) : new Date());
-      setServico(agendamentoEdit.servico || '');
-      setEndereco(agendamentoEdit.endereco || { rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '' });
-      setStatus(agendamentoEdit.status || 'Pendente');
+  // Limpa os campos do formulário
+  const limparCampos = () => {
+    setNomeCliente('');
+    setTelefone('');
+    setDataHora(new Date());
+    setServico('');
+    setValor('');
+    setEndereco({ rua:'', numero:'', bairro:'', cidade:'', estado:'', cep:'' });
+    setStatus('Pendente');
+    setAgendamentoEdit(null);
+  };
 
-      // Limpa e formata o valor
-      if (agendamentoEdit.valor) {
-        const valorLimpo = String(agendamentoEdit.valor).replace(/\D/g, '');
-        setValor(formatValor(valorLimpo));
+  // Efeito que roda toda vez que a tela ganha foco
+  useFocusEffect(
+    useCallback(() => {
+      const agendamentoParam = route.params?.agendamento;
+      if (agendamentoParam) {
+        // Se veio um agendamento para editar, preenche os campos
+        setAgendamentoEdit(agendamentoParam);
+        setNomeCliente(agendamentoParam.nomeCliente || '');
+        setTelefone(agendamentoParam.telefone || '');
+        setDataHora(agendamentoParam.dataHora ? new Date(agendamentoParam.dataHora) : new Date());
+        setServico(agendamentoParam.servico || '');
+        setEndereco(agendamentoParam.endereco || { rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '' });
+        setStatus(agendamentoParam.status || 'Pendente');
+        setValor(agendamentoParam.valor ? formatValor(String(agendamentoParam.valor).replace(/\D/g, '')) : '');
       } else {
-        setValor('');
+        // Se não veio parâmetro, limpa tudo para garantir que é uma nova criação
+        limparCampos();
       }
-    }
-  }, [agendamentoEdit]); // Dependência do efeito
+    }, [route.params?.agendamento])
+  );
 
   useEffect(() => {
     async function loadServicos() {
@@ -72,16 +86,6 @@ export default function Agendamentos({ route, navigation }) {
     loadServicos();
   }, []);
 
-
-  const limparCampos = () => {
-    setNomeCliente('');
-    setTelefone('');
-    setDataHora(new Date());
-    setServico('');
-    setValor('');
-    setEndereco({ rua:'', numero:'', bairro:'', cidade:'', estado:'', cep:'' });
-  };
-
   const handleSaveAgendamento = async () => {
     if (!nomeCliente || !telefone || !dataHora) {
       setAlertInfo({ title: 'Atenção', message: 'Por favor, preencha todos os campos.' });
@@ -91,7 +95,6 @@ export default function Agendamentos({ route, navigation }) {
     try {
       await salvarAgendamento({nomeCliente, telefone, dataHora, servico, valor, endereco, status, uid: user.uid  }, agendamentoEdit?.id);
       setAlertInfo({ title: "Sucesso", message: `Agendamento ${agendamentoEdit ? 'atualizado' : 'cadastrado'}!` });
-      // Define a ação a ser executada quando o alerta de sucesso for fechado
       setOnAlertCloseAction(() => () => {
         limparCampos();
         navigation.goBack();

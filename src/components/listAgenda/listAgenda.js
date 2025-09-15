@@ -20,6 +20,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../../colors/colors";
 import styles from "./style";
+import ActionAlert from '../actionAlert/actionAlert';
+import { deleteAgendamento } from "../../services/firebase/firestoreService";
+
 
 // Criando AnimatedTouchable para animação de scale
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -32,7 +35,7 @@ const CustomActionSheet = ({ visible, onClose, options, title }) => {
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <RNPressable style={actionSheetStyles.overlay} onPress={onClose}>
         <RNPressable style={actionSheetStyles.container} onPress={() => {}}>
-          <Ionicons name="options-outline" size={48} color={colors.secondary} style={actionSheetStyles.mainIcon} />
+          {/* <Ionicons name="options-outline" size={48} color={colors.secondary} style={actionSheetStyles.mainIcon} /> */}
           <Text style={actionSheetStyles.title}>{title || 'Opções'}</Text>
           <Text style={actionSheetStyles.message}>O que você deseja fazer com este agendamento?</Text>
 
@@ -113,6 +116,10 @@ export default function ListAgenda({ data }) {
 
   const formattedDateTimeValue = formatDateTime(item.dataHora);
 
+  const [actionAlertVisible, setActionAlertVisible] = useState(false);
+  const [actionAlertInfo, setActionAlertInfo] = useState({ title: '', message: '' });
+
+
   // Define o estilo do card com base no status
   let cardStyle = {};
   let statusStyle = {};
@@ -140,9 +147,11 @@ export default function ListAgenda({ data }) {
     setVisible(true);
     Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
   };
+
   const closeDetail = () => {
     Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => setVisible(false));
   };
+
   const handlePressIn = () => Animated.spring(scaleValue, { toValue: 0.98, useNativeDriver: true }).start();
   const handlePressOut = () => Animated.spring(scaleValue, { toValue: 1, friction: 3, tension: 40, useNativeDriver: true }).start();
 
@@ -165,27 +174,12 @@ export default function ListAgenda({ data }) {
     navigation.navigate('Agendar', { agendamento: agendamentoParaNavegar });
   };
 
-  const deleteFromFirestore = async () => {
-    try {
-      await deleteDoc(doc(db, 'agendamentos', item.id));
-      Alert.alert('Sucesso', 'Agendamento excluído!');
-      if (typeof data.onDelete === 'function') data.onDelete(item.id);
-    } catch (e) {
-      Alert.alert('Erro', 'Não foi possível excluir o agendamento.');
-      console.log(e);
-    }
-  };
 
+  //Deleta um agendamento
   const handleDelete = () => {
-    closeDetail();
-    Alert.alert(
-      "Excluir Agendamento",
-      `Deseja excluir o agendamento de ${item.nomeCliente}?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Excluir", style: "destructive", onPress: deleteFromFirestore },
-      ]
-    );
+    if (visible) closeDetail(); // Fecha o modal de detalhes se estiver aberto
+    setActionAlertInfo({ title: "Excluir Agendamento", message: `Deseja excluir o agendamento de ${item.nomeCliente}?` });
+    setActionAlertVisible(true);
   };
 
   const actionSheetOptions = [
@@ -326,6 +320,32 @@ export default function ListAgenda({ data }) {
         onClose={() => setActionSheetVisible(false)}
         options={actionSheetOptions}
         title="Ações do Agendamento"
+      />
+
+      {/* Alerta de Ação (Excluir) */}
+      <ActionAlert
+        visible={actionAlertVisible}
+        title={actionAlertInfo.title}
+        message={actionAlertInfo.message}
+        onClose={() => setActionAlertVisible(false)}
+        actions={[
+          { text: "Cancelar", onPress: () => setActionAlertVisible(false) },
+          { text: "Excluir", destructive: true, onPress: async () => {
+              setActionAlertVisible(false);
+              try {
+                await deleteAgendamento(item.id);                
+                if (typeof data.onDelete === 'function') {
+                  // Passa o ID e o resultado de sucesso para o componente pai
+                  data.onDelete(item.id, { success: true, message: "Agendamento excluído com sucesso!" });
+                }
+              } catch (error) {
+                if (typeof data.onDelete === 'function') {
+                  // Passa o ID e o resultado de erro para o componente pai
+                  data.onDelete(item.id, { success: false, message: "Não foi possível excluir o agendamento." });
+                }
+              }
+          }},
+        ]}
       />
     </View>
   );

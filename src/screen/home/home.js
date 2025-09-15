@@ -95,6 +95,20 @@ export default function Home() {
     }
   };
 
+  // Função para lidar com a exclusão vinda do componente filho
+  const handleDeleteResult = (id, result) => {
+    // Mostra o alerta de sucesso ou erro
+    setAlertInfo({
+      title: result.success ? "Sucesso" : "Erro",
+      message: result.message,
+    });
+    setAlertVisible(true);
+
+    // Se a exclusão foi bem-sucedida, remove o item da lista local
+    if (result.success) {
+      setAgendamentos(prev => prev.filter(a => a.id !== id));
+    }
+  };
 
   // Função para obter dias da semana
   const getWeekDays = (dateStr) => {
@@ -250,7 +264,7 @@ export default function Home() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <ListAgenda 
-              data={{...item, onDelete: (id) => setAgendamentos(prev => prev.filter(a => a.id !== id))}}
+              data={{...item, onDelete: handleDeleteResult}}
               onUpdateStatus={updateStatus} 
             />
           )}

@@ -13,13 +13,14 @@ const styles = StyleSheet.create({
   // ===== Card =====
   card: {
     backgroundColor: colors.white,
-    borderRadius: 20,
+    // borderRadius: 20,
+    borderTopEndRadius: 40,
+    borderBottomStartRadius: 40,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
     borderWidth: 1,
-    borderColor: colors.darkGray,
     borderLeft: 6, // Adiciona a borda na esquerda
     borderRightWidth: 6, // Adiciona a borda na direita
     borderRightColor: '#ccc', // Cor padrão, será sobrescrita
