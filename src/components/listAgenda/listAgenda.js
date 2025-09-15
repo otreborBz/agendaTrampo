@@ -199,7 +199,7 @@ export default function ListAgenda({ data }) {
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
             <View style={styles.cardInfoRow}>
-              <Ionicons name="person-outline" size={16} color={colors.secondary} style={styles.cardIcon} />
+              <Ionicons name="person-outline" size={16} color='#555' style={styles.cardIcon} />
               <Text style={styles.cardNome} numberOfLines={1}>{item.nomeCliente}</Text>
             </View>
             <TouchableOpacity onPress={showActionSheet} style={styles.moreButton} hitSlop={15}>

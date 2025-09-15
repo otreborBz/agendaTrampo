@@ -14,6 +14,9 @@ import { colors } from '../../colors/colors';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CustomAlert from '../../components/customAlert/CustomAlert';
+import ActionAlert from '../../components/actionAlert/actionAlert';
+
+import { salvarServicos, carregarServicos } from '../../services/servico/servico';
 
 
 
@@ -40,6 +43,10 @@ export default function Agendamentos({ route, navigation }) {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertInfo, setAlertInfo] = useState({ title: '', message: '' });
   const [onAlertCloseAction, setOnAlertCloseAction] = useState(null);
+
+  const [actionAlertVisible, setActionAlertVisible] = useState(false);
+  const [actionAlertInfo, setActionAlertInfo] = useState({ title: '', message: '' });
+  const [onActionAlertConfirm, setOnActionAlertConfirm] = useState(null);
 
   // Limpa os campos do formulário
   const limparCampos = () => {
@@ -77,8 +84,7 @@ export default function Agendamentos({ route, navigation }) {
   useEffect(() => {
     async function loadServicos() {
       try {
-        const saved = await AsyncStorage.getItem('@servicos');
-        if (saved) setServicosExistentes(JSON.parse(saved));
+        if (carregarServicos()) setServicosExistentes(JSON.parse(saved));
       } catch {
         setServicosExistentes([]);
       }
@@ -123,38 +129,55 @@ export default function Agendamentos({ route, navigation }) {
     setDataHora(updatedDateTime);
   };
 
-  const adicionarServico = () => {
-    if (!novoServico.trim()) {
-      Alert.alert('Erro', 'Digite o nome do serviço!');
+  const adicionarServico = async () => {
+    const servicoParaAdicionar = novoServico.trim();
+
+    if (!servicoParaAdicionar) {
+      setAlertInfo({ title: 'Atenção', message: 'Por favor, informe um serviço!' });
+      setAlertVisible(true);
       return;
     }
-    const newList = [...servicosExistentes, novoServico.trim()];
+
+    // Verifica se o serviço já existe (ignorando maiúsculas/minúsculas)
+    if (servicosExistentes.some(s => s.toLowerCase() === servicoParaAdicionar.toLowerCase())) {
+      setAlertInfo({ title: 'Atenção', message: 'Este serviço já foi adicionado.' });
+      setAlertVisible(true);
+      return;
+    }
+
+    const newList = [...servicosExistentes, servicoParaAdicionar];
     setServicosExistentes(newList);
-    AsyncStorage.setItem('@servicos', JSON.stringify(newList));
-    setServico(novoServico.trim());
+
+    // Salva a lista completa no AsyncStorage
+    await salvarServicos(newList);
+
+    setServico(servicoParaAdicionar);
     setNovoServico('');
     setModalServicoVisible(false);
   };
 
+
   const removerServico = (index) => {
-    Alert.alert(
-      'Confirmar Exclusão',
-      'Tem certeza que deseja excluir este serviço?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          onPress: () => {
-            const newList = [...servicosExistentes];
-            newList.splice(index, 1);
-            setServicosExistentes(newList);
-            AsyncStorage.setItem('@servicos', JSON.stringify(newList));
-            if (servico === servicosExistentes[index]) setServico('');
-          }
-        }
-      ]
-    );
+    const servicoParaRemover = servicosExistentes[index];
+    if (!servicoParaRemover) return;
+
+    setActionAlertInfo({ title: 'Excluir Serviço', message: `Tem certeza que deseja excluir "${servicoParaRemover}"?` });
+
+    // Define a função que será executada ao confirmar a exclusão
+    setOnActionAlertConfirm(() => async () => {
+      const newList = servicosExistentes.filter((_, i) => i !== index);
+      setServicosExistentes(newList);
+
+      // Salva a lista atualizada no AsyncStorage
+      await salvarServicos(newList);
+
+      // Se o serviço removido era o que estava selecionado, limpa a seleção
+      if (servico === servicoParaRemover) setServico('');
+    });
+
+    setActionAlertVisible(true);
   };
+
 
   const selecionarServico = (servicoSelecionado) => {
       setServico(servicoSelecionado);
@@ -399,6 +422,20 @@ export default function Agendamentos({ route, navigation }) {
             </View>
           </View>
         </Modal>
+
+      <ActionAlert
+        visible={actionAlertVisible}
+        title={actionAlertInfo.title}
+        message={actionAlertInfo.message}
+        onClose={() => setActionAlertVisible(false)}
+        actions={[
+          { text: "Cancelar", onPress: () => setActionAlertVisible(false) },
+          { text: "Excluir", destructive: true, onPress: () => {
+              if (typeof onActionAlertConfirm === 'function') onActionAlertConfirm();
+              setActionAlertVisible(false);
+          }},
+        ]}
+      />
 
       </ScrollView>
 

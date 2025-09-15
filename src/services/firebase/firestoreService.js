@@ -11,8 +11,7 @@ import {
   onSnapshot,
   getDoc
 } from 'firebase/firestore';
-import { auth } from './firebaseConnection';
-import {signInWithEmailAndPassword} from 'firebase/auth';
+
 
 
 

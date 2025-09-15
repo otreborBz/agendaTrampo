@@ -14,9 +14,9 @@ export const colors = {
   secondaryDark: '#6ac644',
   
   // Estados
-  success: '#2ecc71',
-  error: '#e74c3c',
-  warning: '#f1c40f',
+  success: '#019e42ff',
+  error: '#921103ff',
+  warning: '#9b7c02ff',
   info: '#3498db',
   confirm: "#d1fae5",
   pending: "#fef3c7",

@@ -7,15 +7,16 @@ const styles = StyleSheet.create({
   // ===== Grid Container =====
   gridItemContainer: {
     width: '50%', // Garante que cada item ocupe metade da tela
-    padding: 3,   // Cria o espaçamento visual entre os cards
+    padding: 3,
+    marginTop: 3,
+    marginBottom: 3,   // Cria o espaçamento visual entre os cards
   },
 
   // ===== Card =====
   card: {
     backgroundColor: colors.white,
-    // borderRadius: 20,
-    borderTopEndRadius: 40,
-    borderBottomStartRadius: 40,
+    borderTopStartRadius: 40,
+    borderBottomEndRadius: 40,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.1,
@@ -42,14 +43,14 @@ const styles = StyleSheet.create({
   cardNome: {
     fontSize: 16,
     fontWeight: "700",
-    color: colors.secondary,
+    color: colors.text,
     flex: 1, // Permite que o nome ocupe o espaço disponível
     marginRight: 8, // Adiciona um espaço antes do botão de opções
   },
   moreButton: { padding: 4 },
   cardServico: {
     fontSize: 14,
-    color: "#555",
+    color: colors.text,
     marginTop: 4, // Adiciona um pequeno espaço abaixo do nome
   },
   cardFooter: {
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
   },
   cardDataHora: {
     fontSize: 13,
-    color: "#666",
+    color: colors.text
   },
 
   // ===== Status Badge =====
@@ -82,16 +83,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   statusConfirmado: {
-    backgroundColor: "#E6F4EA", // verde suave
-    color: "#388E3C",
+    backgroundColor: colors.confirm, // verde suave
+    color: colors.success,
+    fontStyle: 'italic',
   },
   statusPendente: {
-    backgroundColor: "#FFF9E6", // amarelo suave
-    color: "#FFA000",
+    backgroundColor: colors.pending, // amarelo suave
+    color: colors.warning,
+    fontStyle: 'italic',
   },
   statusCancelado: {
-    backgroundColor: "#FDEAEA", // vermelho suave
-    color: "#D32F2F",
+    backgroundColor: colors.canceled, // vermelho suave
+    color: colors.error,
+    fontStyle: 'italic',
   },
 
   // ===== Modal Overlay =====
