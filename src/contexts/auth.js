@@ -4,7 +4,7 @@ import { db, auth } from "../services/firebase/firebaseConnection";
 import {signOut as firebaseSignOut, onAuthStateChanged} from "firebase/auth";
 
 
-import { signInUser, signUpUser, logoutUser } from "../services/firebase/userService";
+import { signInUser, signUpUser, logoutUser, validarSenha } from "../services/firebase/userService";
 
 export const AuthContext = createContext({});
 
@@ -53,6 +53,11 @@ function AuthProvider({ children }) {
   // Cadastro novo usuário
   async function signUp(name, email, password) {
     setLoading(true);
+    //Valida a senha
+    if( !validarSenha(password)){
+      return { success: false, message: "A senha deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um número." };
+    }
+
     try {
       await signUpUser(name, email, password);
       return { success: true };

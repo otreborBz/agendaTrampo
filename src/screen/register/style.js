@@ -102,6 +102,13 @@ const styles = StyleSheet.create({
         color: colors.secondary,
         fontSize: 13,
         fontWeight: '500',
+    },
+    passwordHintText: {
+        fontSize: 12,
+        color: colors.darkGray,
+        width: '100%',
+        textAlign: 'left',
+        marginTop: -10, // Ajusta o espaço criado pelo 'gap' do container
     }
 });
 

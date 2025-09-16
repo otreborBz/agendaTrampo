@@ -1,7 +1,7 @@
 import { db } from './firebaseConnection';
 import {doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth } from './firebaseConnection';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth';
 
 /**
  * Autentica um usuário com email e senha e busca seus dados no Firestore.
@@ -74,5 +74,33 @@ export async function logoutUser() {
   } catch (error) {
     console.error("Erro em logoutUser:", error);
     throw new Error("Não foi possível fazer logout. Tente novamente.");
+  }
+}
+
+/** 
+Verifica senha inserida se tem minuscula, maiuscula, numero e minimo de 8 caracter
+@returns {boolean}
+@throws {Error}
+**/ 
+export function validarSenha(senha) {
+  const regexSenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+  if (!regexSenha.test(senha)) {
+    throw new Error("A senha deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um número.");
+  }
+  return true;
+}
+
+/**
+ * 
+ * @param {String} email 
+ * @returns { boolean}
+ * @throws {Error}
+ */
+export async function redefinirSenha(email){
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return true;
+  } catch (error) {
+    throw new Error("Não foi possível redefinir a senha. Verifique o email digitado e tente novamente.");
   }
 }

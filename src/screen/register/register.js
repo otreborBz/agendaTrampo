@@ -19,6 +19,8 @@ export default function Register() {
   const { signUp, loading } = useContext(AuthContext);
   const navigation = useNavigation();
 
+  const [loadingRegister, setLoadingRegister] = useState(loading);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,17 +36,24 @@ export default function Register() {
 
   // Função para o cadastro
   async function handleRegister() {
+    setLoadingRegister(true);
     if (name === "" || email === "" || password === "") {
       showAlert("Atenção", "Por favor, preencha todos os campos!");
+      setLoadingRegister(false);
       return;
     }
     try {
       const result = await signUp(name, email, password);
       if (!result.success) {
-        showAlert("Erro no Cadastro", result.message);
+        setAlertInfo({ title: "Erro", message: result.message });
+        setAlertVisible(true);
       }
     } catch (error) {
-      showAlert("Erro", "Ocorreu um erro inesperado ao tentar se cadastrar.");
+      setAlertInfo({ title: "Erro", message: error.message });
+      setAlertVisible(true);
+    }
+    finally{
+      setLoadingRegister(false);
     }
   }
   // Função para navegar de volta para a tela de login
@@ -95,6 +104,9 @@ export default function Register() {
           secureTextEntry={true}
           autoCapitalize="none"
         />
+        <Text style={styles.passwordHintText}>
+          A senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas e números.
+        </Text>
 
         <TouchableOpacity
           onPress={handleRegister}
@@ -102,7 +114,7 @@ export default function Register() {
           activeOpacity={0.8}
         >
           {
-            loading ? (
+            loadingRegister ? (
               <ActivityIndicator size="small" color="#FFF" />
             ) : (
               <Text style={styles.textButton}>Cadastrar</Text>
