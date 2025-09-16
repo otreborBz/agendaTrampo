@@ -17,9 +17,15 @@ export async function signInUser(email, password) {
     const userSnapshot = await getDoc(userDocRef);
 
     if (userSnapshot.exists()) {
-      return userSnapshot.data();
+        return userSnapshot.data();
     } else {
-      throw new Error("Dados do usuário não encontrados no banco de dados.");
+        // O usuário existe na autenticação, mas não no Firestore.
+        // Isso pode acontecer se o documento foi excluído manualmente.
+        // Vamos recriar o documento do usuário para evitar o bloqueio do login.
+        console.warn(`Recriando documento para o usuário ${user.uid} que não foi encontrado no Firestore.`);
+        const userData = { uid: user.uid, email: user.email, name: user.email, createdAt: new Date() };
+        await setDoc(userDocRef, userData);
+        return userData;
     }
   } catch (error) {
     if (["auth/user-not-found", "auth/wrong-password", "auth/invalid-credential"].includes(error.code)) {

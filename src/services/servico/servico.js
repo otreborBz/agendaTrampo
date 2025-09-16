@@ -21,6 +21,7 @@ export async function salvarServicos(servicos) {
 export async function carregarServicos() {
   try {
     const data = await AsyncStorage.getItem('@servicos');
+    console.log('data: ', data)
     return data ? JSON.parse(data) : [];
   } catch (error) {
     console.error("Erro ao carregar serviços:", error);

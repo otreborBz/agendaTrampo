@@ -83,13 +83,11 @@ export default function Agendamentos({ route, navigation }) {
 
   useEffect(() => {
     async function loadServicos() {
-      try {
-        if (carregarServicos()) setServicosExistentes(JSON.parse(saved));
-      } catch {
-        setServicosExistentes([]);
-      }
+      // Carrega os serviços salvos no AsyncStorage
+      const servicosSalvos = await carregarServicos();
+      setServicosExistentes(servicosSalvos);
     }
-    loadServicos();
+    loadServicos(); // Chama a função para carregar os serviços quando o componente é montado
   }, []);
 
   const handleSaveAgendamento = async () => {
