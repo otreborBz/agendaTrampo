@@ -14,6 +14,7 @@ import stylesDrawer from './style';
 const Drawer = createDrawerNavigator();
 
 function CustomDrawerContent(props) {
+  
   const { user, logout } = useContext(AuthContext);
 
   function getFirstName(string) {

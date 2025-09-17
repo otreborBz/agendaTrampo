@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigation } from '@react-navigation/native';
-import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase/firebaseConnection';
 import {
   View,
@@ -13,16 +13,16 @@ import {
   Alert,
   Platform,
   ActionSheetIOS,
-  Dimensions,
   StyleSheet,
   Pressable as RNPressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../../colors/colors";
-import styles from "./style";
+
 import ActionAlert from '../actionAlert/actionAlert';
 import { deleteAgendamento } from "../../services/firebase/firestoreService";
-
+import actionSheetStyles  from './actionSheetStyles'
+import styles from "./style";
 
 // Criando AnimatedTouchable para animação de scale
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -35,7 +35,6 @@ const CustomActionSheet = ({ visible, onClose, options, title }) => {
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <RNPressable style={actionSheetStyles.overlay} onPress={onClose}>
         <RNPressable style={actionSheetStyles.container} onPress={() => {}}>
-          {/* <Ionicons name="options-outline" size={48} color={colors.secondary} style={actionSheetStyles.mainIcon} /> */}
           <Text style={actionSheetStyles.title}>{title || 'Opções'}</Text>
           <Text style={actionSheetStyles.message}>O que você deseja fazer com este agendamento?</Text>
 
@@ -68,34 +67,6 @@ const CustomActionSheet = ({ visible, onClose, options, title }) => {
     </Modal>
   );
 };
-
-const actionSheetStyles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  container: {
-    width: '95%',
-    maxWidth: 320,
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  mainIcon: { marginBottom: 15 },
-  title: { fontSize: 20, fontWeight: '600', color: colors.darkGray, marginBottom: 8, textAlign: 'center' },
-  message: { fontSize: 16, color: colors.text, textAlign: 'center', marginBottom: 25 },
-  buttonContainer: { width: '100%', gap: 12 },
-  button: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', paddingVertical: 12, borderRadius: 10, gap: 8 },
-  primaryButton: { backgroundColor: colors.primary },
-  destructiveButton: { backgroundColor: colors.error },
-  primaryButtonText: { color: colors.white, fontSize: 16, fontWeight: '600' },
-  destructiveButtonText: { color: colors.white, fontSize: 16, fontWeight: '600' },
-  cancelButton: { marginTop: 16, padding: 8 },
-  cancelText: { fontSize: 15, color: colors.text, fontWeight: '500' },
-});
 
 // --- Formatação de data ---
 function formatDateTime(field) {
@@ -166,10 +137,18 @@ export default function ListAgenda({ data }) {
 
   const handleEdit = () => {
     closeDetail();
+    // Cria um novo objeto apenas com os dados necessários e serializáveis
     const agendamentoParaNavegar = {
-      ...item,
+      id: item.id,
+      nomeCliente: item.nomeCliente,
+      telefone: item.telefone,
+      servico: item.servico,
+      valor: item.valor,
+      status: item.status,
+      endereco: item.endereco,
       dataHora: item.dataHora?.toDate ? item.dataHora.toDate().toISOString() : item.dataHora,
     };
+
 
     navigation.navigate('Agendar', { agendamento: agendamentoParaNavegar });
   };
@@ -178,7 +157,10 @@ export default function ListAgenda({ data }) {
   //Deleta um agendamento
   const handleDelete = () => {
     if (visible) closeDetail(); // Fecha o modal de detalhes se estiver aberto
-    setActionAlertInfo({ title: "Excluir Agendamento", message: `Deseja excluir o agendamento de ${item.nomeCliente}?` });
+    setActionAlertInfo({ 
+      title: "Excluir Agendamento", 
+      message: `Deseja excluir o agendamento de ${item.nomeCliente}?` 
+    });
     setActionAlertVisible(true);
   };
 

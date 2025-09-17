@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, KeyboardAvoidingView, Platform, Animated, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity, KeyboardAvoidingView, Platform, Animated, ActivityIndicator, Pressable } from 'react-native';
 import styles from './style';
 import { AuthContext } from '../../contexts/auth';
 import { useNavigation } from '@react-navigation/native';
 import CustomAlert from '../../components/customAlert/CustomAlert';
+import Icon from 'react-native-vector-icons/Feather';
+import { set } from 'lodash';
 
 export default function Login() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -15,15 +17,13 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   // Estado para o alerta customizado
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertInfo, setAlertInfo] = useState({ title: '', message: '' });
 
-  const showAlert = (title, message) => {
-    setAlertInfo({ title, message });
-    setAlertVisible(true);
-  };
+
 
   // Animação de entrada
   useEffect(() => {
@@ -54,17 +54,29 @@ export default function Login() {
   // Função de login
   async function handleLogin() {
     if (email === '' || password === '') {
-      showAlert('Atenção', 'Por favor, preencha todos os campos.');
+      setAlertInfo({
+        title: 'Atenção',
+        message: 'Por favor, preencha todos os campos.',
+      });
+      setAlertVisible(true);
       return;
     }
 
     try {
       const result = await signIn(email, password);
       if (!result.success) {
-        showAlert('Erro no Login', result.message);
+        setAlertInfo({
+          title: 'Erro no Login',
+          message: result.message,
+        });
+
       }
     } catch (error) {
-      showAlert('Erro', 'Ocorreu um erro inesperado ao fazer login.');
+      setAlertInfo({
+        title: 'Erro',
+        message: 'Ocorreu um erro inesperado ao fazer login.',
+      });
+      setAlertVisible(true);
     }
   }
 
@@ -102,14 +114,19 @@ export default function Login() {
           autoCapitalize="none"
           autoCorrect={false}
         />
-        <TextInput
-          value={password}
-          onChangeText={setPassword} 
-          placeholder='Senha'
-          style={styles.textInput}
-          secureTextEntry
-          autoCapitalize="none"
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            value={password}
+            onChangeText={setPassword} 
+            placeholder='Senha'
+            style={styles.passwordInput}
+            secureTextEntry={!isPasswordVisible}
+            autoCapitalize="none"
+          />
+          <Pressable onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.eyeIcon}>
+            <Icon name={isPasswordVisible ? 'eye-off' : 'eye'} size={22} color={styles.eyeIcon.color} />
+          </Pressable>
+        </View>
         <TouchableOpacity 
           style={styles.button} 
           activeOpacity={0.8} 
