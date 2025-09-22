@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/services/firebase/firebaseConnection.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1758506531343,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1758506548345,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -27,5 +27,6 @@\n const db = getFirestore(app);\r\n const auth = initializeAuth(app, {\r\n   persistence: getReactNativePersistence(AsyncStorage)\r\n });\r\n+\r\n export { db, auth };\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1758506531343,
+            "name": "Commit-0",
+            "content": "// Import the functions you need from the SDKs you need\r\nimport { initializeApp } from \"firebase/app\";\r\nimport { initializeAuth, getReactNativePersistence } from \"firebase/auth\";\r\nimport { getFirestore } from \"firebase/firestore\";\r\nimport AsyncStorage from '@react-native-async-storage/async-storage';\r\nimport {\r\n  FIREBASE_API_KEY,\r\n  FIREBASE_AUTH_DOMAIN,\r\n  FIREBASE_PROJECT_ID,\r\n  FIREBASE_STORAGE_BUCKET,\r\n  FIREBASE_MESSAGING_SENDER_ID,\r\n  FIREBASE_APP_ID,\r\n  FIREBASE_MEASUREMENT_ID\r\n} from '@env';\r\n\r\nconst firebaseConfig = {\r\n  apiKey: FIREBASE_API_KEY,\r\n  authDomain: FIREBASE_AUTH_DOMAIN,\r\n  projectId: FIREBASE_PROJECT_ID,\r\n  storageBucket: FIREBASE_STORAGE_BUCKET,\r\n  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,\r\n  appId: FIREBASE_APP_ID,\r\n  measurementId: FIREBASE_MEASUREMENT_ID\r\n};\r\n\r\nconst app = initializeApp(firebaseConfig);\r\nconst db = getFirestore(app);\r\nconst auth = initializeAuth(app, {\r\n  persistence: getReactNativePersistence(AsyncStorage)\r\n});\r\nexport { db, auth };"
+        }
+    ]
+}

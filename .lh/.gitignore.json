@@ -1,0 +1,34 @@
+{
+    "sourceFile": ".gitignore",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 4,
+            "patches": [
+                {
+                    "date": 1758506895875,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1758506903800,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,5 +38,5 @@\n \r\n # typescript\r\n *.tsbuildinfo\r\n \r\n-\r\n+#sist\r\n"
+                },
+                {
+                    "date": 1758506910596,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,5 +38,6 @@\n \r\n # typescript\r\n *.tsbuildinfo\r\n \r\n-#sist\r\n+#sytem\r\n+\r\n"
+                },
+                {
+                    "date": 1758506926885,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -39,5 +39,5 @@\n # typescript\r\n *.tsbuildinfo\r\n \r\n #sytem\r\n-\r\n+android\r\n"
+                },
+                {
+                    "date": 1758506934191,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -39,5 +39,6 @@\n # typescript\r\n *.tsbuildinfo\r\n \r\n #sytem\r\n-android\r\n+android/\r\n+ios/\r\n"
+                }
+            ],
+            "date": 1758506895875,
+            "name": "Commit-0",
+            "content": "# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files\r\n\r\n# dependencies\r\nnode_modules/\r\n\r\n# Expo\r\n.expo/\r\ndist/\r\nweb-build/\r\nexpo-env.d.ts\r\n\r\n# Native\r\n.kotlin/\r\n*.orig.*\r\n*.jks\r\n*.p8\r\n*.p12\r\n*.key\r\n*.mobileprovision\r\n\r\n# Metro\r\n.metro-health-check*\r\n\r\n# debug\r\nnpm-debug.*\r\nyarn-debug.*\r\nyarn-error.*\r\n\r\n# macOS\r\n.DS_Store\r\n# Ambiente\r\n.env\r\n.env.*\r\n*.pem\r\n\r\n# local env files\r\n.env*.local\r\n\r\n# typescript\r\n*.tsbuildinfo\r\n\r\n\r\n"
+        }
+    ]
+}
