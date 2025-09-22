@@ -1,19 +1,25 @@
-import { db } from './firebaseConnection';
 import {
-  collection,
   addDoc,
-  doc,
-  updateDoc,
+  collection,
   deleteDoc,
+  doc,
   getDocs,
-  query,
-  where,
   onSnapshot,
-  getDoc
+  query,
+  updateDoc,
+  where
 } from 'firebase/firestore';
+import { db } from './firebaseConnection';
 
-
-
+/**
+ * Transforma um documento do Firestore em um objeto de agendamento, garantindo o ID.
+ * @param {import('firebase/firestore').DocumentSnapshot} doc - O documento do Firestore.
+ * @returns {object} O objeto de agendamento com id.
+ */
+const transformDocToAgendamento = (doc) => ({
+  ...doc.data(),
+  id: doc.id,
+});
 
 /**
  * Buscar agendamentos do usuário
@@ -25,15 +31,8 @@ export async function getAgendamentos(userId) {
   const q = query(agendamentosRef, where('uid', '==', userId));
   const querySnapshot = await getDocs(q);
 
-  const agendamentos = [];
-  querySnapshot.forEach((doc) => {
-    agendamentos.push({ ...doc.data(), id: doc.id });
-  });
-
-  return agendamentos.map((agenda) => ({
-    ...agenda,
-    status: agenda.status || 'Pendente',
-  }));
+  // Usa a função auxiliar para transformar os documentos e evitar repetição de código.
+  return querySnapshot.docs.map(transformDocToAgendamento);
 }
 
 /**
@@ -47,17 +46,10 @@ export function listenAgendamentos(userId, onData, onError) {
   const agendamentosRef = collection(db, 'agendamentos');
   const q = query(agendamentosRef, where('uid', '==', userId));
 
-  return onSnapshot(q, 
+  return onSnapshot(q,
     (querySnapshot) => { // Callback de sucesso
-      const agendamentos = [];
-      querySnapshot.forEach((doc) => {
-        agendamentos.push({ ...doc.data(), id: doc.id });
-      });
-      const mappedData = agendamentos.map((agenda) => ({
-          ...agenda,
-          status: agenda.status || 'Pendente',
-      }));
-      onData(mappedData);
+      const agendamentos = querySnapshot.docs.map(transformDocToAgendamento);
+      onData(agendamentos);
     },
     (error) => { // Callback de erro
       console.error("Erro no listener de agendamentos:", error);
@@ -71,7 +63,13 @@ export function listenAgendamentos(userId, onData, onError) {
  * @param {Object} agendamento
  */
 export async function createAgendamento(agendamento) {
-  return await addDoc(collection(db, 'agendamentos'), agendamento);
+  // Garante que todo novo agendamento tenha um status padrão e data de criação.
+  const newAgendamento = {
+    ...agendamento,
+    status: agendamento.status || 'Pendente',
+    createdAt: new Date(),
+  };
+  return await addDoc(collection(db, 'agendamentos'), newAgendamento);
 }
 
 /**

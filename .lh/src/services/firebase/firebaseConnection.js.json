@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1758506531343,
@@ -12,6 +12,22 @@
                 {
                     "date": 1758506548345,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -27,5 +27,6 @@\n const db = getFirestore(app);\r\n const auth = initializeAuth(app, {\r\n   persistence: getReactNativePersistence(AsyncStorage)\r\n });\r\n+\r\n export { db, auth };\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1758507690086,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,8 @@\n // Import the functions you need from the SDKs you need\r\n import { initializeApp } from \"firebase/app\";\r\n import { initializeAuth, getReactNativePersistence } from \"firebase/auth\";\r\n+import { getAuth, initializeAuth, getReactNativePersistence } from \"firebase/auth\";\r\n import { getFirestore } from \"firebase/firestore\";\r\n import AsyncStorage from '@react-native-async-storage/async-storage';\r\n import {\r\n   FIREBASE_API_KEY,\r\n@@ -28,5 +29,13 @@\n const auth = initializeAuth(app, {\r\n   persistence: getReactNativePersistence(AsyncStorage)\r\n });\r\n \r\n+// A função `initializeAuth` foi substituída por `getAuth`.\r\n+// Esta é a forma recomendada de inicializar o Auth com persistência no React Native.\r\n+const auth = getAuth(app);\r\n+initializeAuth(app, {\r\n+    persistence: getReactNativePersistence(AsyncStorage)\r\n+})\r\n+\r\n+\r\n export { db, auth };\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1758507718369,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,6 @@\n // Import the functions you need from the SDKs you need\r\n import { initializeApp } from \"firebase/app\";\r\n-import { initializeAuth, getReactNativePersistence } from \"firebase/auth\";\r\n import { getAuth, initializeAuth, getReactNativePersistence } from \"firebase/auth\";\r\n import { getFirestore } from \"firebase/firestore\";\r\n import AsyncStorage from '@react-native-async-storage/async-storage';\r\n import {\r\n@@ -25,11 +24,8 @@\n };\r\n \r\n const app = initializeApp(firebaseConfig);\r\n const db = getFirestore(app);\r\n-const auth = initializeAuth(app, {\r\n-  persistence: getReactNativePersistence(AsyncStorage)\r\n-});\r\n \r\n // A função `initializeAuth` foi substituída por `getAuth`.\r\n // Esta é a forma recomendada de inicializar o Auth com persistência no React Native.\r\n const auth = getAuth(app);\r\n"
+                },
+                {
+                    "date": 1758507878423,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,41 @@\n+// Import the functions you need from the SDKs you need\r\n+import {\r\n+  FIREBASE_API_KEY,\r\n+  FIREBASE_APP_ID,\r\n+  FIREBASE_AUTH_DOMAIN,\r\n+  FIREBASE_MEASUREMENT_ID,\r\n+  FIREBASE_MESSAGING_SENDER_ID,\r\n+  FIREBASE_PROJECT_ID,\r\n+  FIREBASE_STORAGE_BUCKET\r\n+} from '@env';\r\n+import AsyncStorage from '@react-native-async-storage/async-storage';\r\n+import { initializeApp } from \"firebase/app\";\r\n+import { getAuth, getReactNativePersistence, initializeAuth } from \"firebase/auth\";\r\n+import { getFirestore } from \"firebase/firestore\";\r\n+\r\n+const firebaseConfig = {\r\n+  apiKey: FIREBASE_API_KEY,\r\n+  authDomain: FIREBASE_AUTH_DOMAIN,\r\n+  projectId: FIREBASE_PROJECT_ID,\r\n+  storageBucket: FIREBASE_STORAGE_BUCKET,\r\n+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,\r\n+  appId: FIREBASE_APP_ID,\r\n+  measurementId: FIREBASE_MEASUREMENT_ID\r\n+};\r\n+\r\n+const app = initializeApp(firebaseConfig);\r\n+const db = getFirestore(app);\r\n+\r\n+// A função `initializeAuth` foi substituída por `getAuth`.\r\n+// Esta é a forma recomendada de inicializar o Auth com persistência no React Native.\r\n+const auth = getAuth(app);\r\n+initializeAuth(app, {\r\n+// Para React Native, `initializeAuth` é a forma correta de configurar a persistência.\r\n+// Ela cria e retorna a instância do Auth, evitando a necessidade de chamar `getAuth` separadamente.\r\n+const auth = initializeAuth(app, {\r\n+  persistence: getReactNativePersistence(AsyncStorage)\r\n+})\r\n+});\r\n+\r\n+\r\n+export { auth, db };\r\n"
+                },
+                {
+                    "date": 1758507885727,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,17 +25,11 @@\n \r\n const app = initializeApp(firebaseConfig);\r\n const db = getFirestore(app);\r\n \r\n-// A função `initializeAuth` foi substituída por `getAuth`.\r\n-// Esta é a forma recomendada de inicializar o Auth com persistência no React Native.\r\n-const auth = getAuth(app);\r\n-initializeAuth(app, {\r\n // Para React Native, `initializeAuth` é a forma correta de configurar a persistência.\r\n // Ela cria e retorna a instância do Auth, evitando a necessidade de chamar `getAuth` separadamente.\r\n const auth = initializeAuth(app, {\r\n   persistence: getReactNativePersistence(AsyncStorage)\r\n-})\r\n });\r\n \r\n-\r\n export { auth, db };\r\n"
                 }
             ],
             "date": 1758506531343,
