@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/components/customAlert/CustomAlert.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1758642211676,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1758643395915,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,13 +1,9 @@\n-import React from 'react';\r\n-import { Modal, View, Text, TouchableOpacity } from 'react-native';\r\n-import { colors } from '../../themes/colors/colors';\r\n+import { Modal, Text, TouchableOpacity, View } from 'react-native';\r\n import styles from './style';\r\n \r\n \r\n const CustomAlert = ({ visible, title, message, onClose, type = 'error' }) => {\r\n-  // const iconName = type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline';\r\n-  // const iconColor = type === 'success' ? colors.success : colors.warning;\r\n \r\n   return (\r\n     <Modal\r\n       visible={visible}\r\n"
+                },
+                {
+                    "date": 1758643401063,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,27 @@\n+import { Modal, Text, TouchableOpacity, View } from 'react-native';\r\n+import styles from './styles';\r\n+\r\n+\r\n+const CustomAlert = ({ visible, title, message, onClose, type = 'error' }) => {\r\n+\r\n+  return (\r\n+    <Modal\r\n+      visible={visible}\r\n+      transparent={true}\r\n+      animationType=\"fade\"\r\n+      onRequestClose={onClose}\r\n+    >\r\n+      <View style={styles.modalContainer}>\r\n+        <View style={styles.alertBox}>\r\n+          <Text style={styles.title}>{title}</Text>\r\n+          <Text style={styles.message}>{message}</Text>\r\n+          <TouchableOpacity style={styles.button} onPress={onClose}>\r\n+            <Text style={styles.buttonText}>OK</Text>\r\n+          </TouchableOpacity>\r\n+        </View>\r\n+      </View>\r\n+    </Modal>\r\n+  );\r\n+};\r\n+\r\n+export default CustomAlert;\r\n"
+                }
+            ],
+            "date": 1758642211676,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { Modal, View, Text, TouchableOpacity } from 'react-native';\r\nimport { colors } from '../../themes/colors/colors';\r\nimport styles from './style';\r\n\r\n\r\nconst CustomAlert = ({ visible, title, message, onClose, type = 'error' }) => {\r\n  // const iconName = type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline';\r\n  // const iconColor = type === 'success' ? colors.success : colors.warning;\r\n\r\n  return (\r\n    <Modal\r\n      visible={visible}\r\n      transparent={true}\r\n      animationType=\"fade\"\r\n      onRequestClose={onClose}\r\n    >\r\n      <View style={styles.modalContainer}>\r\n        <View style={styles.alertBox}>\r\n          <Text style={styles.title}>{title}</Text>\r\n          <Text style={styles.message}>{message}</Text>\r\n          <TouchableOpacity style={styles.button} onPress={onClose}>\r\n            <Text style={styles.buttonText}>OK</Text>\r\n          </TouchableOpacity>\r\n        </View>\r\n      </View>\r\n    </Modal>\r\n  );\r\n};\r\n\r\nexport default CustomAlert;\r\n"
+        }
+    ]
+}

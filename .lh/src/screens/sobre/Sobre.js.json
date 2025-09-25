@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/screens/sobre/Sobre.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1758730548485,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1758730548485,
+            "name": "Commit-0",
+            "content": "import Ionicons from '@expo/vector-icons/Ionicons';\r\nimport { useNavigation } from '@react-navigation/native';\r\nimport { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';\r\nimport styles from './styles';\r\nimport { colors } from '../../themes/colors/Colors';\r\n\r\nexport default function Sobre() {\r\n  const navigation = useNavigation();\r\n  return (\r\n    <View style={styles.container}>\r\n      <TouchableOpacity style={styles.backBtn} onPress={() => navigation.navigate('Home')}>\r\n      <TouchableOpacity style={styles.backBtn} onPress={() => navigation.navigate('Início')}>\r\n        <Ionicons name=\"arrow-back\" size={28} color={colors.secondary} />\r\n      </TouchableOpacity>\r\n      <View style={styles.logoBox}>\r\n        <Image source={require('../../../assets/iconName.png')} style={styles.logo} />\r\n      </View>\r\n      {/* <Text style={styles.title}>AgendaTrampo</Text> */}\r\n      <Text style={styles.desc}>Facilite o agendamento de serviços e organize seu dia a dia de forma prática e moderna.</Text>\r\n      <View style={styles.versionBox}>\r\n        <Ionicons name=\"information-circle-outline\" size={18} color={colors.secondary} />\r\n        <Text style={styles.versionText}>Versão 1.0.0</Text>\r\n      </View>\r\n      <View style={styles.contactBox}>\r\n        <Text style={styles.contactTitle}>Contato</Text>\r\n        <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('mailto:contato@agendatrampo.com')}>\r\n          <Ionicons name=\"mail-outline\" size={20} color={colors.primary} style={{ marginRight: 8 }} />\r\n          <Text style={styles.contactBtnText}>contato@agendatrampo.com</Text>\r\n        </TouchableOpacity>\r\n        <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('https://agendatrampo.com')}>\r\n          <Ionicons name=\"globe-outline\" size={20} color={colors.primary} style={{ marginRight: 8 }} />\r\n          <Text style={styles.contactBtnText}>agendatrampo.com</Text>\r\n        </TouchableOpacity>\r\n      </View>\r\n    </View>\r\n  );\r\n}\r\n\r\n"
+        }
+    ]
+}

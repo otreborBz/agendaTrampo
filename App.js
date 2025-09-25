@@ -1,36 +1,36 @@
-import React, { useContext } from 'react';
-import { StyleSheet } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useContext } from 'react';
+import { ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-
-import AuthProvider, { AuthContext } from './src/contexts/auth';
-import Routes from './src/routes/routes';
-import Loading from './src/components/loading/loading';
+import AuthProvider, { AuthContext } from './src/contexts/Auth';
+import Routes from './src/routes/Routes';
+import { colors } from './src/themes/colors/Colors';
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+      <SafeAreaView style={styles.container}>
         <AuthProvider>
-          <Routes />
+          <AppContent />
         </AuthProvider>
       </SafeAreaView>
     </SafeAreaProvider>
   );
 }
 
-function AppRoutes() {
+function AppContent() {
   const { user, initializing } = useContext(AuthContext);
 
   if (initializing) {
-    return <Loading />; 
+    return <ActivityIndicator size="large" color='#38b6fb' style={{ flex: 1 }} />;
   }
 
-  return <Routes user={user} />;
+  return <Routes />;
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.secondary,
   },
 });

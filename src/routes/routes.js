@@ -4,14 +4,14 @@ import { createStackNavigator } from "@react-navigation/stack";
 import AppDrawer from '../components/appDrawer/AppDrawer';
 
 // Screens
-import Intro from '../screen/intro/intro';
-import Login from '../screen/login/login';
-import Register from '../screen/register/register';
-import ChangeRecord from '../screen/changeRecord/changeRecord';
-import Agendamentos from "../screen/agendamentos/agendamentos";
+import Intro from '../screens/intro/Intro';
+import Login from '../screens/login/Login';
+import Register from '../screens/register/Register';
+import ChangeRecord from '../screens/changeRecord/ChangeRecord';
 
-import { AuthContext } from '../contexts/auth';
-import Loading from '../components/loading/loading';
+import { AuthContext } from '../contexts/Auth';
+import { ActivityIndicator } from "react-native";
+import { colors } from "../themes/colors/Colors";
 
 const Stack = createStackNavigator();
 
@@ -19,18 +19,17 @@ export default function Routes() {
   const { user, initializing } = useContext(AuthContext);
 
   if (initializing) {
-    return <Loading />;
+    return <ActivityIndicator size="large" color={ colors.secondary} />;
   }
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          // Usuário logado → Drawer
           <Stack.Screen name="AppDrawer" component={AppDrawer} options={{ headerShown: false }} />
-          // <Stack.Screen name="Agendamentos" component={Agendamentos} />
+
         ) : (
-          // Usuário não logado → Intro/Login/Register
+
           <>
             <Stack.Screen name="Intro" component={Intro} />
             <Stack.Screen name="Login" component={Login} />

@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/components/actionAlert/style.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1758642211675,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1758642217990,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\r\n-import { colors } from \"../../themes/colors/colors\";\r\n+import { colors } from \"../../themes/colors/Colors\";\r\n \r\n const styles = StyleSheet.create({\r\n   overlay: {\r\n     flex: 1,\r\n"
+                }
+            ],
+            "date": 1758642211675,
+            "name": "Commit-0",
+            "content": "import React from \"react\";\r\nimport { StyleSheet } from \"react-native\";\r\nimport { colors } from \"../../themes/colors/colors\";\r\n\r\nconst styles = StyleSheet.create({\r\n  overlay: {\r\n    flex: 1,\r\n    backgroundColor: \"rgba(0,0,0,0.5)\",\r\n    justifyContent: \"center\",\r\n    alignItems: \"center\",\r\n    padding: 20,\r\n  },\r\n  container: {\r\n    width: \"90%\",\r\n    backgroundColor: colors.white,\r\n    borderRadius: 12,\r\n    padding: 20,\r\n    alignItems: \"center\",\r\n  },\r\n  title: {\r\n    fontSize: 18,\r\n    fontWeight: \"bold\",\r\n    marginBottom: 10,\r\n    color: colors.darkGray,\r\n    textAlign: \"center\",\r\n  },\r\n  message: {\r\n    fontSize: 15,\r\n    marginBottom: 20,\r\n    color: colors.text,\r\n    textAlign: \"center\",\r\n  },\r\n  actionsRow: {\r\n    flexDirection: \"row\",\r\n    justifyContent: \"space-evenly\",\r\n    width: \"100%\",\r\n  },\r\n  button: {\r\n    flex: 1,\r\n    marginHorizontal: 5,\r\n    paddingVertical: 10,\r\n    borderRadius: 8,\r\n    alignItems: \"center\",\r\n  },\r\n  primary: { backgroundColor: colors.primary },\r\n  destructive: { backgroundColor: colors.error },\r\n  buttonText: { color: \"#fff\", fontWeight: \"600\" },\r\n});\r\n\r\nexport default styles;"
+        }
+    ]
+}

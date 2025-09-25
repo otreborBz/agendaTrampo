@@ -1,70 +1,89 @@
-
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { useContext } from 'react';
-import { AuthContext } from '../../contexts/auth';
-import { colors } from '../../colors/colors';
-import Feather from '@expo/vector-icons/Feather';
+import { Ionicons } from '@expo/vector-icons';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import Home from '../../screen/home/home';
-import Sobre from "../../screen/sobre/sobre";
-import Agendamentos from '../../screen/agendamentos/agendamentos';
-import stylesDrawer from './style';
+import { useContext } from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { AuthContext } from '../../contexts/Auth';
+import Agendamentos from '../../screens/agendamentos/Agendamentos';
+import Home from '../../screens/home/Home';
+import Sobre from "../../screens/sobre/Sobre";
+import { colors } from '../../themes/colors/Colors';
+import style from './styles';
 
 const Drawer = createDrawerNavigator();
 
-function CustomDrawerContent(props) {
-  
-  const { user, logout } = useContext(AuthContext);
+function CustomDrawer(props) {
+  const { user, signOut } = useContext(AuthContext);
 
-  function getFirstName(string) {
-    if (!string) return "";
-    const firstName = string.split(" ")[0];
+  function getFirstName(fullName) {
+    if (!fullName || typeof fullName !== 'string') return "Usuário";
+    const firstName = fullName.split(" ")[0];
     return firstName.charAt(0).toUpperCase() + firstName.slice(1);
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.white }}>
-      <DrawerContentScrollView {...props} style={{ backgroundColor: colors.white }} contentContainerStyle={{ paddingTop: 0 }}>
-        <View style={stylesDrawer.header}>
-          <Image source={require('../../image/logo/icon.png')} style={stylesDrawer.logo} />
-          <Text style={stylesDrawer.greetingText}>
-            👋 Olá, <Text style={stylesDrawer.greetingName}>{user?.name ? getFirstName(user.name) : 'Usuário'}</Text>!
-          </Text>
-        </View>
-        <View style={{ flex: 1, backgroundColor: colors.white }}>
-          <DrawerItemList {...props} labelStyle={{ color: colors.secondary, fontWeight: 'bold', fontSize: 16 }} activeTintColor={colors.primary} inactiveTintColor={colors.secondary} />
-        </View>
-        
+    <View style={{ flex: 1 }}>
+      {/* Cabeçalho */}
+      <View style={style.cabecalho}>
+        <Image
+          source={require('../../../assets/icon.png')}
+          style={style.cabecalhoImage}
+        />
+        <Text style={style.cabecalhoText}>
+          Olá, {getFirstName(user?.name)}
+        </Text>
+      </View>
+
+      {/* Itens de Navegação Roláveis */}
+      <DrawerContentScrollView {...props} style={{ backgroundColor: colors.white }}>
+        <DrawerItemList {...props} />
       </DrawerContentScrollView>
-      <View style={stylesDrawer.logoutContainer}>
-        <TouchableOpacity onPress={logout} style={stylesDrawer.logoutBtn}>
-          <Feather name="log-out" size={22} color={colors.secondary} />
-          <Text style={stylesDrawer.logoutText}>Sair</Text>
+
+      {/* Rodapé Fixo com Botão Sair */}
+      <View style={style.rodapeContainer}>
+        <TouchableOpacity onPress={() => signOut()} style={style.rodapeContent}>
+          <Ionicons name="exit-outline" size={22} color={colors.text} />
+          <Text style={style.rodapeText}>
+            Sair
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-
 export default function AppDrawer() {
   return (
     <Drawer.Navigator
-      initialRouteName="Home"
-      drawerContent={props => <CustomDrawerContent {...props} />}
+      initialRouteName="Início"
+      drawerContent={props => <CustomDrawer {...props} />}
       screenOptions={{
-        drawerActiveTintColor: colors.secondary,
-        drawerInactiveTintColor: colors.darkGray,
-        drawerLabelStyle: { fontWeight: 'bold', fontSize: 16 },
-        drawerStyle: { backgroundColor: colors.white },
+        headerStyle: {
+          backgroundColor: colors.secondary,
+        },
+        headerTitleStyle: {
+          color: colors.white,
+          fontWeight: 'bold',
+          fontSize: 18,
+          marginLeft: 10,
+          marginRight: 10,
+        },
+        headerTintColor: colors.white, // Cor do ícone do menu (hamburger) e do botão de voltar
+        drawerActiveBackgroundColor: colors.secondary,
+        drawerActiveTintColor: colors.white,
+        drawerInactiveTintColor: colors.text, // Revertendo para a cor original do texto inativo
+        drawerLabelStyle: {
+          fontSize: 15,
+          fontWeight: 'bold',
+          marginLeft: 10,
+          marginRight: 10,
+        }
+
       }}
     >
       <Drawer.Screen
-        name="Home"
+        name="Início"
         component={Home}
         options={{
-          title: 'Início',
           drawerIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),

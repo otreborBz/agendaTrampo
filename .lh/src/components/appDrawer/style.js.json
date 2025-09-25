@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/components/appDrawer/style.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1758642211677,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1758642218047,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { Dimensions, StyleSheet } from \"react-native\";\r\n-import { colors } from \"../../themes/colors/colors\";\r\n+import { colors } from \"../../themes/colors/Colors\";\r\n \r\n const { width, height } = Dimensions.get(\"window\");\r\n \r\n const styles = StyleSheet.create({\r\n"
+                }
+            ],
+            "date": 1758642211677,
+            "name": "Commit-0",
+            "content": "import { StyleSheet, Dimensions } from \"react-native\";\r\nimport { colors } from \"../../themes/colors/colors\";\r\n\r\nconst { width, height } = Dimensions.get(\"window\");\r\n\r\nconst styles = StyleSheet.create({\r\n\r\n    header: {\r\n    alignItems: 'center',\r\n    paddingVertical: 60,\r\n    backgroundColor: colors.white,\r\n    borderBottomWidth: 1,\r\n    borderBottomColor: '#eee',\r\n  },\r\n  logo: {\r\n    width: 60,\r\n    height: 60,\r\n    marginBottom: 10,\r\n    borderRadius: 30,\r\n  },\r\n  greetingText: {\r\n    fontSize: 16,\r\n    color: colors.text,\r\n    marginBottom: 8,\r\n  },\r\n  greetingName: {\r\n    fontWeight: 'bold',\r\n    color: colors.secondary,\r\n  },\r\n  logoutBtn: {\r\n    flexDirection: 'row',\r\n    alignItems: 'center',\r\n    marginTop: 8,\r\n    marginLeft: 14,\r\n    padding: 6,\r\n    borderRadius: 8,\r\n  },\r\n  logoutText: {\r\n    marginLeft: 6,\r\n    color: colors.secondary,\r\n    fontWeight: 'bold',\r\n    fontSize: 15,\r\n  },\r\n  logoutContainer: {\r\n    borderTopWidth: 1,\r\n    borderTopColor: '#eee',\r\n    padding: 8,\r\n    backgroundColor: colors.white,\r\n    alignItems: 'flex-start',\r\n    justifyContent: 'flex-end',\r\n  },\r\n});\r\n\r\nexport default styles;\r\n"
+        }
+    ]
+}

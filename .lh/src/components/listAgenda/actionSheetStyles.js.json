@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/components/listAgenda/actionSheetStyles.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1758642211674,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1758642217988,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\r\n-import { colors } from \"../../themes/colors/colors\";\r\n+import { colors } from \"../../themes/colors/Colors\";\r\n \r\n \r\n const actionSheetStyles = StyleSheet.create({\r\n   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },\r\n"
+                }
+            ],
+            "date": 1758642211674,
+            "name": "Commit-0",
+            "content": "import { StyleSheet } from \"react-native\";\r\nimport { colors } from \"../../themes/colors/colors\";\r\n\r\n\r\nconst actionSheetStyles = StyleSheet.create({\r\n    overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },\r\n      container: {\r\n        width: '95%',\r\n        maxWidth: 320,\r\n        backgroundColor: 'white',\r\n        borderRadius: 16,\r\n        padding: 20,\r\n        alignItems: 'center',\r\n        shadowColor: '#000',\r\n        shadowOffset: { width: 0, height: 2 },\r\n        shadowOpacity: 0.25,\r\n        shadowRadius: 4,\r\n        elevation: 5,\r\n      },\r\n      mainIcon: { marginBottom: 15 },\r\n      title: { fontSize: 20, fontWeight: '600', color: colors.darkGray, marginBottom: 8, textAlign: 'center' },\r\n      message: { fontSize: 16, color: colors.text, textAlign: 'center', marginBottom: 25 },\r\n      buttonContainer: { width: '100%', gap: 12 },\r\n      button: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', paddingVertical: 12, borderRadius: 10, gap: 8 },\r\n      primaryButton: { backgroundColor: colors.primary },\r\n      destructiveButton: { backgroundColor: colors.error },\r\n      primaryButtonText: { color: colors.white, fontSize: 16, fontWeight: '600' },\r\n      destructiveButtonText: { color: colors.white, fontSize: 16, fontWeight: '600' },\r\n      cancelButton: { marginTop: 16, padding: 8 },\r\n      cancelText: { fontSize: 15, color: colors.text, fontWeight: '500' },\r\n});\r\n\r\nexport default actionSheetStyles;\r\n"
+        }
+    ]
+}

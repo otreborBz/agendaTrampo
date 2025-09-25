@@ -1,12 +1,8 @@
-import React from 'react';
-import { Modal, View, Text, TouchableOpacity } from 'react-native';
-import { colors } from '../../colors/colors';
-import styles from './style';
+import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import styles from './styles';
 
 
 const CustomAlert = ({ visible, title, message, onClose, type = 'error' }) => {
-  // const iconName = type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline';
-  // const iconColor = type === 'success' ? colors.success : colors.warning;
 
   return (
     <Modal

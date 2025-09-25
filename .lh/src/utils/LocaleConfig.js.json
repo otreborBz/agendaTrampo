@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/utils/LocaleConfig.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1758647983310,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1758648087233,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,12 @@\n+import { LocaleConfig } from 'react-native-calendars';\n+\n // Configuração do calendário para padrão brasileiro\n LocaleConfig.locales['pt-br'] = {\n   monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],\n   monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Nov', 'Dez'],\n   dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],\n   dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],\n\\ No newline at end of file\n   today: 'Hoje'\n-};\n+};\n+\n+LocaleConfig.defaultLocale = 'pt-br';\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1758648342678,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,12 @@\n+import { LocaleConfig } from 'react-native-calendars';\n+\n+// Configuração do calendário para padrão brasileiro\n+LocaleConfig.locales['pt-br'] = {\n+  monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],\n+  monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set',  'Nov', 'Dez'],\n+  dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],\n+  dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],\n+  today: 'Hoje'\n+};\n+\n+LocaleConfig.defaultLocale = 'pt-br';\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1758648349693,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,12 @@\n+import { LocaleConfig } from 'react-native-calendars';\n+\n+// Configuração do calendário para padrão brasileiro\n+LocaleConfig.locales['pt-br'] = {\n+  monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],\n+  monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],\n+  dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],\n+  dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],\n+  today: 'Hoje'\n+};\n+\n+LocaleConfig.defaultLocale = 'pt-br';\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1758647983310,
+            "name": "Commit-0",
+            "content": "// Configuração do calendário para padrão brasileiro\nLocaleConfig.locales['pt-br'] = {\n  monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],\n  monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Nov', 'Dez'],\n  dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],\n  dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],\n  today: 'Hoje'\n};"
+        }
+    ]
+}

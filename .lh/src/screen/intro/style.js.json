@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/screen/intro/style.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1758642211677,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1758642218055,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { Dimensions, StyleSheet } from 'react-native';\r\n-import { colors } from '../../themes/colors/colors';\r\n+import { colors } from '../../themes/colors/Colors';\r\n \r\n const { width } = Dimensions.get('window');\r\n \r\n const styles = StyleSheet.create({\r\n"
+                }
+            ],
+            "date": 1758642211677,
+            "name": "Commit-0",
+            "content": "import { StyleSheet, Dimensions } from 'react-native';\r\nimport { colors } from '../../themes/colors/colors';\r\n\r\nconst { width } = Dimensions.get('window');\r\n\r\nconst styles = StyleSheet.create({\r\n    container: {\r\n        flex: 1,\r\n        justifyContent: 'space-evenly',\r\n        alignItems: 'center',\r\n        backgroundColor: colors.background,\r\n        paddingHorizontal: 20,\r\n    },\r\n    logo: {\r\n        width: width * 0.7,\r\n        height: width * 0.7,\r\n        maxWidth: 350,\r\n        maxHeight: 350,\r\n        resizeMode: 'contain',\r\n    },\r\n    buttonContainer: {\r\n        width: '85%',\r\n        alignItems: 'center',\r\n    },\r\n    button: {\r\n        width: '100%',\r\n        height: 50,\r\n        justifyContent: 'center',\r\n        alignItems: 'center',\r\n        backgroundColor: colors.primary,\r\n        paddingVertical: 10,\r\n        paddingHorizontal: 30,\r\n        borderRadius: 10,\r\n        shadowColor: colors.primary,\r\n        shadowOffset: {\r\n            width: 0,\r\n            height: 3,\r\n        },\r\n        shadowOpacity: 0.3,\r\n        shadowRadius: 4.65,\r\n        elevation: 8,\r\n    },\r\n    buttonText: {\r\n        color: colors.white,\r\n        fontSize: 18,\r\n        fontWeight: 'bold',\r\n        textAlign: 'center',\r\n    },\r\n    buttonContainerText: {\r\n        marginTop: 20,\r\n        color: colors.darkGray,\r\n        fontSize: 14,\r\n        fontWeight: '500',\r\n        textAlign: 'center',\r\n    }\r\n});\r\n\r\nexport default styles;"
+        }
+    ]
+}
