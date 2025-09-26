@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
-import { createStackNavigator } from '@react-navigation/stack';
+import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { useContext } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { AuthContext } from '../../contexts/Auth';
@@ -119,34 +119,6 @@ function DrawerNav() {
   );
 }
 
-// Animação customizada: Sobe ao abrir, esmaece ao fechar.
-const customScreenAnimation = ({ current, closing, layouts }) => {
-  const { screen } = layouts;
-
-  // Animação de fade para o fechamento
-  if (closing) {
-    return {
-      cardStyle: {
-        opacity: current.progress,
-      },
-    };
-  }
-
-  // Animação de slide vertical para a abertura
-  return {
-    cardStyle: {
-      transform: [
-        {
-          translateY: current.progress.interpolate({
-            inputRange: [0, 1],
-            outputRange: [screen.height, 0],
-          }),
-        },
-      ],
-    },
-  };
-};
-
 // Navegador Raiz que controla o Drawer e os Modais de tela cheia
 export default function AppDrawer() {
   return (
@@ -161,7 +133,19 @@ export default function AppDrawer() {
         component={Agendamentos}
         options={{
           headerShown: false,
-          cardStyleInterpolator: customScreenAnimation // Usa a animação customizada
+          // Define a animação de deslizar de baixo para cima (e vice-versa)
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          // Define a velocidade da animação
+          transitionSpec: {
+            open: {
+              animation: 'timing',
+              config: { duration: 600 }, // 600ms para abrir (mais lento)
+            },
+            close: {
+              animation: 'timing',
+              config: { duration: 600 }, // 600ms para fechar (mais lento)
+            },
+          },
         }}
       />
     </Stack.Navigator>
