@@ -1,13 +1,12 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { colors } from '../../../themes/colors/Colors';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingVertical: 60, // Aumenta o padding vertical para centralizar melhor com ScrollView
     alignItems: 'center',
-    justifyContent: 'center',
   },
   backBtn: {
     position: 'absolute',
@@ -19,72 +18,79 @@ const styles = StyleSheet.create({
   },
   logoBox: {
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 24,
   },
   logo: {
-    width: 180,
-    height: 180,
+    width: 150,
+    height: 150,
     borderRadius: 20,
-    marginBottom: 4,
+    marginBottom: 16,
   },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: colors.secondary,
+    color: colors.text,
     textAlign: 'center',
-    marginBottom: 8,
-    letterSpacing: 1,
   },
   desc: {
     fontSize: 16,
     color: colors.text,
     textAlign: 'center',
-    marginBottom: 18,
+    marginBottom: 32,
     lineHeight: 22,
     maxWidth: 320,
   },
   versionBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
-    backgroundColor: '#f5f5f5',
+    marginBottom: 40,
+    backgroundColor: colors.lightGray,
     borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: 6,
   },
   versionText: {
     marginLeft: 6,
-    color: colors.secondary,
-    fontWeight: 'bold',
-    fontSize: 15,
+    color: colors.darkGray,
+    fontWeight: '600',
+    fontSize: 14,
   },
-  contactBox: {
+  contactSection: {
     width: '100%',
-    marginTop: 8,
     alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingTop: 24,
   },
   contactTitle: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 10,
+    color: colors.text,
+    marginBottom: 16,
+  },
+  contactActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '90%',
   },
   contactBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginBottom: 10,
-    width: 240,
     justifyContent: 'center',
-    elevation: 1,
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    flex: 1, // Faz com que os botões dividam o espaço
+    marginHorizontal: 6, // Adiciona um pequeno espaço entre eles
   },
   contactBtnText: {
     color: colors.text,
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '600',
+    marginLeft: 8, // Espaço entre o ícone e o texto
   },
 });
 

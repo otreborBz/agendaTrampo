@@ -1,16 +1,16 @@
-import React, { useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { useContext } from "react";
 import AppDrawer from '../components/appDrawer/AppDrawer';
 
 // Screens
+import ChangeRecord from '../screens/changeRecord/ChangeRecord';
 import Intro from '../screens/intro/Intro';
 import Login from '../screens/login/Login';
 import Register from '../screens/register/Register';
-import ChangeRecord from '../screens/changeRecord/ChangeRecord';
 
-import { AuthContext } from '../contexts/Auth';
 import { ActivityIndicator } from "react-native";
+import { AuthContext } from '../contexts/Auth';
 import { colors } from "../themes/colors/Colors";
 
 const Stack = createStackNavigator();
@@ -19,7 +19,7 @@ export default function Routes() {
   const { user, initializing } = useContext(AuthContext);
 
   if (initializing) {
-    return <ActivityIndicator size="large" color={ colors.secondary} />;
+    return <ActivityIndicator size="large" color={colors.secondary} />;
   }
 
   return (

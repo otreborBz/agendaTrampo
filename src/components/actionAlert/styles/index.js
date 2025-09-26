@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { colors } from "../../themes/colors/Colors";
+import { colors } from "../../../themes/colors/Colors";
 
 const styles = StyleSheet.create({
   overlay: {

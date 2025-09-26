@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, View, Text, TouchableOpacity } from "react-native";
-import styles from "./style";
+import styles from "./styles";
 
 
 export default function CustomAlert({ visible, title, message, actions = [], onClose }) {

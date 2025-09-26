@@ -59,6 +59,12 @@ const styles = StyleSheet.create({
     elevation: 8,
     zIndex: 100,
   },
+  fabPressable: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

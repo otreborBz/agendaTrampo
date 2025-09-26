@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { createStackNavigator } from '@react-navigation/stack';
 import { useContext } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { AuthContext } from '../../contexts/Auth';
@@ -10,6 +11,7 @@ import { colors } from '../../themes/colors/Colors';
 import style from './styles';
 
 const Drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
 
 function CustomDrawer(props) {
   const { user, signOut } = useContext(AuthContext);
@@ -25,11 +27,12 @@ function CustomDrawer(props) {
       {/* Cabeçalho */}
       <View style={style.cabecalho}>
         <Image
-          source={require('../../../assets/icon.png')}
+          source={require('../../../assets/iconName.png')}
           style={style.cabecalhoImage}
         />
         <Text style={style.cabecalhoText}>
-          Olá, {getFirstName(user?.name)}
+          <Text style={style.greetingText}>Olá, </Text>
+          <Text style={style.greetingName}>{getFirstName(user?.name)}</Text>
         </Text>
       </View>
 
@@ -51,7 +54,20 @@ function CustomDrawer(props) {
   );
 }
 
-export default function AppDrawer() {
+// Stack que contém apenas a tela Home.
+function HomeStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="HomeScreen" // Nome interno para a Home dentro da Stack
+        component={Home}
+        options={{ headerShown: false }} // Esconde o header da Stack na Home
+      />
+    </Stack.Navigator>
+  );
+}
+
+function DrawerNav() {
   return (
     <Drawer.Navigator
       initialRouteName="Início"
@@ -82,20 +98,10 @@ export default function AppDrawer() {
     >
       <Drawer.Screen
         name="Início"
-        component={Home}
+        component={HomeStack} // Trocamos Home por HomeStack
         options={{
           drawerIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="Agendar"
-        component={Agendamentos}
-        options={{
-          headerShown: false,
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="calendar" size={size} color={color} />
           ),
         }}
       />
@@ -110,5 +116,54 @@ export default function AppDrawer() {
         }}
       />
     </Drawer.Navigator>
+  );
+}
+
+// Animação customizada: Sobe ao abrir, esmaece ao fechar.
+const customScreenAnimation = ({ current, closing, layouts }) => {
+  const { screen } = layouts;
+
+  // Animação de fade para o fechamento
+  if (closing) {
+    return {
+      cardStyle: {
+        opacity: current.progress,
+      },
+    };
+  }
+
+  // Animação de slide vertical para a abertura
+  return {
+    cardStyle: {
+      transform: [
+        {
+          translateY: current.progress.interpolate({
+            inputRange: [0, 1],
+            outputRange: [screen.height, 0],
+          }),
+        },
+      ],
+    },
+  };
+};
+
+// Navegador Raiz que controla o Drawer e os Modais de tela cheia
+export default function AppDrawer() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="DrawerNav"
+        component={DrawerNav}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Agendar"
+        component={Agendamentos}
+        options={{
+          headerShown: false,
+          cardStyleInterpolator: customScreenAnimation // Usa a animação customizada
+        }}
+      />
+    </Stack.Navigator>
   );
 }

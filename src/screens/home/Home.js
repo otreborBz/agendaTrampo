@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { useContext, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Animated, FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
 import CustomAlert from '../../components/customAlert/CustomAlert';
@@ -32,6 +32,22 @@ export default function Home() {
 
   const [showCalendar, setShowCalendar] = useState(true);
   const [showFullCalendar, setShowFullCalendar] = useState(false);
+
+  // Valor animado para a escala do FAB
+  const fabScale = useRef(new Animated.Value(1)).current;
+
+  const onPressInFab = () => {
+    // Anima para uma escala menor
+    Animated.spring(fabScale, {
+      toValue: 0.9,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const onPressOutFab = () => {
+    // Anima de volta para a escala original
+    Animated.spring(fabScale, { toValue: 1, useNativeDriver: true }).start();
+  };
 
   // Carrega serviços do AsyncStorage
   useEffect(() => {
@@ -269,13 +285,16 @@ export default function Home() {
       )}
 
       {/* Botão de ação flutuante para adicionar agendamento */}
-      <TouchableOpacity
-        style={styles.fab}
-        activeOpacity={0.8}
-        onPress={() => navigation.navigate('Agendar')}
-      >
-        <Ionicons name="add" size={32} color={colors.white} />
-      </TouchableOpacity>
+      <Animated.View style={[{ transform: [{ scale: fabScale }] }, styles.fab]}>
+        <Pressable
+          onPress={() => navigation.navigate('Agendar')}
+          onPressIn={onPressInFab}
+          onPressOut={onPressOutFab}
+          style={styles.fabPressable}
+        >
+          <Ionicons name="add" size={32} color={colors.white} />
+        </Pressable>
+      </Animated.View>
     </View>
   );
 }

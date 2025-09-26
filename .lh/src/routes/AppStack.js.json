@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/routes/AppStack.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1758895879387,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1758895920954,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import { createStackNavigator } from \"@react-navigation/stack\";\n import React from \"react\";\n \n import AppDrawer from '../components/appDrawer/AppDrawer';\n-import Agendar from '../screens/agendar/Agendar'; // Verifique se o caminho está correto\n+import Agendamentos from '../screens/agendamentos/Agendamentos'; // Componente correto para a tela de agendamento\n \n const Stack = createStackNavigator();\n \n /**\n@@ -21,9 +21,9 @@\n \n       {/* Tela com animação de Modal */}\n       <Stack.Screen\n         name=\"Agendar\"\n-        component={Agendar}\n+        component={Agendamentos}\n         options={{\n           presentation: 'modal', // <-- É esta linha que faz a tela subir\n         }}\n       />\n"
+                },
+                {
+                    "date": 1758895930733,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,32 +0,0 @@\n-import { createStackNavigator } from \"@react-navigation/stack\";\n-import React from \"react\";\n-\n-import AppDrawer from '../components/appDrawer/AppDrawer';\n-import Agendamentos from '../screens/agendamentos/Agendamentos'; // Componente correto para a tela de agendamento\n-\n-const Stack = createStackNavigator();\n-\n-/**\n- * Este Stack Navigator agrupa as telas que devem ter a animação padrão\n- * e as que devem ter animação de modal.\n- */\n-export default function AppStack() {\n-  return (\n-    <Stack.Navigator screenOptions={{ headerShown: false }}>\n-      {/* Telas normais */}\n-      <Stack.Screen\n-        name=\"AppDrawer\"\n-        component={AppDrawer}\n-      />\n-\n-      {/* Tela com animação de Modal */}\n-      <Stack.Screen\n-        name=\"Agendar\"\n-        component={Agendamentos}\n-        options={{\n-          presentation: 'modal', // <-- É esta linha que faz a tela subir\n-        }}\n-      />\n-    </Stack.Navigator>\n-  );\n-}\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1758895879387,
+            "name": "Commit-0",
+            "content": "import { createStackNavigator } from \"@react-navigation/stack\";\nimport React from \"react\";\n\nimport AppDrawer from '../components/appDrawer/AppDrawer';\nimport Agendar from '../screens/agendar/Agendar'; // Verifique se o caminho está correto\n\nconst Stack = createStackNavigator();\n\n/**\n * Este Stack Navigator agrupa as telas que devem ter a animação padrão\n * e as que devem ter animação de modal.\n */\nexport default function AppStack() {\n  return (\n    <Stack.Navigator screenOptions={{ headerShown: false }}>\n      {/* Telas normais */}\n      <Stack.Screen\n        name=\"AppDrawer\"\n        component={AppDrawer}\n      />\n\n      {/* Tela com animação de Modal */}\n      <Stack.Screen\n        name=\"Agendar\"\n        component={Agendar}\n        options={{\n          presentation: 'modal', // <-- É esta linha que faz a tela subir\n        }}\n      />\n    </Stack.Navigator>\n  );\n}\n"
+        }
+    ]
+}
