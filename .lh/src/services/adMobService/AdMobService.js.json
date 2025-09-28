@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/services/adMobService/AdMobService.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1759039344349,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1759039760234,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,5 +3,5 @@\n // Use o ID de bloco de anúncios de teste para desenvolvimento\n // e o seu ID real para produção.\n export const adUnitId = __DEV__\n   ? TestIds.BANNER\n-  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; // <-- SUBSTITUA PELO SEU ID DE PRODUÇÃO\n\\ No newline at end of file\n+  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1759039768113,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,5 @@\n import { TestIds } from 'react-native-google-mobile-ads';\n \n-// Use o ID de bloco de anúncios de teste para desenvolvimento\n-// e o seu ID real para produção.\n export const adUnitId = __DEV__\n   ? TestIds.BANNER\n   : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1759039344349,
+            "name": "Commit-0",
+            "content": "import { TestIds } from 'react-native-google-mobile-ads';\n\n// Use o ID de bloco de anúncios de teste para desenvolvimento\n// e o seu ID real para produção.\nexport const adUnitId = __DEV__\n  ? TestIds.BANNER\n  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; // <-- SUBSTITUA PELO SEU ID DE PRODUÇÃO"
+        }
+    ]
+}

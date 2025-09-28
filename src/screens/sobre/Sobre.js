@@ -5,6 +5,9 @@ import { Image, Linking, ScrollView, Text, TouchableOpacity, View } from 'react-
 import { colors } from '../../themes/colors/Colors';
 import styles from './styles';
 
+import AdBanner from '../../components/adBanner/AdBanner';
+
+
 export default function Sobre() {
   const navigation = useNavigation();
   // Pega a versão do app dinamicamente do app.json
@@ -44,6 +47,7 @@ export default function Sobre() {
           </TouchableOpacity>
         </View>
       </View>
+        <AdBanner />
     </ScrollView>
   );
 }

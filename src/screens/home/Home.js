@@ -13,6 +13,10 @@ import { colors } from '../../themes/colors/Colors';
 import '../../utils/LocaleConfig';
 import styles from './styles';
 
+import AdBanner from '../../components/adBanner/AdBanner';
+
+
+
 export default function Home() {
 
   const navigation = useNavigation();
@@ -159,6 +163,8 @@ export default function Home() {
     return calendarMarks;
   }, [agendamentos, selectedDate]);
 
+
+
   return (
     <View style={styles.container}>
       <CustomAlert
@@ -252,13 +258,12 @@ export default function Home() {
 
       {listLoading ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={{ marginTop: 10, color: colors.text }}>Carregando agendamentos...</Text>
+          <ActivityIndicator size="large" color={colors.secondary} />
         </View>
       ) : (
         <FlatList
           key={'_'}
-          numColumns={2}
+          numColumns={1}
           data={agendamentos.filter(item => {
             if (!item.dataHora) return false;
             const data = typeof item.dataHora === 'string' ? item.dataHora : (item.dataHora.toDate ? item.dataHora.toDate().toISOString() : '');
@@ -283,7 +288,6 @@ export default function Home() {
           }
         />
       )}
-
       {/* Botão de ação flutuante para adicionar agendamento */}
       <Animated.View style={[{ transform: [{ scale: fabScale }] }, styles.fab]}>
         <Pressable

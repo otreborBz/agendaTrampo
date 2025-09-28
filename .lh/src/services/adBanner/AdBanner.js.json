@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/services/adBanner/AdBanner.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1759039027031,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1759039344619,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,16 @@\n-  <BannerAd\n-          unitId={adUnitId}\n-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}\n-          requestOptions={{ requestNonPersonalizedAdsOnly: true }}\n-        />\n\\ No newline at end of file\n+import React from 'react';\n+import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';\n+import { adUnitId } from '../adMobService/AdMobService';\n+\n+/**\n+ * Componente reutilizável para exibir um banner de anúncio.\n+ */\n+export default function AdBanner() {\n+  return (\n+    <BannerAd\n+      unitId={adUnitId}\n+      size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}\n+      requestOptions={{ requestNonPersonalizedAdsOnly: true }}\n+    />\n+  );\n+}\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1759039027031,
+            "name": "Commit-0",
+            "content": "  <BannerAd\n          unitId={adUnitId}\n          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}\n          requestOptions={{ requestNonPersonalizedAdsOnly: true }}\n        />"
+        }
+    ]
+}
