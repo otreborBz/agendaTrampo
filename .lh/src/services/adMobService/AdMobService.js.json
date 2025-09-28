@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 8,
             "patches": [
                 {
                     "date": 1759039344349,
@@ -16,6 +16,30 @@
                 {
                     "date": 1759039768113,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,5 @@\n import { TestIds } from 'react-native-google-mobile-ads';\n \n-// Use o ID de bloco de anúncios de teste para desenvolvimento\n-// e o seu ID real para produção.\n export const adUnitId = __DEV__\n   ? TestIds.BANNER\n   : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1759096811531,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,9 @@\n-import { TestIds } from 'react-native-google-mobile-ads';\n-\n-export const adUnitId = __DEV__\n-  ? TestIds.BANNER\n-  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; \n\\ No newline at end of file\n+import { TestIds } from 'react-native-google-mobile-ads';\r\n+\r\n+export const adUnitId = __DEV__\r\n+  ? TestIds.BANNER\r\n+  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy';\r\n+\r\n+export const adUnitIdInterstitial = __DEV__\r\n+  ? 'ca-app-pub-3940256099942544/1033173712' // ID de teste do Google\r\n+  : 'ca-app-pub-xxxx/yyyy'; // seu ID real\r\n"
+                },
+                {
+                    "date": 1759096817875,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,6 +4,6 @@\n   ? TestIds.BANNER\r\n   : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy';\r\n \r\n export const adUnitIdInterstitial = __DEV__\r\n-  ? 'ca-app-pub-3940256099942544/1033173712' // ID de teste do Google\r\n+  ? 'ca-app-pub-3940256099942544/1033173712'\r\n   : 'ca-app-pub-xxxx/yyyy'; // seu ID real\r\n"
+                },
+                {
+                    "date": 1759097057297,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,9 @@\n+import { TestIds } from 'react-native-google-mobile-ads';\r\n+\r\n+export const adUnitId = __DEV__\r\n+  ? TestIds.BANNER\r\n+  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy';\r\n+\r\n+export const adUnitIdInterstitial = __DEV__\r\n+  ? TestIds.INTERSTITIAL\r\n+  : 'ca-app-pub-xxxx/yyyy';\r\n"
+                },
+                {
+                    "date": 1759098212854,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,13 +6,4 @@\n \r\n export const adUnitIdInterstitial = __DEV__\r\n   ? TestIds.INTERSTITIAL\r\n   : 'ca-app-pub-xxxx/yyyy';\r\n-import { TestIds } from 'react-native-google-mobile-ads';\r\n-\r\n-export const adUnitId = __DEV__\r\n-  ? TestIds.BANNER\r\n-  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy';\r\n-\r\n-export const adUnitIdInterstitial = __DEV__\r\n-  ? 'ca-app-pub-3940256099942544/1033173712'\r\n-  : 'ca-app-pub-xxxx/yyyy'; // seu ID real\r\n"
+                },
+                {
+                    "date": 1759102095895,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,20 @@\n+// services/adMobService/AdMobService.ts\r\n import { TestIds } from 'react-native-google-mobile-ads';\r\n \r\n+/**\r\n+ * ID de banner\r\n+ * - Usa TestIds.BANNER em desenvolvimento (__DEV__)\r\n+ * - Usa seu ID real em produção\r\n+ */\r\n export const adUnitId = __DEV__\r\n   ? TestIds.BANNER\r\n-  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy';\r\n+  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; // substitua pelo seu ID real de produção\r\n \r\n+/**\r\n+ * ID intersticial\r\n+ * - Usa TestIds.INTERSTITIAL em desenvolvimento (__DEV__)\r\n+ * - Usa seu ID real em produção\r\n+ */\r\n export const adUnitIdInterstitial = __DEV__\r\n   ? TestIds.INTERSTITIAL\r\n-  : 'ca-app-pub-xxxx/yyyy';\r\n+  : 'ca-app-pub-xxxx/yyyy'; // substitua pelo seu ID real de produção\r\n"
+                },
+                {
+                    "date": 1759102413089,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,20 +1,20 @@\n // services/adMobService/AdMobService.ts\r\n import { TestIds } from 'react-native-google-mobile-ads';\r\n \r\n /**\r\n- * ID de banner\r\n- * - Usa TestIds.BANNER em desenvolvimento (__DEV__)\r\n- * - Usa seu ID real em produção\r\n+ * Banner Ad Unit ID\r\n+ * - Em desenvolvimento (__DEV__), usa TestIds.BANNER\r\n+ * - Em produção, substitua pelo seu ID real do AdMob\r\n  */\r\n export const adUnitId = __DEV__\r\n   ? TestIds.BANNER\r\n-  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; // substitua pelo seu ID real de produção\r\n+  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; // ✅ substitua pelo seu ID real\r\n \r\n /**\r\n- * ID intersticial\r\n- * - Usa TestIds.INTERSTITIAL em desenvolvimento (__DEV__)\r\n- * - Usa seu ID real em produção\r\n+ * Interstitial Ad Unit ID\r\n+ * - Em desenvolvimento (__DEV__), usa TestIds.INTERSTITIAL\r\n+ * - Em produção, substitua pelo seu ID real do AdMob\r\n  */\r\n export const adUnitIdInterstitial = __DEV__\r\n   ? TestIds.INTERSTITIAL\r\n-  : 'ca-app-pub-xxxx/yyyy'; // substitua pelo seu ID real de produção\r\n+  : 'ca-app-pub-xxxxxxxxxxxxxxxx/zzzzzzzzzz'; // ✅ substitua pelo seu ID real\r\n"
                 }
             ],
             "date": 1759039344349,

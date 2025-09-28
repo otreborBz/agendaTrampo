@@ -83,21 +83,6 @@ export default StyleSheet.create({
     marginBottom: 12,
   },
 
-  inputIcon: {
-    borderWidth: 1,
-    borderColor: colors.secondary,
-    borderRadius: 10,
-    paddingVertical: 14,
-    marginBottom: 12,
-  },
-
-  textButton: {
-    width: '100%',
-    height: 50,
-    backgroundColor: colors.secondary,
-    borderRadius: 10,
-  },
-
   textButtonEndereco: {
     color: '#fff',
     fontWeight: 'bold',
@@ -133,13 +118,7 @@ export default StyleSheet.create({
     color: colors.secondary,
   },
 
-  // Estilos específicos para o Modal de Endereço
-  modalEnderecoLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 4,
-  },
+  // Inputs dentro do modal de endereço
   modalEnderecoInputContainer: {
     height: 44,
     marginBottom: 8,
@@ -147,7 +126,6 @@ export default StyleSheet.create({
   modalEnderecoCepContainer: {
     marginBottom: 8,
   },
-  // Fim dos estilos específicos
 
   servicoItem: {
     flexDirection: 'row',
@@ -173,7 +151,6 @@ export default StyleSheet.create({
   },
 
   buttonCloseModal: {
-    // backgroundColor: colors.error,
     borderWidth: 1,
     borderColor: colors.secondary,
     borderRadius: 10,
@@ -227,11 +204,9 @@ export default StyleSheet.create({
     paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
   },
 
   buttonFooterCancel: {
-    width: '30%',
     backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.secondary,

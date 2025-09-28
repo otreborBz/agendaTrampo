@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1758724185691,
@@ -20,6 +20,10 @@
                 {
                     "date": 1758724275671,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -222,9 +222,9 @@\n \r\n   buttonFooter: {\r\n     backgroundColor: colors.secondary,\r\n     borderRadius: 10,\r\n-    width: '30%',\r\n+    width: '48%',\r\n     paddingVertical: 14,\r\n     alignItems: 'center',\r\n     justifyContent: 'center',\r\n     marginLeft: 8,\r\n"
+                },
+                {
+                    "date": 1759101698543,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -82,23 +82,8 @@\n     paddingVertical: 14,\r\n     marginBottom: 12,\r\n   },\r\n \r\n-  inputIcon: {\r\n-    borderWidth: 1,\r\n-    borderColor: colors.secondary,\r\n-    borderRadius: 10,\r\n-    paddingVertical: 14,\r\n-    marginBottom: 12,\r\n-  },\r\n-\r\n-  textButton: {\r\n-    width: '100%',\r\n-    height: 50,\r\n-    backgroundColor: colors.secondary,\r\n-    borderRadius: 10,\r\n-  },\r\n-\r\n   textButtonEndereco: {\r\n     color: '#fff',\r\n     fontWeight: 'bold',\r\n     fontSize: 15,\r\n@@ -132,23 +117,16 @@\n     textAlign: 'center',\r\n     color: colors.secondary,\r\n   },\r\n \r\n-  // Estilos específicos para o Modal de Endereço\r\n-  modalEnderecoLabel: {\r\n-    fontSize: 13,\r\n-    fontWeight: '600',\r\n-    color: colors.text,\r\n-    marginBottom: 4,\r\n-  },\r\n+  // Inputs dentro do modal de endereço\r\n   modalEnderecoInputContainer: {\r\n     height: 44,\r\n     marginBottom: 8,\r\n   },\r\n   modalEnderecoCepContainer: {\r\n     marginBottom: 8,\r\n   },\r\n-  // Fim dos estilos específicos\r\n \r\n   servicoItem: {\r\n     flexDirection: 'row',\r\n     justifyContent: 'space-between',\r\n@@ -172,9 +150,8 @@\n     alignItems: 'center',\r\n   },\r\n \r\n   buttonCloseModal: {\r\n-    // backgroundColor: colors.error,\r\n     borderWidth: 1,\r\n     borderColor: colors.secondary,\r\n     borderRadius: 10,\r\n     paddingVertical: 14,\r\n@@ -226,13 +203,11 @@\n     width: '48%',\r\n     paddingVertical: 14,\r\n     alignItems: 'center',\r\n     justifyContent: 'center',\r\n-    marginLeft: 8,\r\n   },\r\n \r\n   buttonFooterCancel: {\r\n-    width: '30%',\r\n     backgroundColor: colors.background,\r\n     borderWidth: 1,\r\n     borderColor: colors.secondary,\r\n     borderRadius: 10,\r\n"
                 }
             ],
             "date": 1758724185691,

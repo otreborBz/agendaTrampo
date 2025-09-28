@@ -3,9 +3,9 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import { AuthContext } from '../../contexts/Auth';
-
 import { salvarAgendamento } from '../../services/agendamentoService/agendamentoService';
 import { buscarCep } from '../../services/apiViaCep/apiViaCepService';
+import { carregarServicos, salvarServicos } from '../../services/servico/servico';
 
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../../themes/colors/Colors';
@@ -15,15 +15,17 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import ActionAlert from '../../components/actionAlert/actionAlert';
 import CustomAlert from '../../components/customAlert/CustomAlert';
 
-import { carregarServicos, salvarServicos } from '../../services/servico/servico';
+import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
+import { adUnitIdInterstitial } from '../../services/adMobService/AdMobService';
 
-
-
+// --- Interstitial Ads ---
+const interstitialAdUnitId = __DEV__ ? TestIds.INTERSTITIAL : adUnitIdInterstitial;
 
 export default function Agendamentos({ route, navigation }) {
   const { user } = useContext(AuthContext);
   const [agendamentoEdit, setAgendamentoEdit] = useState(route?.params?.agendamento || null);
 
+  // --- Formulário ---
   const [nomeCliente, setNomeCliente] = useState(agendamentoEdit?.nomeCliente || '');
   const [telefone, setTelefone] = useState(agendamentoEdit?.telefone || '');
   const [dataHora, setDataHora] = useState(agendamentoEdit?.dataHora ? new Date(agendamentoEdit.dataHora) : new Date());
@@ -39,6 +41,7 @@ export default function Agendamentos({ route, navigation }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
+  // --- Alerts ---
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertInfo, setAlertInfo] = useState({ title: '', message: '' });
   const [onAlertCloseAction, setOnAlertCloseAction] = useState(null);
@@ -47,7 +50,14 @@ export default function Agendamentos({ route, navigation }) {
   const [actionAlertInfo, setActionAlertInfo] = useState({ title: '', message: '' });
   const [onActionAlertConfirm, setOnActionAlertConfirm] = useState(null);
 
-  // Limpa os campos do formulário
+  // --- Interstitial Ad Hook ---
+  const { isLoaded, isClosed, load, show, error } = useInterstitialAd(interstitialAdUnitId, {
+    requestNonPersonalizedAdsOnly: true,
+  });
+
+  const [saveCompleted, setSaveCompleted] = useState(false);
+
+  // --- Limpar campos ---
   const limparCampos = () => {
     setNomeCliente('');
     setTelefone('');
@@ -59,12 +69,11 @@ export default function Agendamentos({ route, navigation }) {
     setAgendamentoEdit(null);
   };
 
-  // Efeito que roda toda vez que a tela ganha foco
+  // --- Preenche campos ao ganhar foco ---
   useFocusEffect(
     useCallback(() => {
       const agendamentoParam = route.params?.agendamento;
       if (agendamentoParam) {
-        // Se veio um agendamento para editar, preenche os campos
         setAgendamentoEdit(agendamentoParam);
         setNomeCliente(agendamentoParam.nomeCliente || '');
         setTelefone(agendamentoParam.telefone || '');
@@ -74,41 +83,73 @@ export default function Agendamentos({ route, navigation }) {
         setStatus(agendamentoParam.status || 'Pendente');
         setValor(agendamentoParam.valor ? formatValor(String(agendamentoParam.valor).replace(/\D/g, '')) : '');
       } else {
-        // Se não veio parâmetro, limpa tudo para garantir que é uma nova criação
         limparCampos();
       }
     }, [route.params?.agendamento])
   );
 
+  // --- Carrega serviços do AsyncStorage ---
   useEffect(() => {
     async function loadServicos() {
-      // Carrega os serviços salvos no AsyncStorage
       const servicosSalvos = await carregarServicos();
       setServicosExistentes(servicosSalvos);
     }
-    loadServicos(); // Chama a função para carregar os serviços quando o componente é montado
+    loadServicos();
   }, []);
 
+  // --- Carrega o anúncio ao montar ---
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // --- Recarrega anúncio ao ser fechado ---
+  useEffect(() => {
+    if (isClosed) {
+      setSaveCompleted(true); // exibe alerta após fechar anúncio
+      load(); // prepara para próximo
+    }
+  }, [isClosed, load]);
+
+  // --- Monitoramento de erros do anúncio ---
+  useEffect(() => {
+    if (error) console.error('[AD_STATE] Falha ao carregar o anúncio:=', error.message);
+    if (isLoaded) console.log('[AD_STATE] Anúncio carregado e pronto para exibir!');
+  }, [error, isLoaded]);
+
+  // --- Alerta de sucesso pós salvamento ---
+  useEffect(() => {
+    if (saveCompleted) {
+      setAlertInfo({ title: "Sucesso", message: `Agendamento ${agendamentoEdit ? 'atualizado' : 'cadastrado'}!` });
+      setOnAlertCloseAction(() => () => navigation.goBack());
+      setAlertVisible(true);
+      setSaveCompleted(false);
+    }
+  }, [saveCompleted, navigation]);
+
+  // --- Salvar agendamento ---
   const handleSaveAgendamento = async () => {
     if (!nomeCliente || !telefone || !dataHora) {
       setAlertInfo({ title: 'Atenção', message: 'Por favor, preencha todos os campos.' });
       setAlertVisible(true);
       return;
     }
+
     try {
       await salvarAgendamento({ nomeCliente, telefone, dataHora, servico, valor, endereco, status, uid: user.uid }, agendamentoEdit?.id);
-      setAlertInfo({ title: "Sucesso", message: `Agendamento ${agendamentoEdit ? 'atualizado' : 'cadastrado'}!` });
-      setOnAlertCloseAction(() => () => {
-        limparCampos();
-        navigation.goBack();
-      });
-      setAlertVisible(true);
+
+      if (isLoaded) {
+        show(); // mostra anúncio
+      } else {
+        setSaveCompleted(true); // exibe alerta sem anúncio
+      }
+
     } catch (error) {
       setAlertInfo({ title: "Erro", message: "Não foi possível salvar o agendamento. Tente novamente." });
       setAlertVisible(true);
     }
   };
 
+  // --- DateTimePicker Handlers ---
   const onChangeDate = (event, selectedDate) => {
     setShowDatePicker(false);
     if (event.type === 'dismissed') return;
@@ -126,78 +167,57 @@ export default function Agendamentos({ route, navigation }) {
     setDataHora(updatedDateTime);
   };
 
+  // --- Serviços ---
   const adicionarServico = async () => {
     const servicoParaAdicionar = novoServico.trim();
-
     if (!servicoParaAdicionar) {
       setAlertInfo({ title: 'Atenção', message: 'Por favor, informe um serviço!' });
       setAlertVisible(true);
       return;
     }
-
-    // Verifica se o serviço já existe (ignorando maiúsculas/minúsculas)
     if (servicosExistentes.some(s => s.toLowerCase() === servicoParaAdicionar.toLowerCase())) {
       setAlertInfo({ title: 'Atenção', message: 'Este serviço já foi adicionado.' });
       setAlertVisible(true);
       return;
     }
-
     const newList = [...servicosExistentes, servicoParaAdicionar];
     setServicosExistentes(newList);
-
-    // Salva a lista completa no AsyncStorage
     await salvarServicos(newList);
-
     setServico(servicoParaAdicionar);
     setNovoServico('');
     setModalServicoVisible(false);
   };
 
-
   const removerServico = (index) => {
     const servicoParaRemover = servicosExistentes[index];
     if (!servicoParaRemover) return;
-
     setActionAlertInfo({ title: 'Excluir Serviço', message: `Tem certeza que deseja excluir "${servicoParaRemover}"?` });
-
-    // Define a função que será executada ao confirmar a exclusão
     setOnActionAlertConfirm(() => async () => {
       const newList = servicosExistentes.filter((_, i) => i !== index);
       setServicosExistentes(newList);
-
-      // Salva a lista atualizada no AsyncStorage
       await salvarServicos(newList);
-
-      // Se o serviço removido era o que estava selecionado, limpa a seleção
       if (servico === servicoParaRemover) setServico('');
     });
-
     setActionAlertVisible(true);
   };
-
 
   const selecionarServico = (servicoSelecionado) => {
     setServico(servicoSelecionado);
     setModalServicoVisible(false);
   };
 
-
-  // busca o cep
+  // --- CEP / Endereço ---
   const handleSearchCep = async () => {
     setLoadingCep(true);
-
     if (!endereco.cep || endereco.cep.length !== 8) {
       setAlertInfo({ title: 'Atenção', message: 'Por favor, informe um CEP válido.' });
       setAlertVisible(true);
       setLoadingCep(false);
       return;
     }
-
     try {
       const resultado = await buscarCep(endereco.cep);
-      if (resultado) {
-        setEndereco(prev => ({ ...prev, ...resultado }));
-      }
+      if (resultado) setEndereco(prev => ({ ...prev, ...resultado }));
     } catch (error) {
       setAlertInfo({ title: 'Erro', message: error.message });
       setAlertVisible(true);
@@ -206,10 +226,8 @@ export default function Agendamentos({ route, navigation }) {
     }
   };
 
-
-
   const saveEndereco = () => {
-    const { rua, numero, bairro, cidade, estado, cep } = endereco;
+    const { rua, numero, bairro } = endereco;
     if (!rua || !numero || !bairro) {
       setAlertInfo({ title: 'Erro', message: 'Preencha todos os campos do endereço!' });
       setAlertVisible(true);
@@ -218,9 +236,9 @@ export default function Agendamentos({ route, navigation }) {
     setModalEnderecoVisible(false);
     setAlertInfo({ title: 'Sucesso', message: 'Endereço salvo!' });
     setAlertVisible(true);
-
   };
 
+  // --- Formatação ---
   const formatTelefone = (text) => {
     let cleaned = text.replace(/\D/g, '');
     if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
@@ -239,6 +257,7 @@ export default function Agendamentos({ route, navigation }) {
     return formatted;
   };
 
+  // --- Render ---
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <CustomAlert
@@ -248,7 +267,7 @@ export default function Agendamentos({ route, navigation }) {
         onClose={() => {
           setAlertVisible(false);
           if (typeof onAlertCloseAction === 'function') onAlertCloseAction();
-          setOnAlertCloseAction(null); // Limpa a ação após a execução
+          setOnAlertCloseAction(null);
         }}
       />
       <ScrollView style={{ flex: 1, paddingHorizontal: 20 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
@@ -256,6 +275,7 @@ export default function Agendamentos({ route, navigation }) {
           <Text style={styles.headerTitle}>{agendamentoEdit ? 'Editar Agendamento' : 'Novo Agendamento'}</Text>
         </View>
 
+        {/* Nome */}
         <Text style={styles.label}>Nome do Cliente*</Text>
         <View style={styles.inputIconRowBox}>
           <Ionicons name="person-outline" size={20} color={colors.secondary} />
@@ -268,6 +288,7 @@ export default function Agendamentos({ route, navigation }) {
           />
         </View>
 
+        {/* Telefone */}
         <Text style={styles.label}>Telefone*</Text>
         <View style={styles.inputIconRowBox}>
           <Ionicons name="call-outline" size={20} color={colors.secondary} />
@@ -281,49 +302,43 @@ export default function Agendamentos({ route, navigation }) {
           />
         </View>
 
+        {/* Data e Hora */}
         <Text style={styles.label}>Data e Hora*</Text>
         <TouchableOpacity style={[styles.input, styles.inputIconRow]} onPress={() => setShowDatePicker(true)}>
           <MaterialIcons name="date-range" size={20} color={colors.secondary} />
           <Text style={{ color: colors.text, marginLeft: 8 }}>{dataHora.toLocaleString('pt-BR')}</Text>
         </TouchableOpacity>
+        {showDatePicker && <DateTimePicker value={dataHora} mode="date" display="default" onChange={onChangeDate} />}
+        {showTimePicker && <DateTimePicker value={dataHora} mode="time" display="default" onChange={onChangeTime} />}
 
-        {showDatePicker && (
-          <DateTimePicker value={dataHora} mode="date" display="default" onChange={onChangeDate} />
-        )}
-        {showTimePicker && (
-          <DateTimePicker value={dataHora} mode="time" display="default" onChange={onChangeTime} />
-        )}
+        {/* Serviço */}
+        <Text style={styles.label}>Serviço</Text>
+        <TouchableOpacity style={[styles.input, styles.inputIconRow]} onPress={() => setModalServicoVisible(true)}>
+          <FontAwesome5 name="tools" size={18} color={colors.secondary} style={{ marginRight: 8 }} />
+          <Text style={{ color: servico ? colors.text : colors.gray, flex: 1 }} numberOfLines={1}>{servico || 'Selecione um serviço'}</Text>
+        </TouchableOpacity>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <View style={{ flex: 1, marginRight: 8 }}>
-            <Text style={styles.label}>Serviço</Text>
-            <TouchableOpacity style={[styles.input, styles.inputIconRow]} onPress={() => setModalServicoVisible(true)}>
-              <FontAwesome5 name="tools" size={18} color={colors.secondary} style={{ marginRight: 8 }} />
-              <Text style={{ color: servico ? colors.text : colors.gray, flex: 1 }} numberOfLines={1}>{servico || 'Selecionar'}</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{ flex: 1, marginLeft: 8 }}>
-            <Text style={styles.label}>Valor (R$)</Text>
-            <View style={styles.inputIconRowBox}>
-              <FontAwesome5 name="money-bill-wave" size={18} color={colors.secondary} />
-              <TextInput
-                style={styles.inputBox}
-                value={valor}
-                onChangeText={(text) => setValor(formatValor(text))}
-                placeholder="0,00"
-                keyboardType="numeric"
-                placeholderTextColor={colors.gray}
-              />
-            </View>
-          </View>
+        {/* Valor */}
+        <Text style={styles.label}>Valor (R$)</Text>
+        <View style={styles.inputIconRowBox}>
+          <FontAwesome5 name="money-bill-wave" size={18} color={colors.secondary} />
+          <TextInput
+            style={styles.inputBox}
+            value={valor}
+            onChangeText={(text) => setValor(formatValor(text))}
+            placeholder="0,00"
+            keyboardType="numeric"
+            placeholderTextColor={colors.gray}
+          />
         </View>
 
+        {/* Endereço */}
         <TouchableOpacity style={styles.buttonEndereco} onPress={() => setModalEnderecoVisible(true)}>
           <Ionicons name="location-outline" size={18} color={colors.white} />
           <Text style={styles.textButtonEndereco}>Cadastrar Endereço</Text>
         </TouchableOpacity>
 
-        {/* Modal de serviços */}
+        {/* --- Modal Serviços --- */}
         <Modal visible={modalServicoVisible} animationType="slide" transparent>
           <View style={styles.modalContainer}>
             <View style={[styles.modalBox, { maxHeight: '85%' }]}>
@@ -342,14 +357,10 @@ export default function Agendamentos({ route, navigation }) {
                       returnKeyType="done"
                     />
                   </View>
-                  <TouchableOpacity
-                    style={[styles.buttonAddServico, { marginLeft: 8, height: 48, width: 48, borderRadius: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 0 }]}
-                    onPress={adicionarServico}
-                  >
+                  <TouchableOpacity style={[styles.buttonAddServico, { marginLeft: 8, height: 48, width: 48, borderRadius: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 0 }]} onPress={adicionarServico}>
                     <MaterialIcons name="save" size={26} color="#fff" />
                   </TouchableOpacity>
                 </View>
-
                 <View style={{ maxHeight: 200 }}>
                   {servicosExistentes.map((s, idx) => (
                     <View key={idx} style={styles.servicoItem}>
@@ -363,21 +374,21 @@ export default function Agendamentos({ route, navigation }) {
                   ))}
                 </View>
               </ScrollView>
-              <View style={{ width: '100%', paddingTop: 8 }}>
-                <TouchableOpacity style={[styles.buttonCloseModal, { width: '100%', marginRight: 0, marginTop: 0 }]} onPress={() => setModalServicoVisible(false)}>
-                  <Text style={styles.buttonTextCloseModal}>Fechar</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity style={[styles.buttonCloseModal, { width: '100%', marginRight: 0, marginTop: 0 }]} onPress={() => setModalServicoVisible(false)}>
+                <Text style={styles.buttonTextCloseModal}>Fechar</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>
 
-        {/* Modal de endereço */}
+        {/* --- Modal Endereço --- */}
         <Modal visible={modalEnderecoVisible} animationType="slide" transparent>
           <View style={styles.modalContainer}>
             <View style={[styles.modalBox, { maxHeight: '85%' }]}>
               <ScrollView contentContainerStyle={{ paddingBottom: 16 }} showsVerticalScrollIndicator={false}>
                 <Text style={styles.modalTitle}>Endereço</Text>
+
+                {/* CEP */}
                 <Text style={styles.label}>CEP*</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                   <View style={[styles.inputIconRowBox, { flex: 1, marginBottom: 0 }]}>
@@ -472,6 +483,7 @@ export default function Agendamentos({ route, navigation }) {
                   </View>
                 </View>
 
+                {/* Botões do Modal Endereço */}
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 16 }}>
                   <TouchableOpacity style={[styles.buttonCloseModal, { flex: 1, marginRight: 8 }]} onPress={() => setModalEnderecoVisible(false)}>
                     <Text style={styles.buttonTextCloseModal}>Cancelar</Text>
@@ -485,22 +497,9 @@ export default function Agendamentos({ route, navigation }) {
           </View>
         </Modal>
 
-        <ActionAlert
-          visible={actionAlertVisible}
-          title={actionAlertInfo.title}
-          message={actionAlertInfo.message}
-          onClose={() => setActionAlertVisible(false)}
-          actions={[
-            { text: "Cancelar", onPress: () => setActionAlertVisible(false) },
-            {
-              text: "Excluir", destructive: true, onPress: () => {
-                if (typeof onActionAlertConfirm === 'function') onActionAlertConfirm();
-                setActionAlertVisible(false);
-              }
-            },
-          ]}
-        />
       </ScrollView>
+
+      {/* Footer */}
       <View style={styles.footerRow}>
         <TouchableOpacity style={styles.buttonFooterCancel} onPress={() => navigation.goBack()}>
           <Text style={styles.buttonTextCancel}>Cancelar</Text>
@@ -509,6 +508,20 @@ export default function Agendamentos({ route, navigation }) {
           <Text style={styles.buttonTextFooter}>{agendamentoEdit ? 'Salvar' : 'Agendar'}</Text>
         </TouchableOpacity>
       </View>
+
+      {/* ActionAlert */}
+      <ActionAlert
+        visible={actionAlertVisible}
+        title={actionAlertInfo.title}
+        message={actionAlertInfo.message}
+        onConfirm={() => {
+          setActionAlertVisible(false);
+          if (typeof onActionAlertConfirm === 'function') onActionAlertConfirm();
+          setOnActionAlertConfirm(null);
+        }}
+        onCancel={() => setActionAlertVisible(false)}
+      />
+
     </KeyboardAvoidingView>
   );
 }

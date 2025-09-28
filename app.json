@@ -4,12 +4,12 @@
     "slug": "agendaTrampo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/iconMain.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/iconMain.png",
-      "resizeMode": "contain",
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "ios": {

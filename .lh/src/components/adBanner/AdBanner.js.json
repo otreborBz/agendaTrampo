@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 4,
+            "activePatchIndex": 8,
             "patches": [
                 {
                     "date": 1759039404287,
@@ -24,6 +24,22 @@
                 {
                     "date": 1759041182437,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,10 +6,10 @@\n   return (\n     <View style={{ alignItems: 'center', marginVertical: 10 }}>\n       <BannerAd\n         unitId={adUnitId}\n-        size={BannerAdSize.ADAPTIVE_BANNER} // apenas o valor constante\n+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}\n         requestOptions={{ requestNonPersonalizedAdsOnly: true }}\n       />\n     </View>\n   );\n\\ No newline at end of file\n-}\n+}\n"
+                },
+                {
+                    "date": 1759098890498,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,15 +1,25 @@\n-import { View } from 'react-native';\n-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';\n-import { adUnitId } from '../../services/adMobService/AdMobService';\n-\n-export default function AdBanner() {\n-  return (\n-    <View style={{ alignItems: 'center', marginVertical: 10 }}>\n-      <BannerAd\n-        unitId={adUnitId}\n-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}\n-        requestOptions={{ requestNonPersonalizedAdsOnly: true }}\n-      />\n-    </View>\n-  );\n-}\n\\ No newline at end of file\n+import { View } from 'react-native';\r\n+import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';\r\n+import { adUnitId } from '../../services/adMobService/AdMobService';\r\n+\r\n+export default function AdBanner() {\r\n+  return (\r\n+    <View style={{ alignItems: 'center', marginVertical: 10 }}>\r\n+    <View style={{ alignItems: 'center', justifyContent: 'center', minHeight: 50, marginVertical: 10 }}>\r\n+      <BannerAd\r\n+        unitId={adUnitId}\r\n+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}\r\n+        requestOptions={{ requestNonPersonalizedAdsOnly: true }}\r\n+        onAdLoaded={() => {\r\n+          console.log('[AdBanner] Anúncio de banner carregado com sucesso!');\r\n+        }}\r\n+        onAdFailedToLoad={(error) => {\r\n+          console.error('[AdBanner] Falha ao carregar o anúncio de banner:', error);\r\n+        }}\r\n+        onAdOpened={() => {\r\n+          console.log('[AdBanner] Anúncio de banner foi aberto.');\r\n+        }}\r\n+      />\r\n+    </View>\r\n+  );\r\n+}\r\n"
+                },
+                {
+                    "date": 1759098923734,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,22 +4,12 @@\n \r\n export default function AdBanner() {\r\n   return (\r\n     <View style={{ alignItems: 'center', marginVertical: 10 }}>\r\n-    <View style={{ alignItems: 'center', justifyContent: 'center', minHeight: 50, marginVertical: 10 }}>\r\n       <BannerAd\r\n         unitId={adUnitId}\r\n         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}\r\n         requestOptions={{ requestNonPersonalizedAdsOnly: true }}\r\n-        onAdLoaded={() => {\r\n-          console.log('[AdBanner] Anúncio de banner carregado com sucesso!');\r\n-        }}\r\n-        onAdFailedToLoad={(error) => {\r\n-          console.error('[AdBanner] Falha ao carregar o anúncio de banner:', error);\r\n-        }}\r\n-        onAdOpened={() => {\r\n-          console.log('[AdBanner] Anúncio de banner foi aberto.');\r\n-        }}\r\n       />\r\n     </View>\r\n   );\r\n }\r\n"
+                },
+                {
+                    "date": 1759099317601,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,15 @@\n+import { View } from 'react-native';\r\n+import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';\r\n+import { adUnitId } from '../../services/adMobService/AdMobService';\r\n+\r\n+export default function AdBanner() {\r\n+  return (\r\n+    <View style={{ alignItems: 'center', justifyContent: 'center', minHeight: 50, marginVertical: 10 }}>\r\n+      <BannerAd\r\n+        unitId={adUnitId}\r\n+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}\r\n+        requestOptions={{ requestNonPersonalizedAdsOnly: true }}\r\n+      />\r\n+    </View>\r\n+  );\r\n+}\r\n"
+                },
+                {
+                    "date": 1759102483559,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,26 +5,11 @@\n export default function AdBanner() {\r\n   return (\r\n     <View style={{ alignItems: 'center', justifyContent: 'center', minHeight: 50, marginVertical: 10 }}>\r\n       <BannerAd\r\n-        unitId={adUnitId}\r\n-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}\r\n-        requestOptions={{ requestNonPersonalizedAdsOnly: true }}\r\n+        unitId={adUnitId} // usa TestIds.BANNER em dev, ID real em produção\r\n+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} // banner responsivo\r\n+        requestOptions={{ requestNonPersonalizedAdsOnly: true }} // garante anúncios não personalizados\r\n       />\r\n     </View>\r\n   );\r\n }\r\n-import { View } from 'react-native';\r\n-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';\r\n-import { adUnitId } from '../../services/adMobService/AdMobService';\r\n-\r\n-export default function AdBanner() {\r\n-  return (\r\n-    <View style={{ alignItems: 'center', marginVertical: 10 }}>\r\n-      <BannerAd\r\n-        unitId={adUnitId}\r\n-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}\r\n-        requestOptions={{ requestNonPersonalizedAdsOnly: true }}\r\n-      />\r\n-    </View>\r\n-  );\r\n-}\r\n"
                 }
             ],
             "date": 1759039404287,

@@ -1,12 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
-import { Image, Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../../themes/colors/Colors';
 import styles from './styles';
 
 import AdBanner from '../../components/adBanner/AdBanner';
-
 
 export default function Sobre() {
   const navigation = useNavigation();
@@ -14,11 +13,7 @@ export default function Sobre() {
   const appVersion = Constants.expoConfig.version;
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: colors.white }}
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-    >
+    <View style={styles.container}>
       <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={28} color={colors.primary} />
       </TouchableOpacity>
@@ -33,11 +28,10 @@ export default function Sobre() {
         <Ionicons name="information-circle-outline" size={18} color={colors.darkGray} />
         <Text style={styles.versionText}>Versão {appVersion}</Text>
       </View>
-
       <View style={styles.contactSection}>
         <Text style={styles.contactTitle}>Fale Conosco</Text>
         <View style={styles.contactActionsRow}>
-          <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('mailto:contato@agendatrampo.com')} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('mailto:codebr.contato@gmail.com')} activeOpacity={0.7}>
             <Ionicons name="mail-outline" size={20} color={colors.primary} />
             <Text style={styles.contactBtnText}>E-mail</Text>
           </TouchableOpacity>
@@ -47,7 +41,7 @@ export default function Sobre() {
           </TouchableOpacity>
         </View>
       </View>
-        <AdBanner />
-    </ScrollView>
+      <AdBanner />
+    </View>
   );
 }
