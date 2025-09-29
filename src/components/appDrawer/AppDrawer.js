@@ -54,19 +54,6 @@ function CustomDrawer(props) {
   );
 }
 
-// Stack que contém apenas a tela Home.
-function HomeStack() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="HomeScreen" // Nome interno para a Home dentro da Stack
-        component={Home}
-        options={{ headerShown: false }} // Esconde o header da Stack na Home
-      />
-    </Stack.Navigator>
-  );
-}
-
 function DrawerNav() {
   return (
     <Drawer.Navigator
@@ -98,7 +85,7 @@ function DrawerNav() {
     >
       <Drawer.Screen
         name="Início"
-        component={HomeStack} // Trocamos Home por HomeStack
+        component={Home} // Usando o componente Home diretamente
         options={{
           drawerIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />

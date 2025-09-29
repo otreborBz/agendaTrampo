@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Animated, Dimensions, FlatList, Modal, Pressable, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
 import CustomAlert from '../../components/customAlert/CustomAlert';
@@ -13,13 +13,14 @@ import { colors } from '../../themes/colors/Colors';
 import '../../utils/LocaleConfig';
 import styles from './styles';
 
-import AdBanner from '../../components/adBanner/AdBanner';
 
 
+const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
 export default function Home() {
 
   const navigation = useNavigation();
+  const route = useRoute();
   const { user } = useContext(AuthContext);
 
   // Estados
@@ -30,6 +31,9 @@ export default function Home() {
   const [listError, setListError] = useState(null);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertInfo, setAlertInfo] = useState({ title: '', message: '' });
+  const [filtroModalVisible, setFiltroModalVisible] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const modalTranslateX = useRef(new Animated.Value(screenWidth)).current;
 
   // Serviços
   const [servicosExistentes, setServicosExistentes] = useState([]);
@@ -61,6 +65,74 @@ export default function Home() {
     };
     loadServicos();
   }, []);
+
+  // Adiciona o botão de filtro no cabeçalho da navegação
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => {
+            setFiltroModalVisible(true); // Apenas torna o modal visível
+          }}
+          style={{
+            flexDirection: 'row', // Coloca os itens lado a lado
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: 10,
+            paddingVertical: 6,
+            paddingHorizontal: 12,
+          }}
+        >
+          <Ionicons name="filter" size={18} color={colors.white} />
+          <Text style={{ color: colors.white, fontWeight: 'bold', fontSize: 14, marginLeft: 8 }}>
+            {statusFiltro}
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, statusFiltro]);
+
+  // Animação do Modal de Filtro
+  useEffect(() => {
+    if (filtroModalVisible) {
+      // Animação de entrada
+      Animated.spring(modalTranslateX, {
+        toValue: 0,
+        useNativeDriver: true,
+        speed: 12, // Mantém a velocidade padrão
+        bounciness: 4, // Reduz um pouco o "salto" para uma sensação mais suave
+      }).start();
+    }
+  }, [filtroModalVisible]);
+
+  // Função para lidar com a seleção de filtro e animação de saída
+  const handleFiltroSelect = (status) => {
+    setIsFiltering(true); // Mostra o indicador de carregamento
+
+    // Inicia a animação de saída
+    Animated.timing(modalTranslateX, {
+      toValue: screenWidth,
+      useNativeDriver: true,
+      duration: 450, // Aumenta a duração para 450ms
+    }).start(() => {
+      // Após a animação, atualiza o filtro e fecha o modal
+      setStatusFiltro(status);
+      setFiltroModalVisible(false);
+      setIsFiltering(false); // Esconde o indicador
+    });
+  };
+
+  // Função para fechar o modal ao tocar no overlay
+  const handleCloseModal = () => {
+    Animated.timing(modalTranslateX, {
+      toValue: screenWidth,
+      useNativeDriver: true,
+      duration: 450, // Aumenta a duração para 450ms
+    }).start(() => {
+      // Apenas fecha o modal após a animação
+      setFiltroModalVisible(false);
+    });
+  }
 
   // Listener de agendamentos em tempo real
   useEffect(() => {
@@ -174,6 +246,42 @@ export default function Home() {
         onClose={() => setAlertVisible(false)}
       />
 
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={filtroModalVisible}
+        onRequestClose={() => setFiltroModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={[styles.filtroModalOverlay, { backgroundColor: 'transparent' }]}
+          activeOpacity={1}
+          onPressOut={handleCloseModal}
+        >
+          <TouchableWithoutFeedback>
+            <Animated.View style={[styles.filtroModalContent, { transform: [{ translateX: modalTranslateX }] }]}>
+              <View style={styles.filtroModalHeader}>
+                <View style={styles.filtroModalHandle} />
+                <Text style={styles.filtroModalTitle}>Filtrar por Status</Text>
+              </View>
+              <View style={styles.filtroModalOptionsContainer}>
+                {['Todos', 'Pendente', 'Concluído', 'Cancelado'].map(status => (
+                  <TouchableOpacity
+                    key={status}
+                    style={[
+                      styles.filtroModalOptionButton,
+                      statusFiltro === status && styles.filtroModalOptionButtonActive
+                    ]}
+                    onPress={() => handleFiltroSelect(status)}
+                  >
+                    <Text style={[styles.filtroModalOptionText, statusFiltro === status && styles.filtroModalOptionTextActive]}>{status}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </Animated.View>
+          </TouchableWithoutFeedback>
+        </TouchableOpacity>
+      </Modal>
+
       {/* Calendário sempre visível */}
       {showCalendar && (
         <View style={{ backgroundColor: colors.white, borderRadius: 10, padding: 4, marginTop: 0, marginBottom: 4, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 2 }}>
@@ -256,7 +364,12 @@ export default function Home() {
         </View>
       )}
 
-      {listLoading ? (
+
+      {isFiltering ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={colors.secondary} />
+        </View>
+      ) : listLoading ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" color={colors.secondary} />
         </View>
@@ -264,13 +377,25 @@ export default function Home() {
         <FlatList
           key={'_'}
           numColumns={1}
-          data={agendamentos.filter(item => {
-            if (!item.dataHora) return false;
-            const data = typeof item.dataHora === 'string' ? item.dataHora : (item.dataHora.toDate ? item.dataHora.toDate().toISOString() : '');
-            const matchDate = data.startsWith(selectedDate);
-            const matchStatus = statusFiltro === 'Todos' ? true : (item.status === statusFiltro);
-            return matchDate && matchStatus;
-          })}
+          data={agendamentos
+            .filter(item => {
+              if (!item.dataHora) return false;
+              const data = typeof item.dataHora === 'string' ? item.dataHora : (item.dataHora.toDate ? item.dataHora.toDate().toISOString() : '');
+              const matchDate = data.startsWith(selectedDate);
+
+              if (statusFiltro === 'Todos') return matchDate;
+              if (statusFiltro === 'Concluído') {
+                return matchDate && (item.status === 'Concluído' || item.status === 'Concluido');
+              }
+              const matchStatus = item.status === statusFiltro;
+              return matchDate && matchStatus;
+            })
+            .sort((a, b) => {
+              // Converte 'dataHora' para objetos Date para uma comparação segura
+              const dateA = a.dataHora?.toDate ? a.dataHora.toDate() : new Date(a.dataHora);
+              const dateB = b.dataHora?.toDate ? b.dataHora.toDate() : new Date(b.dataHora);
+              return dateB - dateA; // Ordena do mais tarde (maior) para o mais cedo (menor)
+            })}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <ListAgenda

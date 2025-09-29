@@ -15,7 +15,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import ActionAlert from '../../components/actionAlert/actionAlert';
 import CustomAlert from '../../components/customAlert/CustomAlert';
 
-import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
+import { TestIds, useInterstitialAd } from 'react-native-google-mobile-ads';
 import { adUnitIdInterstitial } from '../../services/adMobService/AdMobService';
 
 // --- Interstitial Ads ---
@@ -54,8 +54,6 @@ export default function Agendamentos({ route, navigation }) {
   const { isLoaded, isClosed, load, show, error } = useInterstitialAd(interstitialAdUnitId, {
     requestNonPersonalizedAdsOnly: true,
   });
-
-  const [saveCompleted, setSaveCompleted] = useState(false);
 
   // --- Limpar campos ---
   const limparCampos = () => {
@@ -105,8 +103,12 @@ export default function Agendamentos({ route, navigation }) {
   // --- Recarrega anúncio ao ser fechado ---
   useEffect(() => {
     if (isClosed) {
-      setSaveCompleted(true); // exibe alerta após fechar anúncio
-      load(); // prepara para próximo
+      // Após o anúncio ser fechado, mostra o alerta de sucesso e prepara para voltar
+      setAlertInfo({ title: "Sucesso", message: `Agendamento ${agendamentoEdit ? 'atualizado' : 'cadastrado'}!` });
+      setOnAlertCloseAction(() => () => navigation.goBack());
+      setAlertVisible(true);
+      // Recarrega o anúncio para a próxima vez
+      load();
     }
   }, [isClosed, load]);
 
@@ -115,16 +117,6 @@ export default function Agendamentos({ route, navigation }) {
     if (error) console.error('[AD_STATE] Falha ao carregar o anúncio:=', error.message);
     if (isLoaded) console.log('[AD_STATE] Anúncio carregado e pronto para exibir!');
   }, [error, isLoaded]);
-
-  // --- Alerta de sucesso pós salvamento ---
-  useEffect(() => {
-    if (saveCompleted) {
-      setAlertInfo({ title: "Sucesso", message: `Agendamento ${agendamentoEdit ? 'atualizado' : 'cadastrado'}!` });
-      setOnAlertCloseAction(() => () => navigation.goBack());
-      setAlertVisible(true);
-      setSaveCompleted(false);
-    }
-  }, [saveCompleted, navigation]);
 
   // --- Salvar agendamento ---
   const handleSaveAgendamento = async () => {
@@ -140,7 +132,10 @@ export default function Agendamentos({ route, navigation }) {
       if (isLoaded) {
         show(); // mostra anúncio
       } else {
-        setSaveCompleted(true); // exibe alerta sem anúncio
+        // Se o anúncio não carregou, mostra o alerta de sucesso diretamente
+        setAlertInfo({ title: "Sucesso", message: `Agendamento ${agendamentoEdit ? 'atualizado' : 'cadastrado'}!` });
+        setOnAlertCloseAction(() => () => navigation.goBack());
+        setAlertVisible(true);
       }
 
     } catch (error) {

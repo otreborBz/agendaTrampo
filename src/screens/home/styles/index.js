@@ -3,45 +3,6 @@ import { Platform, StyleSheet } from "react-native";
 import { colors } from "../../../themes/colors/Colors";
 
 const styles = StyleSheet.create({
-  statusFilterWrapper: {
-    width: '100%',
-    marginBottom: 8,
-  },
-  statusFilterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 14,
-    paddingVertical: 2,
-  },
-  statusFilterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 18,
-    borderRadius: 22,
-    backgroundColor: colors.white,
-    marginHorizontal: 4,
-    borderWidth: 1,
-    borderColor: colors.lightGray,
-  },
-  statusFilterButtonActive: {
-    backgroundColor: colors.secondary,
-    borderColor: colors.secondary,
-  },
-  statusFilterText: {
-    color: colors.text,
-    fontWeight: '600',
-    fontSize: 15,
-    letterSpacing: 0.2,
-  },
-  statusFilterTextActive: {
-    color: colors.white,
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(0,0,0,0.08)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
   fab: {
     position: 'absolute',
     right: 24,
@@ -104,6 +65,73 @@ const styles = StyleSheet.create({
     color: '#999',
   },
 
+  filtroModalOverlay: {
+    flex: 1,
+    // Não precisa mais de justificação, o overlay cobre tudo
+  },
+  filtroModalContent: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 24,
+    borderBottomLeftRadius: 24,
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: -4, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 20,
+    position: 'absolute', // Posiciona na lateral
+    right: 0,
+    top: 80, // Posiciona mais ao topo, abaixo do header
+    width: '65%', // Ocupa 65% da largura da tela
+    // A altura será definida pelo conteúdo
+  },
+  filtroModalHeader: {
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
+  filtroModalHandle: {
+    width: 40,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: '#ccc',
+    marginBottom: 12,
+  },
+  filtroModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.text,
+  },
+  filtroModalOptionsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  filtroModalOptionButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 10, // Reduz o padding para caber o texto
+    borderRadius: 12,
+    backgroundColor: colors.lightGray,
+    marginBottom: 10,
+    alignItems: 'center',
+    width: '48%', // Define a largura para criar uma grade 2x2
+  },
+  filtroModalOptionButtonActive: {
+    backgroundColor: colors.secondary,
+    shadowColor: colors.secondary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  filtroModalOptionText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  filtroModalOptionTextActive: {
+    color: colors.white,
+  },
   label: {
     fontSize: 14,
     fontWeight: '500',
