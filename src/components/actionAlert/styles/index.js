@@ -41,9 +41,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
-  primary: { backgroundColor: colors.primary },
-  destructive: { backgroundColor: colors.error },
-  buttonText: { color: "#fff", fontWeight: "600" },
+  primary: {
+    backgroundColor: "transparent",
+    borderWidth: 1.5,
+    borderColor: colors.secondary,
+  },
+  destructive: {
+    backgroundColor: colors.secondary
+  },
+  primaryButtonText: {
+    color: colors.secondary,
+    fontWeight: "600"
+  },
+  destructiveButtonText: { color: "#fff", fontWeight: "600" },
 });
 
 export default styles;

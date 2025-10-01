@@ -127,7 +127,7 @@ export default function ListAgenda({ data }) {
   //Deleta um agendamento
   const handleDelete = () => {
     closeSwipeable();
-    if (visible) closeDetail(); // Fecha o modal de detalhes se estiver aberto
+    if (visible) closeDetail();
     setActionAlertInfo({
       title: "Excluir Agendamento",
       message: `Deseja excluir o agendamento de ${item.nomeCliente}?`

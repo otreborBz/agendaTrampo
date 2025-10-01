@@ -1,5 +1,4 @@
-import React from "react";
-import { Modal, View, Text, TouchableOpacity } from "react-native";
+import { Modal, Text, TouchableOpacity, View } from "react-native";
 import styles from "./styles";
 
 
@@ -21,12 +20,14 @@ export default function CustomAlert({ visible, title, message, actions = [], onC
                   style={[styles.button, action.destructive ? styles.destructive : styles.primary]}
                   onPress={action.onPress}
                 >
-                  <Text style={styles.buttonText}>{action.text}</Text>
+                  <Text style={action.destructive ? styles.destructiveButtonText : styles.primaryButtonText}>
+                    {action.text}
+                  </Text>
                 </TouchableOpacity>
               ))
             ) : (
               <TouchableOpacity style={[styles.button, styles.primary]} onPress={onClose}>
-                <Text style={styles.buttonText}>OK</Text>
+                <Text style={styles.primaryButtonText}>OK</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -35,5 +36,3 @@ export default function CustomAlert({ visible, title, message, actions = [], onC
     </Modal>
   );
 }
-
-
