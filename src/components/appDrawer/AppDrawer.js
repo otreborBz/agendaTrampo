@@ -85,7 +85,7 @@ function DrawerNav() {
     >
       <Drawer.Screen
         name="Início"
-        component={Home} // Usando o componente Home diretamente
+        component={Home}
         options={{
           drawerIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
@@ -120,17 +120,15 @@ export default function AppDrawer() {
         component={Agendamentos}
         options={{
           headerShown: false,
-          // Define a animação de deslizar de baixo para cima (e vice-versa)
           cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
-          // Define a velocidade da animação
           transitionSpec: {
             open: {
               animation: 'timing',
-              config: { duration: 600 }, // 600ms para abrir (mais lento)
+              config: { duration: 600 },
             },
             close: {
               animation: 'timing',
-              config: { duration: 600 }, // 600ms para fechar (mais lento)
+              config: { duration: 600 },
             },
           },
         }}

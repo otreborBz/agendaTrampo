@@ -70,7 +70,7 @@ function AuthProvider({ children }) {
   }
 
   // Deslogar o usuario
-  async function logout() {
+  async function signOut() {
     try {
       await logoutUser();
       return { success: true };
@@ -88,7 +88,7 @@ function AuthProvider({ children }) {
         initializing,
         signUp,
         signIn,
-        logout
+        signOut
       }}
     >
       {children}
