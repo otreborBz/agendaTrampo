@@ -152,22 +152,23 @@ const styles = StyleSheet.create({
   },
   swipeRightContainer: {
     flexDirection: 'row',
-    borderRadius: 20,
     overflow: 'hidden',
-    width: 180,
-    gap:5,
+    width: 160,
+    gap: 5,
   },
   swipeEditButton: {
     backgroundColor: colors.secondary,
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    borderRadius: 30,
+    width: 60,
   },
   swipeDeleteButton: {
     backgroundColor: colors.error,
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    borderRadius: 30,
+    width: 60,
   },
 });
 
