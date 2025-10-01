@@ -509,12 +509,21 @@ export default function Agendamentos({ route, navigation }) {
         visible={actionAlertVisible}
         title={actionAlertInfo.title}
         message={actionAlertInfo.message}
-        onConfirm={() => {
-          setActionAlertVisible(false);
-          if (typeof onActionAlertConfirm === 'function') onActionAlertConfirm();
-          setOnActionAlertConfirm(null);
-        }}
-        onCancel={() => setActionAlertVisible(false)}
+        onClose={() => setActionAlertVisible(false)}
+        actions={[
+          {
+            text: "Cancelar",
+            onPress: () => setActionAlertVisible(false)
+          },
+          {
+            text: "Excluir",
+            destructive: true,
+            onPress: () => {
+              if (typeof onActionAlertConfirm === 'function') onActionAlertConfirm();
+              setActionAlertVisible(false);
+            }
+          },
+        ]}
       />
 
     </KeyboardAvoidingView>
