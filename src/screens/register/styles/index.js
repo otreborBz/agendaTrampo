@@ -11,12 +11,19 @@ const styles = StyleSheet.create({
         backgroundColor: colors.background,
         paddingHorizontal: 20,
     },
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 30, // Adiciona um respiro vertical
+    },
     screenTitle: {
         fontSize: 26,
         color: colors.secondary,
         fontWeight: '600',
         letterSpacing: 0.5,
-        marginBottom: 40,
+        marginBottom: 15,
         textAlign: 'center',
     },
     logo: {
@@ -70,6 +77,11 @@ const styles = StyleSheet.create({
         shadowRadius: 4.65,
         elevation: 8,
     },
+    buttonDisabled: {
+        backgroundColor: colors.gray,
+        elevation: 0,
+        shadowOpacity: 0,
+    },
     textButton: {
         color: colors.white,
         fontSize: 18,
@@ -109,6 +121,39 @@ const styles = StyleSheet.create({
         width: '100%',
         textAlign: 'left',
         marginTop: -10, // Ajusta o espaço criado pelo 'gap' do container
+    },
+    termsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        marginTop: 15,
+        marginBottom: 10,
+    },
+    checkbox: {
+        width: 24,
+        height: 24,
+        borderWidth: 2,
+        borderColor: colors.secondary,
+        borderRadius: 6,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+        checkedColor: colors.secondary,
+    },
+    termsTextContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        flex: 1,
+    },
+    termsText: {
+        fontSize: 14,
+        color: colors.darkGray,
+    },
+    termsLink: {
+        fontSize: 14,
+        color: colors.secondary,
+        fontWeight: 'bold',
+        textDecorationLine: 'underline',
     }
 });
 

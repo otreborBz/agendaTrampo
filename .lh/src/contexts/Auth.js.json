@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 10,
+            "activePatchIndex": 12,
             "patches": [
                 {
                     "date": 1759336090436,
@@ -48,6 +48,14 @@
                 {
                     "date": 1759336656472,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -87,9 +87,9 @@\n         loading,\r\n         initializing,\r\n         signUp,\r\n         signIn,\r\n-        logout\r\n+        \r\n       }}\r\n     >\r\n       {children}\r\n     </AuthContext.Provider>\r\n"
+                },
+                {
+                    "date": 1759370990835,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,10 +3,13 @@\n import { db, auth } from \"../services/firebase/firebaseConnection\";\r\n import {signOut as firebaseSignOut, onAuthStateChanged} from \"firebase/auth\";\r\n \r\n \r\n+import { saveTermsAcceptance } from \"../services/firebase/firestoreService\";\r\n import { signInUser, signUpUser, logoutUser, validarSenha } from \"../services/firebase/userService\";\r\n \r\n+const TERMS_VERSION = \"1.0\";\r\n+\r\n export const AuthContext = createContext({});\r\n \r\n function AuthProvider({ children }) {\r\n   const [user, setUser] = useState(null);\r\n@@ -59,8 +62,17 @@\n     }\r\n \r\n     try {\r\n       await signUpUser(name, email, password);\r\n+      const createdUser = await signUpUser(name, email, password);\r\n+\r\n+      // Salva o aceite dos termos de uso\r\n+      await saveTermsAcceptance(createdUser.uid, {\r\n+        acceptedTerms: true,\r\n+        acceptedAt: new Date().toISOString(),\r\n+        termsVersion: TERMS_VERSION,\r\n+      });\r\n+\r\n       return { success: true };\r\n     } catch (error) {\r\n       return { success: false, message: error.message };\r\n     } finally {\r\n@@ -87,9 +99,9 @@\n         loading,\r\n         initializing,\r\n         signUp,\r\n         signIn,\r\n-        \r\n+        signOut\r\n       }}\r\n     >\r\n       {children}\r\n     </AuthContext.Provider>\r\n"
+                },
+                {
+                    "date": 1759371025804,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,13 +3,10 @@\n import { db, auth } from \"../services/firebase/firebaseConnection\";\r\n import {signOut as firebaseSignOut, onAuthStateChanged} from \"firebase/auth\";\r\n \r\n \r\n-import { saveTermsAcceptance } from \"../services/firebase/firestoreService\";\r\n import { signInUser, signUpUser, logoutUser, validarSenha } from \"../services/firebase/userService\";\r\n \r\n-const TERMS_VERSION = \"1.0\";\r\n-\r\n export const AuthContext = createContext({});\r\n \r\n function AuthProvider({ children }) {\r\n   const [user, setUser] = useState(null);\r\n@@ -62,17 +59,8 @@\n     }\r\n \r\n     try {\r\n       await signUpUser(name, email, password);\r\n-      const createdUser = await signUpUser(name, email, password);\r\n-\r\n-      // Salva o aceite dos termos de uso\r\n-      await saveTermsAcceptance(createdUser.uid, {\r\n-        acceptedTerms: true,\r\n-        acceptedAt: new Date().toISOString(),\r\n-        termsVersion: TERMS_VERSION,\r\n-      });\r\n-\r\n       return { success: true };\r\n     } catch (error) {\r\n       return { success: false, message: error.message };\r\n     } finally {\r\n"
                 }
             ],
             "date": 1759336090435,

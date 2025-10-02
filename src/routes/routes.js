@@ -8,6 +8,7 @@ import ChangeRecord from '../screens/changeRecord/ChangeRecord';
 import Intro from '../screens/intro/Intro';
 import Login from '../screens/login/Login';
 import Register from '../screens/register/Register';
+import TermsScreen from "../screens/terms/Terms";
 
 import { ActivityIndicator } from "react-native";
 import { AuthContext } from '../contexts/Auth';
@@ -35,6 +36,7 @@ export default function Routes() {
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />
             <Stack.Screen name="ChangeRecord" component={ChangeRecord} />
+            <Stack.Screen name="Terms" component={TermsScreen} />
           </>
         )}
       </Stack.Navigator>

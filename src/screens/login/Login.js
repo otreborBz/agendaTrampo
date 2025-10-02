@@ -130,7 +130,7 @@ export default function Login() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.buttonTerms} activeOpacity={0.7}>
+      <TouchableOpacity style={styles.buttonTerms} activeOpacity={0.7} onPress={() => navigation.navigate('Terms')}>
         <Text style={styles.textButtonTerms}>Termos de uso</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>

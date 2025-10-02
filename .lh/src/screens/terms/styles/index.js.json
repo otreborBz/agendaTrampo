@@ -1,0 +1,118 @@
+{
+    "sourceFile": "src/screens/terms/styles/index.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 25,
+            "patches": [
+                {
+                    "date": 1759369006676,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1759369016324,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,6 @@\n+import \n+\n const styles = StyleSheet.create({\n   container: {\n     flex: 1,\n     backgroundColor: \"#fff\",\n"
+                },
+                {
+                    "date": 1759369030904,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import \n+import { }\n \n const styles = StyleSheet.create({\n   container: {\n     flex: 1,\n"
+                },
+                {
+                    "date": 1759369039749,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,7 @@\n-import { }\n+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from \"react-native\";\n \n+\n const styles = StyleSheet.create({\n   container: {\n     flex: 1,\n     backgroundColor: \"#fff\",\n"
+                },
+                {
+                    "date": 1759369052159,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,6 @@\n-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from \"react-native\";\n+import { StyleSheet } from \"react-native\";\n \n-\n const styles = StyleSheet.create({\n   container: {\n     flex: 1,\n     backgroundColor: \"#fff\",\n@@ -42,5 +41,7 @@\n     color: \"#fff\",\n     fontSize: 16,\n     fontWeight: \"600\",\n   },\n-});\n\\ No newline at end of file\n+});\n+\n+export \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1759369313256,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,7 @@\n import { StyleSheet } from \"react-native\";\n \n+\n const styles = StyleSheet.create({\n   container: {\n     flex: 1,\n     backgroundColor: \"#fff\",\n@@ -43,5 +44,5 @@\n     fontWeight: \"600\",\n   },\n });\n \n-export \n\\ No newline at end of file\n+export default styles;\n"
+                },
+                {
+                    "date": 1759369320874,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n import { StyleSheet } from \"react-native\";\n+import colors from\n \n-\n const styles = StyleSheet.create({\n   container: {\n     flex: 1,\n     backgroundColor: \"#fff\",\n"
+                },
+                {
+                    "date": 1759369333076,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,8 @@\n import { StyleSheet } from \"react-native\";\n-import colors from\n+import colors from \"../src/themes/colors/Colors\";\n \n+\n const styles = StyleSheet.create({\n   container: {\n     flex: 1,\n     backgroundColor: \"#fff\",\n@@ -31,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: \"#4A90E2\",\n+    backgroundColor: ,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                },
+                {
+                    "date": 1759369338601,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: ,\n+    backgroundColor: colors,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                },
+                {
+                    "date": 1759369356026,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import colors from \"../src/themes/colors/Colors\";\n+import colors from \"../src\";\n \n \n const styles = StyleSheet.create({\n   container: {\n@@ -32,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: colors,\n+    backgroundColor: colors.secondary,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                },
+                {
+                    "date": 1759369362057,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import colors from \"../src\";\n+import colors from \"../\";\n \n \n const styles = StyleSheet.create({\n   container: {\n"
+                },
+                {
+                    "date": 1759369367913,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import colors from \"../\";\n+import colors from \"../../../\";\n \n \n const styles = StyleSheet.create({\n   container: {\n"
+                },
+                {
+                    "date": 1759369373952,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import colors from \"../../../\";\n+import colors from \"../../../themes/colors/\";\n \n \n const styles = StyleSheet.create({\n   container: {\n"
+                },
+                {
+                    "date": 1759369401605,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import colors from \"../../../themes/colors/\";\n+import colors from \"../../../themes/colors/Colors\";\n \n \n const styles = StyleSheet.create({\n   container: {\n@@ -32,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: colors.secondary,\n+    backgroundColor: colors.,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                },
+                {
+                    "date": 1759369406885,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: colors.,\n+    backgroundColor: colors,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                },
+                {
+                    "date": 1759369444504,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import colors from \"../../../themes/colors/Colors\";\n+import Colors from \"../../../themes/colors/Colors\";\n \n \n const styles = StyleSheet.create({\n   container: {\n@@ -32,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: colors,\n+    backgroundColor: colors.,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                },
+                {
+                    "date": 1759369453868,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import Colors from \"../../../themes/colors/Colors\";\n+import Colors from \"../../../themes/colors\";\n \n \n const styles = StyleSheet.create({\n   container: {\n"
+                },
+                {
+                    "date": 1759369474498,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import Colors from \"../../../themes/colors\";\n+import Colors from \"../../../themes/colors/\";\n \n \n const styles = StyleSheet.create({\n   container: {\n@@ -32,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: colors.,\n+    backgroundColor: ,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                },
+                {
+                    "date": 1759369479655,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: ,\n+    backgroundColor: Colors.,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                },
+                {
+                    "date": 1759369494804,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import Colors from \"../../../themes/colors/\";\n+import Colors from \"../../../themes/colors/Colors\";\n \n \n const styles = StyleSheet.create({\n   container: {\n@@ -32,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: Colors.,\n+    backgroundColor: Colors.secondary,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                },
+                {
+                    "date": 1759369544207,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import Colors from \"../../../themes/colors/Colors\";\n+import {Colors from \"../../../themes/colors/Colors\";\n \n \n const styles = StyleSheet.create({\n   container: {\n"
+                },
+                {
+                    "date": 1759369551714,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import {Colors from \"../../../themes/colors/Colors\";\n+import {}Colors from \"../../../themes/colors/Colors\";\n \n \n const styles = StyleSheet.create({\n   container: {\n"
+                },
+                {
+                    "date": 1759369557766,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import {}Colors from \"../../../themes/colors/Colors\";\n+import { Colors } from \"react-native/Libraries/NewAppScreen\"; from \"../../../themes/colors/Colors\";\n \n \n const styles = StyleSheet.create({\n   container: {\n"
+                },
+                {
+                    "date": 1759369566604,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import { Colors } from \"react-native/Libraries/NewAppScreen\"; from \"../../../themes/colors/Colors\";\n+import { Colors }  from \"../../../themes/colors/Colors\";\n \n \n const styles = StyleSheet.create({\n   container: {\n"
+                },
+                {
+                    "date": 1759369583442,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import { Colors }  from \"../../../themes/colors/Colors\";\n+import { colors, Colors } from \"../../../themes/colors/Colors\";\n \n \n const styles = StyleSheet.create({\n   container: {\n@@ -32,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: Colors.secondary,\n+    backgroundColor: colors,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                },
+                {
+                    "date": 1759369594737,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { StyleSheet } from \"react-native\";\n-import { colors, Colors } from \"../../../themes/colors/Colors\";\n+import { colors } from \"../../../themes/colors/Colors\";\n \n \n const styles = StyleSheet.create({\n   container: {\n@@ -32,9 +32,9 @@\n     marginBottom: 10,\n     textAlign: \"justify\",\n   },\n   button: {\n-    backgroundColor: colors,\n+    backgroundColor: colors.secondary,\n     padding: 15,\n     borderRadius: 10,\n     alignItems: \"center\",\n     marginTop: 20,\n"
+                }
+            ],
+            "date": 1759369006676,
+            "name": "Commit-0",
+            "content": "const styles = StyleSheet.create({\n  container: {\n    flex: 1,\n    backgroundColor: \"#fff\",\n  },\n  scrollContent: {\n    padding: 20,\n    paddingBottom: 40,\n  },\n  title: {\n    fontSize: 22,\n    fontWeight: \"bold\",\n    color: \"#333\",\n    marginBottom: 10,\n    marginTop: 20,\n  },\n  subtitle: {\n    fontSize: 16,\n    fontWeight: \"600\",\n    color: \"#444\",\n    marginTop: 15,\n    marginBottom: 5,\n  },\n  paragraph: {\n    fontSize: 14,\n    color: \"#555\",\n    lineHeight: 20,\n    marginBottom: 10,\n    textAlign: \"justify\",\n  },\n  button: {\n    backgroundColor: \"#4A90E2\",\n    padding: 15,\n    borderRadius: 10,\n    alignItems: \"center\",\n    marginTop: 20,\n  },\n  buttonText: {\n    color: \"#fff\",\n    fontSize: 16,\n    fontWeight: \"600\",\n  },\n});"
+        }
+    ]
+}

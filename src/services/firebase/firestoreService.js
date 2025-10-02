@@ -6,6 +6,7 @@ import {
   getDocs,
   onSnapshot,
   query,
+  setDoc,
   updateDoc,
   where
 } from 'firebase/firestore';
@@ -90,3 +91,21 @@ export async function deleteAgendamento(id) {
   const agendamentoRef = doc(db, 'agendamentos', id);
   return await deleteDoc(agendamentoRef);
 }
+
+/**
+ * Salva o aceite dos termos de uso de um usuário.
+ * @param {string} uid - O ID do usuário.
+ * @param {object} termsData - Os dados do aceite dos termos.
+ */
+export const saveTermsAcceptance = async (uid, termsData) => {
+  if (!uid) {
+    throw new Error("UID do usuário é necessário para salvar o aceite dos termos.");
+  }
+  try {
+    const termsRef = doc(db, 'user_terms', uid);
+    await setDoc(termsRef, termsData);
+  } catch (error) {
+    console.error("Erro ao salvar aceite dos termos: ", error);
+    throw new Error("Não foi possível salvar o aceite dos termos.");
+  }
+};

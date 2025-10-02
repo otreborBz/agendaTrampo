@@ -1,10 +1,12 @@
-import React, { createContext, useState, useEffect } from "react";
-import { collection, query, where, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
-import { db, auth } from "../services/firebase/firebaseConnection";
-import {signOut as firebaseSignOut, onAuthStateChanged} from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { createContext, useEffect, useState } from "react";
+import { auth, db } from "../services/firebase/firebaseConnection";
 
+import { saveTermsAcceptance } from "../services/firebase/firestoreService";
+import { logoutUser, signInUser, signUpUser, validarSenha } from "../services/firebase/userService";
 
-import { signInUser, signUpUser, logoutUser, validarSenha } from "../services/firebase/userService";
+const TERMS_VERSION = "1.0";
 
 export const AuthContext = createContext({});
 
@@ -34,7 +36,7 @@ function AuthProvider({ children }) {
       setInitializing(false);
     });
 
-    return () => unsubscribe(); 
+    return () => unsubscribe();
   }, []);
 
   // Logar o usuario
@@ -54,19 +56,27 @@ function AuthProvider({ children }) {
   async function signUp(name, email, password) {
     setLoading(true);
     //Valida a senha
-    if( !validarSenha(password)){
+    if (!validarSenha(password)) {
       return { success: false, message: "A senha deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um número." };
     }
 
     try {
-      await signUpUser(name, email, password);
+      const createdUser = await signUpUser(name, email, password);
+
+      // Salva o aceite dos termos de uso
+      await saveTermsAcceptance(createdUser.uid, {
+        acceptedTerms: true,
+        acceptedAt: new Date().toISOString(),
+        termsVersion: TERMS_VERSION,
+      });
+
       return { success: true };
     } catch (error) {
       return { success: false, message: error.message };
     } finally {
-      setLoading(false);  
+      setLoading(false);
     }
-  
+
   }
 
   // Deslogar o usuario

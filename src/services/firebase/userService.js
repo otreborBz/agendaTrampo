@@ -1,7 +1,6 @@
-import { db } from './firebaseConnection';
-import {doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth } from './firebaseConnection';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from './firebaseConnection';
 
 /**
  * Autentica um usuário com email e senha e busca seus dados no Firestore.
@@ -17,15 +16,15 @@ export async function signInUser(email, password) {
     const userSnapshot = await getDoc(userDocRef);
 
     if (userSnapshot.exists()) {
-        return userSnapshot.data();
+      return userSnapshot.data();
     } else {
-        // O usuário existe na autenticação, mas não no Firestore.
-        // Isso pode acontecer se o documento foi excluído manualmente.
-        // Vamos recriar o documento do usuário para evitar o bloqueio do login.
-        console.warn(`Recriando documento para o usuário ${user.uid} que não foi encontrado no Firestore.`);
-        const userData = { uid: user.uid, email: user.email, name: user.email, createdAt: new Date() };
-        await setDoc(userDocRef, userData);
-        return userData;
+      // O usuário existe na autenticação, mas não no Firestore.
+      // Isso pode acontecer se o documento foi excluído manualmente.
+      // Vamos recriar o documento do usuário para evitar o bloqueio do login.
+      console.warn(`Recriando documento para o usuário ${user.uid} que não foi encontrado no Firestore.`);
+      const userData = { uid: user.uid, email: user.email, name: user.email, createdAt: new Date() };
+      await setDoc(userDocRef, userData);
+      return userData;
     }
   } catch (error) {
     if (["auth/user-not-found", "auth/wrong-password", "auth/invalid-credential"].includes(error.code)) {
@@ -41,7 +40,7 @@ export async function signInUser(email, password) {
  * @param {string} name - O nome do usuário.
  * @param {string} email - O email do usuário.
  * @param {string} password - A senha do usuário.
- * @returns {Promise<void>} - Retorna uma promise vazia em caso de sucesso.
+ * @returns {Promise<object>} - Retorna o objeto do usuário criado em caso de sucesso.
  * @throws {Error} - Lança um erro com uma mensagem amigável em caso de falha.
  */
 export async function signUpUser(name, email, password) {
@@ -49,6 +48,7 @@ export async function signUpUser(name, email, password) {
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
     const userDocRef = doc(db, "users", user.uid);
     await setDoc(userDocRef, { uid: user.uid, name, email, createdAt: new Date() });
+    return user;
   } catch (error) {
     if (error.code === "auth/email-already-in-use") {
       throw new Error("Este e-mail já está em uso.");
@@ -81,7 +81,7 @@ export async function logoutUser() {
 Verifica senha inserida se tem minuscula, maiuscula, numero e minimo de 8 caracter
 @returns {boolean}
 @throws {Error}
-**/ 
+**/
 export function validarSenha(senha) {
   const regexSenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
   if (!regexSenha.test(senha)) {
@@ -96,7 +96,7 @@ export function validarSenha(senha) {
  * @returns { boolean}
  * @throws {Error}
  */
-export async function redefinirSenha(email){
+export async function redefinirSenha(email) {
   try {
     await sendPasswordResetEmail(auth, email);
     return true;
