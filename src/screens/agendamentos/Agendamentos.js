@@ -238,13 +238,39 @@ export default function Agendamentos({ route, navigation }) {
 
   // --- Formatação ---
   const formatTelefone = (text) => {
-    let cleaned = text.replace(/\D/g, '');
+    let cleaned = text.replace(/\D/g, ''); // só números
+
     if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
-    if (cleaned.length <= 2) return `(${cleaned}`;
-    if (cleaned.length <= 6) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`;
-    if (cleaned.length <= 10) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
-    return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`;
+
+    if (cleaned.length === 0) return '';
+
+    if (cleaned.length < 3) {
+      return `(${cleaned}`;
+    }
+
+    if (cleaned.length < 7) {
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`;
+    }
+
+    if (cleaned.length === 10) {
+      // formato fixo
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
+    }
+
+    if (cleaned.length === 11) {
+      // formato celular
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
+    }
+
+    // em digitação intermediária
+    if (cleaned.length < 10) {
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
+    }
+
+    return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
   };
+
+
 
   const formatValor = (text) => {
     let cleaned = text.replace(/\D/g, '');
