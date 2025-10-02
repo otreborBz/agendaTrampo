@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Dimensions, FlatList, Modal, Pressable, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
@@ -20,7 +20,6 @@ const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 export default function Home() {
 
   const navigation = useNavigation();
-  const route = useRoute();
   const { user } = useContext(AuthContext);
 
   // Estados
@@ -106,33 +105,33 @@ export default function Home() {
   }, [filtroModalVisible]);
 
   // Função para lidar com a seleção de filtro e animação de saída
-  const handleFiltroSelect = (status) => {
+  const handleFiltroSelect = useCallback((status) => {
     setIsFiltering(true); // Mostra o indicador de carregamento
 
     // Inicia a animação de saída
     Animated.timing(modalTranslateX, {
       toValue: screenWidth,
       useNativeDriver: true,
-      duration: 450, // Aumenta a duração para 450ms
+      duration: 300,
     }).start(() => {
       // Após a animação, atualiza o filtro e fecha o modal
       setStatusFiltro(status);
       setFiltroModalVisible(false);
       setIsFiltering(false); // Esconde o indicador
     });
-  };
+  }, [modalTranslateX]);
 
   // Função para fechar o modal ao tocar no overlay
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     Animated.timing(modalTranslateX, {
       toValue: screenWidth,
       useNativeDriver: true,
-      duration: 450, // Aumenta a duração para 450ms
+      duration: 300,
     }).start(() => {
       // Apenas fecha o modal após a animação
       setFiltroModalVisible(false);
     });
-  }
+  }, [modalTranslateX]);
 
   // Listener de agendamentos em tempo real
   useEffect(() => {

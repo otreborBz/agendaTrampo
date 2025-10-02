@@ -8,11 +8,10 @@ import { colors } from './src/themes/colors/Colors';
 
 export default function App() {
   useEffect(() => {
-    // Inicializa o SDK do Google Mobile Ads
     mobileAds()
       .initialize()
       .then(adapterStatuses => {
-        console.log('SDK do Google Mobile Ads inicializado com sucesso!');
+        // console.log('SDK do Google Mobile Ads inicializado com sucesso!');
       });
   }, []);
 
@@ -41,6 +40,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.secondary,
-    // O padding para a status bar não é mais necessário aqui
   },
 });
