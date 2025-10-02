@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { useContext, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import CustomAlert from '../../components/customAlert/CustomAlert';
@@ -10,7 +10,8 @@ export default function Login() {
 
   const navigation = useNavigation();
 
-  const { signIn, loading } = useContext(AuthContext);
+  const { signIn } = useContext(AuthContext);
+  const [loadingLogin, setLoadingLogin] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,6 +35,7 @@ export default function Login() {
 
   // Função de login
   async function handleLogin() {
+    setLoadingLogin(true);
     if (email === '' || password === '') {
       setAlertInfo({
         title: 'Atenção',
@@ -59,8 +61,14 @@ export default function Login() {
         message: 'Ocorreu um erro inesperado ao fazer login.',
       });
       setAlertVisible(true);
+    } finally {
+      setLoadingLogin(false);
     }
   }
+
+  const goToTerms = useCallback(() => {
+    navigation.navigate("Terms");
+  }, [navigation]);
 
   return (
     <KeyboardAvoidingView
@@ -107,7 +115,7 @@ export default function Login() {
           activeOpacity={0.8}
           onPress={handleLogin}
         >
-          {loading ? (
+          {loadingLogin ? (
             <ActivityIndicator size="small" color="#FFF" />
           ) : (
             <Text style={styles.textButton}>Entrar</Text>
@@ -130,7 +138,7 @@ export default function Login() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.buttonTerms} activeOpacity={0.7} onPress={() => navigation.navigate('Terms')}>
+      <TouchableOpacity style={styles.buttonTerms} activeOpacity={0.7} onPress={goToTerms}>
         <Text style={styles.textButtonTerms}>Termos de uso</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>

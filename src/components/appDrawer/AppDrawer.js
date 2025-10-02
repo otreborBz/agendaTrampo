@@ -1,25 +1,31 @@
 import { Ionicons } from '@expo/vector-icons';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
-import { useContext } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { useContext, useState } from 'react';
+import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 import { AuthContext } from '../../contexts/Auth';
 import Agendamentos from '../../screens/agendamentos/Agendamentos';
 import Home from '../../screens/home/Home';
 import Sobre from "../../screens/sobre/Sobre";
 import { colors } from '../../themes/colors/Colors';
+import ActionAlert from '../actionAlert/actionAlert';
 import style from './styles';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
 function CustomDrawer(props) {
-  const { user, signOut } = useContext(AuthContext);
+  const { user, signOut, deleteAccount } = useContext(AuthContext);
+  const [actionAlertVisible, setActionAlertVisible] = useState(false);
 
   function getFirstName(fullName) {
     if (!fullName || typeof fullName !== 'string') return "Usuário";
     const firstName = fullName.split(" ")[0];
     return firstName.charAt(0).toUpperCase() + firstName.slice(1);
+  }
+
+  function handleDeleteAccount() {
+    setActionAlertVisible(true);
   }
 
   return (
@@ -49,8 +55,38 @@ function CustomDrawer(props) {
             Sair
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleDeleteAccount} style={[style.rodapeContent, { marginTop: 10 }]}>
+          <Ionicons name="trash-outline" size={22} color={colors.error} />
+          <Text style={[style.rodapeText, { color: colors.error }]}>
+            Excluir Conta
+          </Text>
+        </TouchableOpacity>
       </View>
-    </View>
+
+      <ActionAlert
+        visible={actionAlertVisible}
+        title="Excluir Conta"
+        message="Você tem certeza que deseja excluir sua conta? Todos os seus dados, incluindo agendamentos, serão apagados permanentemente. Esta ação não pode ser desfeita."
+        onClose={() => setActionAlertVisible(false)}
+        actions={[
+          { text: "Cancelar", onPress: () => setActionAlertVisible(false) },
+          {
+            text: "Excluir",
+            destructive: true,
+            onPress: async () => {
+              setActionAlertVisible(false);
+              const result = await deleteAccount();
+              if (!result.success) {
+                // Usamos o Alert nativo para erros inesperados, pois é um fluxo secundário.
+                Alert.alert("Erro", result.message);
+              }
+              // Se for sucesso, o onAuthStateChanged cuidará de redirecionar o usuário.
+            },
+          },
+        ]}
+      />
+    </View >
   );
 }
 

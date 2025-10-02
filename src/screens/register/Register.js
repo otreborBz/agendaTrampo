@@ -21,7 +21,7 @@ export default function Register() {
   const { signUp, loading } = useContext(AuthContext);
   const navigation = useNavigation();
 
-  const [loadingRegister, setLoadingRegister] = useState(loading);
+  const [loadingRegister, setLoadingRegister] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

@@ -1,6 +1,7 @@
-import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, deleteUser, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebaseConnection';
+import { deleteUserData as deleteFirestoreUserData } from './firestoreService';
 
 /**
  * Autentica um usuário com email e senha e busca seus dados no Firestore.
@@ -102,5 +103,34 @@ export async function redefinirSenha(email) {
     return true;
   } catch (error) {
     throw new Error("Não foi possível redefinir a senha. Verifique o email digitado e tente novamente.");
+  }
+}
+
+/**
+ * Exclui a conta do usuário logado e todos os seus dados.
+ * Requer que o usuário tenha feito login recentemente.
+ * @returns {Promise<void>}
+ * @throws {Error} Lança um erro com uma mensagem amigável em caso de falha.
+ */
+export async function deleteUserAccount() {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("Nenhum usuário logado para excluir.");
+  }
+
+  try {
+    // 1. Excluir todos os dados do usuário no Firestore
+    await deleteFirestoreUserData(user.uid);
+
+    // 2. Excluir o usuário do Firebase Authentication
+    await deleteUser(user);
+
+  } catch (error) {
+    console.error("Erro ao excluir conta do usuário:", error);
+    if (error.code === 'auth/requires-recent-login') {
+      throw new Error("Esta é uma operação sensível. Por favor, faça login novamente antes de excluir sua conta.");
+    }
+    throw new Error("Não foi possível excluir a conta. Tente novamente mais tarde.");
   }
 }

@@ -4,7 +4,7 @@ import { createContext, useEffect, useState } from "react";
 import { auth, db } from "../services/firebase/firebaseConnection";
 
 import { saveTermsAcceptance } from "../services/firebase/firestoreService";
-import { logoutUser, signInUser, signUpUser, validarSenha } from "../services/firebase/userService";
+import { deleteUserAccount, logoutUser, signInUser, signUpUser, validarSenha } from "../services/firebase/userService";
 
 const TERMS_VERSION = "1.0";
 
@@ -90,6 +90,19 @@ function AuthProvider({ children }) {
     }
   }
 
+  // Excluir conta do usuário
+  async function deleteAccount() {
+    setLoading(true);
+    try {
+      await deleteUserAccount();
+      return { success: true };
+    } catch (error) {
+      return { success: false, message: error.message };
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -98,7 +111,8 @@ function AuthProvider({ children }) {
         initializing,
         signUp,
         signIn,
-        signOut
+        signOut,
+        deleteAccount
       }}
     >
       {children}
