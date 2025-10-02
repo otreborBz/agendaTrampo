@@ -229,4 +229,18 @@ export default StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+
+  // Estilos para o modal de loading pós-anúncio
+  loadingModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+  loadingModalText: {
+    marginTop: 15,
+    fontSize: 16,
+    color: colors.white,
+    fontWeight: '600',
+  },
 });

@@ -35,7 +35,7 @@ export default function Sobre() {
             <Ionicons name="mail-outline" size={20} color={colors.primary} />
             <Text style={styles.contactBtnText}>E-mail</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('https://agendatrampo.com')} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('https://otreborbz.github.io/agendatrampopage/')} activeOpacity={0.7}>
             <Ionicons name="globe-outline" size={20} color={colors.primary} />
             <Text style={styles.contactBtnText}>Website</Text>
           </TouchableOpacity>

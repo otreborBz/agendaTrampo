@@ -40,6 +40,7 @@ export default function Agendamentos({ route, navigation }) {
   const [modalEnderecoVisible, setModalEnderecoVisible] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // Novo estado para o loading pós-anúncio
 
   // --- Alerts ---
   const [alertVisible, setAlertVisible] = useState(false);
@@ -103,6 +104,7 @@ export default function Agendamentos({ route, navigation }) {
   // --- Recarrega anúncio ao ser fechado ---
   useEffect(() => {
     if (isClosed) {
+      setIsSaving(false); // Desativa o loading
       // Após o anúncio ser fechado, mostra o alerta de sucesso e prepara para voltar
       setAlertInfo({ title: "Sucesso", message: `Agendamento ${agendamentoEdit ? 'atualizado' : 'cadastrado'}!` });
       setOnAlertCloseAction(() => () => navigation.goBack());
@@ -110,7 +112,7 @@ export default function Agendamentos({ route, navigation }) {
       // Recarrega o anúncio para a próxima vez
       load();
     }
-  }, [isClosed, load]);
+  }, [isClosed, load, navigation, agendamentoEdit]);
 
   // --- Monitoramento de erros do anúncio ---
   useEffect(() => {
@@ -130,6 +132,7 @@ export default function Agendamentos({ route, navigation }) {
       await salvarAgendamento({ nomeCliente, telefone, dataHora, servico, valor, endereco, status, uid: user.uid }, agendamentoEdit?.id);
 
       if (isLoaded) {
+        setIsSaving(true); // Ativa o loading
         show(); // mostra anúncio
       } else {
         // Se o anúncio não carregou, mostra o alerta de sucesso diretamente
@@ -265,6 +268,17 @@ export default function Agendamentos({ route, navigation }) {
           setOnAlertCloseAction(null);
         }}
       />
+      {/* Modal de Loading para aguardar o fechamento do anúncio */}
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isSaving}
+      >
+        <View style={styles.loadingModalContainer}>
+          <ActivityIndicator size="large" color={colors.white} />
+          <Text style={styles.loadingModalText}>Finalizando agendamento...</Text>
+        </View>
+      </Modal>
       <ScrollView style={{ flex: 1, paddingHorizontal: 20 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
         <View style={{ alignItems: 'center' }}>
           <Text style={styles.headerTitle}>{agendamentoEdit ? 'Editar Agendamento' : 'Novo Agendamento'}</Text>
