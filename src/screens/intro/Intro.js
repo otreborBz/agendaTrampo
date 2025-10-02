@@ -24,7 +24,7 @@ export default function Intro() {
                     <Text style={styles.buttonText}>Continuar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity>
-                    <Text style={styles.buttonContainerText}> CodeBr | Roberto Carvalho</Text>
+                    <Text style={styles.buttonContainerText}> CodeBr</Text>
                 </TouchableOpacity>
             </View>
         </View>

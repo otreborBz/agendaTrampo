@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/screens/intro/Intro.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1759367232040,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1759367232040,
+            "name": "Commit-0",
+            "content": "import { useNavigation } from '@react-navigation/native';\r\nimport { Image, Text, TouchableOpacity, View } from 'react-native';\r\n\r\nimport styles from './styles';\r\n\r\nexport default function Intro() {\r\n    const navigation = useNavigation();\r\n\r\n    function gotoScreen() {\r\n        navigation.navigate('Login');\r\n    }\r\n\r\n    return (\r\n        <View style={styles.container}>\r\n            <Image\r\n                source={require('../../../assets/iconName.png')}\r\n                style={styles.logo}\r\n            />\r\n            <Text style={styles.slogan}>\r\n                Organize seus trabalhos, conquiste seus clientes.\r\n            </Text>\r\n            <View style={styles.buttonContainer}>\r\n                <TouchableOpacity style={styles.button} onPress={gotoScreen}>\r\n                    <Text style={styles.buttonText}>Continuar</Text>\r\n                </TouchableOpacity>\r\n                <TouchableOpacity>\r\n                    <Text style={styles.buttonContainerText}> CodeBr</Text>\r\n                </TouchableOpacity>\r\n            </View>\r\n        </View>\r\n    )\r\n}"
+        }
+    ]
+}

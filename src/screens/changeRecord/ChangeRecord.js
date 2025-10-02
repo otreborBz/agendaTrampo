@@ -60,6 +60,7 @@ export default function ChangeRecord(){
                     value={email}
                     onChangeText={(text) => setEmail(text)}
                     placeholder='Email'
+                    placeholderTextColor={"#869ab0"}
                     style={styles.textInput}
                     keyboardType="email-address"
                     autoCapitalize="none"

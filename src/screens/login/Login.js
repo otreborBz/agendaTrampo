@@ -82,6 +82,7 @@ export default function Login() {
           value={email}
           onChangeText={setEmail}
           placeholder='Email'
+          placeholderTextColor={"#869ab0"}
           style={styles.textInput}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -92,6 +93,7 @@ export default function Login() {
             value={password}
             onChangeText={setPassword}
             placeholder='Senha'
+            placeholderTextColor={"#869ab0"}
             style={styles.passwordInput}
             secureTextEntry={!isPasswordVisible}
             autoCapitalize="none"

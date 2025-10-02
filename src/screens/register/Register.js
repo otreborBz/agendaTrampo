@@ -83,6 +83,7 @@ export default function Register() {
           value={name}
           onChangeText={(text) => setName(text)}
           placeholder="Nome completo"
+          placeholderTextColor={"#869ab0"}
           style={styles.textInput}
           autoCapitalize="words"
           autoCorrect={false}
@@ -91,6 +92,7 @@ export default function Register() {
           value={email}
           onChangeText={(text) => setEmail(text)}
           placeholder="Email"
+          placeholderTextColor={"#869ab0"}
           style={styles.textInput}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -100,6 +102,7 @@ export default function Register() {
           value={password}
           onChangeText={(text) => setPassword(text)}
           placeholder="Senha"
+          placeholderTextColor={"#869ab0"}
           style={styles.textInput}
           secureTextEntry={true}
           autoCapitalize="none"
