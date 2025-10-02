@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 11,
+            "activePatchIndex": 14,
             "patches": [
                 {
                     "date": 1759039344349,
@@ -51,6 +51,18 @@
                 },
                 {
                     "date": 1759433187800,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,14 +7,14 @@\n  * - Em produção, substitua pelo seu ID real do AdMob\r\n  */\r\n export const adUnitId = __DEV__\r\n   ? TestIds.BANNER\r\n-  : 'ca-app-pub-9122146481221602/7222476631'; // ✅ substitua pelo seu ID real\r\n+  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; // ✅ substitua pelo seu ID real\r\n \r\n /**\r\n  * Interstitial Ad Unit ID\r\n  * - Em desenvolvimento (__DEV__), usa TestIds.INTERSTITIAL\r\n  * - Em produção, substitua pelo seu ID real do AdMob\r\n  */\r\n export const adUnitIdInterstitial = __DEV__\r\n   ? TestIds.INTERSTITIAL\r\n-  : 'ca-app-pub-9122146481221602/7214737772'; // ✅ substitua pelo seu ID real\r\n+  : 'ca-app-pub-xxxxxxxxxxxxxxxx/zzzzzzzzzz'; // ✅ substitua pelo seu ID real\r\n"
+                },
+                {
+                    "date": 1759439958429,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,9 +7,9 @@\n  * - Em produção, substitua pelo seu ID real do AdMob\r\n  */\r\n export const adUnitId = __DEV__\r\n   ? TestIds.BANNER\r\n-  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; // ✅ substitua pelo seu ID real\r\n+  : 'ca-app-pub-9122146481221602/7222476631'; // ✅ substitua pelo seu ID real\r\n \r\n /**\r\n  * Interstitial Ad Unit ID\r\n  * - Em desenvolvimento (__DEV__), usa TestIds.INTERSTITIAL\r\n"
+                },
+                {
+                    "date": 1759439972260,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,5 +16,5 @@\n  * - Em produção, substitua pelo seu ID real do AdMob\r\n  */\r\n export const adUnitIdInterstitial = __DEV__\r\n   ? TestIds.INTERSTITIAL\r\n-  : 'ca-app-pub-xxxxxxxxxxxxxxxx/zzzzzzzzzz'; // ✅ substitua pelo seu ID real\r\n+  : 'ca-app-pub-9122146481221602/7214737772'; // ✅ substitua pelo seu ID real\r\n"
+                },
+                {
+                    "date": 1759444421216,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,14 +7,14 @@\n  * - Em produção, substitua pelo seu ID real do AdMob\r\n  */\r\n export const adUnitId = __DEV__\r\n   ? TestIds.BANNER\r\n-  : 'ca-app-pub-9122146481221602/7222476631'; // ✅ substitua pelo seu ID real\r\n+  : 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'; // ✅ substitua pelo seu ID real\r\n \r\n /**\r\n  * Interstitial Ad Unit ID\r\n  * - Em desenvolvimento (__DEV__), usa TestIds.INTERSTITIAL\r\n  * - Em produção, substitua pelo seu ID real do AdMob\r\n  */\r\n export const adUnitIdInterstitial = __DEV__\r\n   ? TestIds.INTERSTITIAL\r\n-  : 'ca-app-pub-9122146481221602/7214737772'; // ✅ substitua pelo seu ID real\r\n+  : 'ca-app-pub-xxxxxxxxxxxxxxxx/zzzzzzzzzz'; // ✅ substitua pelo seu ID real\r\n"
                 }
             ],
